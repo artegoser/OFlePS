@@ -124,4 +124,9 @@ dist
 .yarn/unplugged
 .yarn/build-state.yml
 .yarn/install-state.gz
-.pnp.*
+.pnp.\*
+
+#prisma
+prisma/migrations
+prisma/dev.db
+prisma/dev.db-journal
