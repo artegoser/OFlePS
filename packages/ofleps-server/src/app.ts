@@ -1,9 +1,8 @@
-import { IConfigService } from "./config/config.interface";
 import { ConfigService } from "./config/config.service";
 import { PrismaClient } from "@prisma/client";
 
 class App {
-  config: IConfigService;
+  config: ConfigService;
   prisma: PrismaClient;
   constructor() {
     this.config = new ConfigService();

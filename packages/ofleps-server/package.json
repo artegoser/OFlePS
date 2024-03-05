@@ -1,0 +1,31 @@
+{
+  "name": "ofleps-server",
+  "version": "1.0.0",
+  "description": "Open and Flexible Payment System",
+  "main": "dist/app.js",
+  "private": true,
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "tsc",
+    "dev": "tsc-watch --onSuccess \"node ./dist/app.js\"",
+    "start": "node dist/app.js",
+    "build-proto": "protoc --plugin=../../node_modules/.bin/protoc-gen-ts_proto.cmd --ts_proto_out=./dist --ts_proto_opt=outputServices=grpc-js --ts_proto_opt=esModuleInterop=true -I=src/ ./src/service.proto"
+  },
+  "keywords": [],
+  "author": "artegoser",
+  "license": "GPL-3.0-or-later",
+  "devDependencies": {
+    "@types/node": "^20.6.2",
+    "@typescript-eslint/eslint-plugin": "^6.7.0",
+    "@typescript-eslint/parser": "^6.7.0",
+    "eslint": "^8.49.0",
+    "prisma": "^5.3.1",
+    "tsc-watch": "^6.0.4",
+    "typescript": "^5.2.2"
+  },
+  "dependencies": {
+    "@prisma/client": "^5.10.2",
+    "dotenv": "^16.3.1",
+    "number-precision": "^1.6.0"
+  }
+}
