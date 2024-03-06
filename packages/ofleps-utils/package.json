@@ -1,0 +1,15 @@
+{
+  "name": "ofleps-utils",
+  "version": "1.0.0",
+  "description": "",
+  "main": "dist/lib.js",
+  "types": "dist/lib.d.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "tsc"
+  },
+  "dependencies": {},
+  "keywords": [],
+  "author": "artegoser",
+  "license": "GPL-3.0-or-later"
+}

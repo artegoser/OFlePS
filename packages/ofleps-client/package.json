@@ -4,15 +4,19 @@
   "description": "",
   "main": "dist/lib.js",
   "types": "dist/lib.d.ts",
+  "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "btest": "npm run build && npm run test",
+    "test": "node dist/test.js",
     "build": "tsc"
   },
   "dependencies": {
+    "@noble/hashes": "^1.3.3",
+    "@trpc/client": "^10.45.1",
     "ofleps-server": "../ofleps-server",
-    "@trpc/client": "^10.45.1"
+    "ofleps-utils": "../ofleps-utils"
   },
   "keywords": [],
-  "author": "",
+  "author": "artegoser",
   "license": "GPL-3.0-or-later"
 }
