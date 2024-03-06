@@ -14,18 +14,19 @@
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 import { router, publicProcedure } from "./trpc";
-import app from "./config/app.service";
+import { config, db } from "./config/app.service";
 import { createHTTPServer } from "@trpc/server/adapters/standalone";
 import { z } from "zod";
 
 const appRouter = router({
-  transactions: publicProcedure.query(() => {
-    const transactions = app.prisma.transaction.findMany();
-    if (transactions) {
-      return transactions;
-    }
-    return;
-  }),
+  transactions: publicProcedure
+    .input(z.object({ from: z.number(), to: z.number() }))
+    .query(({ input }) => {
+      return db.transaction.findMany({
+        skip: input.from,
+        take: input.to - input.from,
+      });
+    }),
 });
 
 const server = createHTTPServer({

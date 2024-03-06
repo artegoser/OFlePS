@@ -16,14 +16,5 @@
 import { ConfigService } from "./config.service";
 import { PrismaClient } from "@prisma/client";
 
-class App {
-  config: ConfigService;
-  prisma: PrismaClient;
-  constructor() {
-    this.config = new ConfigService();
-    this.prisma = new PrismaClient();
-  }
-}
-
-const app = new App();
-export default app;
+export const db = new PrismaClient();
+export const config = new ConfigService();

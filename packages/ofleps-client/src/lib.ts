@@ -1,7 +1,7 @@
 import type { AppRouter } from "ofleps-server";
 import { createTRPCProxyClient, httpBatchLink } from "@trpc/client";
 
-export default function Client(baseUrl: string) {
+function createTRPC(baseUrl: string) {
   return createTRPCProxyClient<AppRouter>({
     links: [
       httpBatchLink({
@@ -9,4 +9,15 @@ export default function Client(baseUrl: string) {
       }),
     ],
   });
+}
+
+export default class Client {
+  private _t;
+  constructor(baseUrl: string) {
+    this._t = createTRPC(baseUrl);
+  }
+
+  transactions(from: number, to: number) {
+    return this._t.transactions.query({ from, to });
+  }
 }
