@@ -10,7 +10,11 @@ const ofleps = new Client("http://localhost:3000");
     publicKey: ofleps.publicKey,
   });
 
-  const resp = await ofleps.registerUser("test", "test@gmail.com");
+  const resp = await ofleps.registerUser("test", "tester1@gmail.com");
 
   console.log(resp);
+
+  const resp2 = await ofleps.createAccount("test", "test", "USD");
+
+  console.log(resp2);
 })();

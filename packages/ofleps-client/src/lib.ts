@@ -75,7 +75,7 @@ export default class Client {
     return this._t.currencies.getBySymbol.query(symbol);
   }
 
-  registerUser(name: string, email: string) {
+  async registerUser(name: string, email: string) {
     if (!this._privateKey || !this._publicKey) {
       throw this._noPrivateKey;
     }
@@ -85,12 +85,16 @@ export default class Client {
       this._privateKey
     );
 
-    return this._t.user.register.mutate({
+    const resp = await this._t.user.register.mutate({
       name,
       email,
       publicKey: this._publicKey,
       signature: sign,
     });
+
+    this._userId = resp.id;
+
+    return resp;
   }
 
   async login(id: string, privateKey: HexString) {
