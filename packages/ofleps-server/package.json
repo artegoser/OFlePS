@@ -18,9 +18,7 @@
   },
   "dependencies": {
     "ofleps-utils": "../ofleps-utils",
-    "@trpc/client": "^10.45.1",
     "@prisma/client": "^5.10.2",
-    "@trpc/server": "^10.45.1",
     "dotenv": "^16.3.1",
     "number-precision": "^1.6.0",
     "zod": "^3.22.4"

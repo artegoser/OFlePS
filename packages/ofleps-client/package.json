@@ -11,8 +11,6 @@
     "build": "tsc"
   },
   "dependencies": {
-    "@noble/hashes": "^1.3.3",
-    "@trpc/client": "^10.45.1",
     "ofleps-server": "../ofleps-server",
     "ofleps-utils": "../ofleps-utils"
   },

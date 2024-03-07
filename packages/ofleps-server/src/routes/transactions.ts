@@ -13,19 +13,16 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-import Client from "./lib.js";
+import { router, publicProcedure } from "../config/trpc.js";
+import { z } from "zod";
+import core from "../core/main.js";
 
-const ofleps = new Client("http://localhost:3000");
+const transactions = router({
+  get: publicProcedure
+    .input(z.object({ from: z.number(), to: z.number() }))
+    .query(({ input }) => {
+      return core.transactions.getTransactions(input.from, input.to);
+    }),
+});
 
-(async () => {
-  ofleps.generateKeyPair();
-
-  console.log({
-    privateKey: ofleps.privateKey,
-    publicKey: ofleps.publicKey,
-  });
-
-  const resp = await ofleps.registerUser("test", "test@gmail.com");
-
-  console.log(resp);
-})();
+export default transactions;

@@ -13,35 +13,18 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-import { router, publicProcedure } from "./trpc.js";
+import { router, publicProcedure } from "./config/trpc.js";
 import { config, db } from "./config/app.service.js";
 import { createHTTPServer } from "@trpc/server/adapters/standalone";
 import core from "./core/main.js";
+
 import { z } from "zod";
+import user from "./routes/user.js";
+import transactions from "./routes/transactions.js";
 
 const appRouter = router({
-  transactions: publicProcedure
-    .input(z.object({ from: z.number(), to: z.number() }))
-    .query(({ input }) => {
-      return core.transactions.getTransactions(input.from, input.to);
-    }),
-  user: publicProcedure
-    .input(
-      z.object({
-        name: z.string(),
-        email: z.string(),
-        publicKey: z.string(),
-        signature: z.string(),
-      })
-    )
-    .mutation(({ input }) => {
-      return core.user.registerUser(
-        input.name,
-        input.email,
-        input.publicKey,
-        input.signature
-      );
-    }),
+  transactions,
+  user,
 });
 
 const server = createHTTPServer({

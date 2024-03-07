@@ -1,19 +1,15 @@
 import { db } from "../config/app.service.js";
-import * as ed from "@noble/ed25519";
-import { decode, encode, stringify } from "ofleps-utils";
+import { HexString, decode, encode, stringify } from "ofleps-utils";
 import { BadRequestError } from "../errors/main.js";
+import { ec } from "ofleps-utils";
 
 export async function registerUser(
   name: string,
   email: string,
-  publicKey: string,
-  signature: string
+  publicKey: HexString,
+  signature: HexString
 ) {
-  const pKey = ed.etc.hexToBytes(publicKey);
-  const sign = ed.etc.hexToBytes(signature);
-  const message = encode(stringify({ name, email, publicKey }));
-
-  if (!(await ed.verifyAsync(sign, message, pKey))) {
+  if (!ec.verify(signature, { name, email, publicKey }, publicKey)) {
     throw new BadRequestError("Invalid signature");
   }
 

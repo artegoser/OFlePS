@@ -13,19 +13,29 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-import Client from "./lib.js";
+import { router, publicProcedure } from "../config/trpc.js";
+import { z } from "zod";
+import { HexString } from "ofleps-utils";
+import core from "../core/main.js";
 
-const ofleps = new Client("http://localhost:3000");
+const user = router({
+  register: publicProcedure
+    .input(
+      z.object({
+        name: z.string(),
+        email: z.string(),
+        publicKey: z.string(),
+        signature: z.string(),
+      })
+    )
+    .mutation(({ input }) => {
+      return core.user.registerUser(
+        input.name,
+        input.email,
+        input.publicKey as HexString,
+        input.signature as HexString
+      );
+    }),
+});
 
-(async () => {
-  ofleps.generateKeyPair();
-
-  console.log({
-    privateKey: ofleps.privateKey,
-    publicKey: ofleps.publicKey,
-  });
-
-  const resp = await ofleps.registerUser("test", "test@gmail.com");
-
-  console.log(resp);
-})();
+export default user;

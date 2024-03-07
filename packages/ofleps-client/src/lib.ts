@@ -1,16 +1,28 @@
+// Copyright (c) 2024 artegoser (Artemy Egorov)
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program. If not, see <https://www.gnu.org/licenses/>.
+
 import type { AppRouter } from "ofleps-server";
 import { createTRPCProxyClient, httpBatchLink } from "@trpc/client";
-import * as ed from "@noble/ed25519";
-import { stringify, encode } from "ofleps-utils";
 
-import { sha512 } from "@noble/hashes/sha512";
-ed.etc.sha512Sync = (...m) => sha512(ed.etc.concatBytes(...m));
+import { ec, HexString } from "ofleps-utils";
 
 export default class Client {
   private _t;
-  private _privateKey?: string;
-  private _publicKey?: string;
-  constructor(baseUrl: string, privateKey?: string) {
+  private _privateKey?: HexString;
+  private _publicKey?: HexString;
+  constructor(baseUrl: string, privateKey?: HexString) {
     this._t = createTRPCProxyClient<AppRouter>({
       links: [
         httpBatchLink({
@@ -20,7 +32,7 @@ export default class Client {
     });
 
     if (privateKey) {
-      this._setPrivateKey(privateKey);
+      this.setPrivateKey(privateKey);
     }
   }
 
@@ -33,43 +45,43 @@ export default class Client {
   }
 
   generateKeyPair() {
-    const privateKey = ed.utils.randomPrivateKey();
-    const publicKey = ed.getPublicKey(privateKey);
+    const privateKey = ec.getRandomPrivateKey();
+    const publicKey = ec.getPublicKey(privateKey);
 
-    this._privateKey = ed.etc.bytesToHex(privateKey);
-    this._publicKey = ed.etc.bytesToHex(publicKey);
+    this._privateKey = privateKey;
+    this._publicKey = publicKey;
 
-    return { privateKey: this._privateKey, publicKey: this._publicKey };
+    return { privateKey, publicKey };
   }
 
-  private _setPrivateKey(privateKey: string) {
-    const publicKey = ed.getPublicKey(ed.etc.hexToBytes(privateKey));
+  setPrivateKey(privateKey: HexString) {
+    const publicKey = ec.getPublicKey(privateKey);
+
     this._privateKey = privateKey;
-    this._publicKey = ed.etc.bytesToHex(publicKey);
+    this._publicKey = publicKey;
 
     return this._publicKey;
   }
 
   transactions(from: number, to: number) {
-    return this._t.transactions.query({ from, to });
+    return this._t.transactions.get.query({ from, to });
   }
 
-  createUser(name: string, email: string) {
+  registerUser(name: string, email: string) {
     if (!this._privateKey || !this._publicKey) {
-      throw new Error("No private key");
+      throw new Error("No private key, generate or set first");
     }
 
-    const message = encode(
-      stringify({ name, email, publicKey: this._publicKey })
+    const sign = ec.sign(
+      { name, email, publicKey: this._publicKey },
+      this._privateKey
     );
 
-    const sign = ed.sign(message, ed.etc.hexToBytes(this._privateKey));
-
-    return this._t.user.mutate({
+    return this._t.user.register.mutate({
       name,
       email,
       publicKey: this._publicKey,
-      signature: ed.etc.bytesToHex(sign),
+      signature: sign,
     });
   }
 }
