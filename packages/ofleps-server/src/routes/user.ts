@@ -36,13 +36,18 @@ const user = router({
         input.signature as HexString
       );
     }),
-  getUserById: publicProcedure.input(z.string()).query(({ input }) => {
+  get: publicProcedure
+    .input(z.object({ from: z.number(), to: z.number() }))
+    .query(({ input }) => {
+      return core.user.getUsers(input.from, input.to);
+    }),
+  getById: publicProcedure.input(z.string()).query(({ input }) => {
     return core.user.getUserById(input);
   }),
-  getUserByEmail: publicProcedure.input(z.string()).query(({ input }) => {
+  getByEmail: publicProcedure.input(z.string()).query(({ input }) => {
     return core.user.getUserByEmail(input);
   }),
-  getUserByPublicKey: publicProcedure.input(z.string()).query(({ input }) => {
+  getByPublicKey: publicProcedure.input(z.string()).query(({ input }) => {
     return core.user.getUserByPublicKey(input as HexString);
   }),
 });
