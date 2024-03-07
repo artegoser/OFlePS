@@ -8,39 +8,38 @@ datasource db {
 }
 
 model User {
-  id            String          @id @default(cuid())
-  email         String          @unique
-  publicKey     String          @unique
-  name          String
-  accounts      Account[]
-  SmartContract SmartContract[]
+  id             String          @id @default(cuid())
+  email          String          @unique
+  publicKey      String          @unique
+  name           String
+  accounts       Account[]
+  SmartContracts SmartContract[]
 }
 
 model Account {
-  id       String @id @default(cuid())
-  currency String
-  balance  Float
-  User     User   @relation(fields: [userId], references: [id])
-  userId   String
+  id             String @id @default(cuid())
+  name           String @unique
+  description    String @default("")
+  currencySymbol String
+  balance        Float
+  userId         String
 
+  User                 User          @relation(fields: [userId], references: [id])
   transactionSender    Transaction[] @relation("TransactionSender")
   transactionRecipient Transaction[] @relation("TransactionRecipient")
-
-  @@unique([userId, currency])
+  currency             Currency      @relation(fields: [currencySymbol], references: [symbol])
 }
 
 model Transaction {
-  id String @id @default(cuid())
-
-  amount Float
-  type   String
-
+  id          String @id @default(cuid())
+  amount      Float
+  type        String
   senderId    String
   recipientId String
   signature   String
 
   comment String   @default("")
-  date    DateTime
+  date    DateTime @default(now())
 
   sender    Account @relation(name: "TransactionSender", fields: [senderId], references: [id])
   recipient Account @relation(name: "TransactionRecipient", fields: [recipientId], references: [id])
@@ -48,9 +47,11 @@ model Transaction {
 
 model Currency {
   symbol      String @id
-  name        String
+  name        String @unique
   description String
   type        String @default("fiat")
+
+  Accounts Account[]
 }
 
 model SmartContract {

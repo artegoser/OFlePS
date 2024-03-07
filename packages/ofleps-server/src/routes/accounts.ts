@@ -15,36 +15,32 @@
 
 import { router, publicProcedure } from "../config/trpc.js";
 import { z } from "zod";
-import { HexString } from "ofleps-utils";
 import core from "../core/main.js";
+import { HexString } from "ofleps-utils";
 
-const user = router({
-  register: publicProcedure
+const accounts = router({
+  getById: publicProcedure.input(z.string()).query(({ input }) => {
+    return core.account.getAccountById(input);
+  }),
+  create: publicProcedure
     .input(
       z.object({
         name: z.string(),
-        email: z.string(),
-        publicKey: z.string(),
+        description: z.string(),
+        currencySymbol: z.string(),
+        userId: z.string(),
         signature: z.string(),
       })
     )
     .mutation(({ input }) => {
-      return core.user.registerUser(
-        input.name,
-        input.email,
-        input.publicKey as HexString,
-        input.signature as HexString
-      );
+      return core.account.createAccount({
+        name: input.name,
+        description: input.description,
+        currencySymbol: input.currencySymbol,
+        userId: input.userId,
+        signature: input.signature as HexString,
+      });
     }),
-  getUserById: publicProcedure.input(z.string()).query(({ input }) => {
-    return core.user.getUserById(input);
-  }),
-  getUserByEmail: publicProcedure.input(z.string()).query(({ input }) => {
-    return core.user.getUserByEmail(input);
-  }),
-  getUserByPublicKey: publicProcedure.input(z.string()).query(({ input }) => {
-    return core.user.getUserByPublicKey(input as HexString);
-  }),
 });
 
-export default user;
+export default accounts;

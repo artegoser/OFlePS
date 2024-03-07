@@ -13,29 +13,19 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-import { router } from "./config/trpc.js";
-import { config } from "./config/app.service.js";
-import { createHTTPServer } from "@trpc/server/adapters/standalone";
+import { router, publicProcedure } from "../config/trpc.js";
+import { z } from "zod";
+import core from "../core/main.js";
 
-import user from "./routes/user.js";
-import transactions from "./routes/transactions.js";
-import accounts from "./routes/accounts.js";
-import currencies from "./routes/currencies.js";
-
-const appRouter = router({
-  transactions,
-  user,
-  accounts,
-  currencies,
+const currencies = router({
+  getBySymbol: publicProcedure.input(z.string()).query(({ input }) => {
+    return core.currencies.getCurrencyBySymbol(input);
+  }),
+  get: publicProcedure
+    .input(z.object({ from: z.number(), to: z.number() }))
+    .query(({ input }) => {
+      return core.currencies.getCurrencies(input.from, input.to);
+    }),
 });
 
-const server = createHTTPServer({
-  router: appRouter,
-});
-
-server.listen(config.port, config.host);
-console.log(`server is running at ${config.host}:${config.port}`);
-
-// Export type router type signature,
-// NOT the router itself.
-export type AppRouter = typeof appRouter;
+export default currencies;

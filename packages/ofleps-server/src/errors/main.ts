@@ -31,8 +31,12 @@ export abstract class OflepsError extends TRPCError {
 }
 
 export class NotFoundError extends OflepsError {
-  constructor() {
-    super("NOT_FOUND", "Not found", "The requested resource was not found");
+  constructor(message: string) {
+    super(
+      "NOT_FOUND",
+      "Not found",
+      `The requested resource was not found: ${message}`
+    );
   }
 }
 

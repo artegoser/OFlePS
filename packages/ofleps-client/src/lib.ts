@@ -22,7 +22,8 @@ export default class Client {
   private _t;
   private _privateKey?: HexString;
   private _publicKey?: HexString;
-  constructor(baseUrl: string, privateKey?: HexString) {
+  private _userId?: string;
+  constructor(baseUrl: string, privateKey?: HexString, userId?: string) {
     this._t = createTRPCProxyClient<AppRouter>({
       links: [
         httpBatchLink({
@@ -34,6 +35,10 @@ export default class Client {
     if (privateKey) {
       this.setPrivateKey(privateKey);
     }
+
+    if (userId) {
+      this._userId = userId;
+    }
   }
 
   get publicKey() {
@@ -42,6 +47,10 @@ export default class Client {
 
   get privateKey() {
     return this._privateKey;
+  }
+
+  get userId() {
+    return this._userId;
   }
 
   generateKeyPair() {
