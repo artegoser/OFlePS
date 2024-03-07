@@ -44,12 +44,9 @@ export default class Client {
     return this._userId;
   }
 
-  generateKeyPair() {
+  private _generateKeyPair() {
     const privateKey = ec.getRandomPrivateKey();
     const publicKey = ec.getPublicKey(privateKey);
-
-    this._privateKey = privateKey;
-    this._publicKey = publicKey;
 
     return { privateKey, publicKey };
   }
@@ -67,6 +64,21 @@ export default class Client {
     return this._t.transactions.get.query({ from, to });
   }
 
+  transfer(from: string, to: string, amount: number) {
+    if (!this._privateKey || !this._publicKey) {
+      throw this._noPrivateKey;
+    }
+
+    const sign = ec.sign({ from, to, amount }, this._privateKey);
+
+    return this._t.transactions.transfer.mutate({
+      from,
+      to,
+      amount,
+      signature: sign,
+    });
+  }
+
   getCurrencies(from: number, to: number) {
     return this._t.currencies.get.query({ from, to });
   }
@@ -77,7 +89,10 @@ export default class Client {
 
   async registerUser(name: string, email: string) {
     if (!this._privateKey || !this._publicKey) {
-      throw this._noPrivateKey;
+      const { privateKey, publicKey } = this._generateKeyPair();
+
+      this._privateKey = privateKey;
+      this._publicKey = publicKey;
     }
 
     const sign = ec.sign(

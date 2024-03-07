@@ -16,12 +16,32 @@
 import { router, publicProcedure } from "../config/trpc.js";
 import { z } from "zod";
 import core from "../core/main.js";
+import { HexString } from "ofleps-utils";
 
 const transactions = router({
   get: publicProcedure
     .input(z.object({ from: z.number(), to: z.number() }))
     .query(({ input }) => {
       return core.transactions.getTransactions(input.from, input.to);
+    }),
+  transfer: publicProcedure
+    .input(
+      z.object({
+        from: z.string(),
+        to: z.string(),
+        amount: z.number(),
+        signature: z.string(),
+        comment: z.string().optional(),
+      })
+    )
+    .mutation(({ input }) => {
+      return core.transactions.transfer(
+        input.from,
+        input.to,
+        input.amount,
+        input.signature as HexString,
+        input.comment
+      );
     }),
 });
 

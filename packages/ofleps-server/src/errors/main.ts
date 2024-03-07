@@ -45,6 +45,12 @@ export abstract class OflepsError extends TRPCError {
   }
 }
 
+export class ForbiddenError extends OflepsError {
+  constructor(message: string) {
+    super("FORBIDDEN", "Forbidden", `This action is forbidden: ${message}`);
+  }
+}
+
 export class NotFoundError extends OflepsError {
   constructor(message: string) {
     super(
