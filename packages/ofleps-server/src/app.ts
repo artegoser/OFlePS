@@ -17,12 +17,14 @@ import { router } from "./config/trpc.js";
 import { config } from "./config/app.service.js";
 import { createHTTPServer } from "@trpc/server/adapters/standalone";
 
+import root from "./routes/root.js";
 import user from "./routes/user.js";
 import transactions from "./routes/transactions.js";
 import accounts from "./routes/accounts.js";
 import currencies from "./routes/currencies.js";
 
 const appRouter = router({
+  root,
   transactions,
   user,
   accounts,

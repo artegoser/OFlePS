@@ -31,18 +31,18 @@ model Account {
 }
 
 model Transaction {
-  id          String @id @default(cuid())
-  amount      Float
-  type        String
-  senderId    String
-  recipientId String
-  signature   String
+  id        String @id @default(cuid())
+  amount    Float
+  type      String
+  from      String
+  to        String
+  signature String
 
   comment String   @default("")
   date    DateTime @default(now())
 
-  sender    Account @relation(name: "TransactionSender", fields: [senderId], references: [id])
-  recipient Account @relation(name: "TransactionRecipient", fields: [recipientId], references: [id])
+  sender    Account @relation(name: "TransactionSender", fields: [from], references: [id])
+  recipient Account @relation(name: "TransactionRecipient", fields: [to], references: [id])
 }
 
 model Currency {

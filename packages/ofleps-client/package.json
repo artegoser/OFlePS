@@ -7,7 +7,8 @@
   "type": "module",
   "scripts": {
     "btest": "npm run build && npm run test",
-    "test": "node dist/test.js",
+    "test": "node dist/tests/test.js",
+    "test:admin": "npm run build && node dist/tests/admin_init.js",
     "build": "tsc"
   },
   "dependencies": {

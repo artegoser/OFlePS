@@ -27,13 +27,19 @@ export function getTransactions(from: number, to: number) {
   });
 }
 
-export async function transfer(
-  from: string,
-  to: string,
-  amount: number,
-  signature: HexString,
-  comment?: string
-) {
+export async function transfer({
+  from,
+  to,
+  amount,
+  signature,
+  comment,
+}: {
+  from: string;
+  to: string;
+  amount: number;
+  signature: HexString;
+  comment?: string;
+}) {
   if (from === to) {
     throw new BadRequestError("You can't transfer money to same account");
   }
@@ -64,7 +70,7 @@ export async function transfer(
     if (
       !ec.verify(
         signature,
-        { from, to, amount, comment },
+        { from, to, amount, comment, type: "transfer" },
         sender.User.publicKey as HexString
       )
     ) {
@@ -95,8 +101,8 @@ export async function transfer(
         amount,
         type: "transfer",
         signature,
-        senderId: from,
-        recipientId: to,
+        from,
+        to,
         comment,
       },
     });

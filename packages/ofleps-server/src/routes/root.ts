@@ -18,25 +18,37 @@ import { z } from "zod";
 import core from "../core/main.js";
 import { HexString } from "ofleps-utils";
 
-const transactions = router({
-  get: publicProcedure
-    .input(z.object({ from: z.number(), to: z.number() }))
-    .query(({ input }) => {
-      return core.transactions.getTransactions(input.from, input.to);
-    }),
-  transfer: publicProcedure
+export const root = router({
+  addCurrency: publicProcedure
     .input(
       z.object({
-        from: z.string(),
-        to: z.string(),
-        amount: z.number(),
+        symbol: z.string(),
+        name: z.string(),
+        description: z.string(),
+        type: z.string().optional(),
         signature: z.string(),
-        comment: z.string().optional(),
       })
     )
     .mutation(({ input }) => {
-      return core.transactions.transfer({
-        from: input.from,
+      return core.root.addCurrency({
+        symbol: input.symbol,
+        name: input.name,
+        description: input.description,
+        type: input.type,
+        signature: input.signature as HexString,
+      });
+    }),
+  issue: publicProcedure
+    .input(
+      z.object({
+        to: z.string(),
+        amount: z.number(),
+        comment: z.string().optional(),
+        signature: z.string(),
+      })
+    )
+    .mutation(({ input }) => {
+      return core.root.issue({
         to: input.to,
         amount: input.amount,
         comment: input.comment,
@@ -45,4 +57,4 @@ const transactions = router({
     }),
 });
 
-export default transactions;
+export default root;

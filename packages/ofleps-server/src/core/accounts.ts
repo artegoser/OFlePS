@@ -14,7 +14,11 @@
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 import { db } from "../config/app.service.js";
-import { BadRequestError, NotFoundError } from "../errors/main.js";
+import {
+  BadRequestError,
+  ForbiddenError,
+  NotFoundError,
+} from "../errors/main.js";
 import { ec } from "ofleps-utils";
 import { getUserById } from "./user.js";
 import { getCurrencyBySymbol } from "./currencies.js";
@@ -52,7 +56,7 @@ export async function createAccount({
       user.publicKey as HexString
     )
   ) {
-    throw new BadRequestError("Invalid signature");
+    throw new ForbiddenError("Invalid signature");
   }
 
   return await db.account.create({

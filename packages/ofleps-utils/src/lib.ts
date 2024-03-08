@@ -31,18 +31,18 @@ export const ec = {
     return ed.etc.bytesToHex(bytes) as HexString;
   },
   getRandomPrivateKey(): HexString {
-    return ed.etc.bytesToHex(ed.utils.randomPrivateKey()) as HexString;
+    return this.b2h(ed.utils.randomPrivateKey()) as HexString;
   },
   getPublicKey(privateKey: HexString): HexString {
-    return ed.etc.bytesToHex(ed.getPublicKey(privateKey)) as HexString;
+    return this.b2h(ed.getPublicKey(privateKey)) as HexString;
   },
   sign(message: IECMessage, privateKey: HexString): HexString {
-    return ed.etc.bytesToHex(
+    return this.b2h(
       ed.sign(encode(stringify(message)), privateKey)
     ) as HexString;
   },
   signString(message: string, privateKey: HexString): HexString {
-    return ed.etc.bytesToHex(ed.sign(encode(message), privateKey)) as HexString;
+    return this.b2h(ed.sign(encode(message), privateKey)) as HexString;
   },
   verify(
     signature: HexString,
@@ -50,5 +50,11 @@ export const ec = {
     publicKey: HexString
   ): boolean {
     return ed.verify(signature, encode(stringify(message)), publicKey);
+  },
+  generateKeyPair() {
+    const privateKey = this.getRandomPrivateKey();
+    const publicKey = this.getPublicKey(privateKey);
+
+    return { privateKey, publicKey };
   },
 };

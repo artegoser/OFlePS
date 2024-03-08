@@ -14,7 +14,7 @@
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 import { db } from "../config/app.service.js";
-import { BadRequestError } from "../errors/main.js";
+import { ForbiddenError } from "../errors/main.js";
 import { ec } from "ofleps-utils";
 
 import type { HexString } from "ofleps-utils";
@@ -27,7 +27,7 @@ export async function registerUser(
   signature: HexString
 ) {
   if (!ec.verify(signature, { name, email, publicKey }, publicKey)) {
-    throw new BadRequestError("Invalid signature");
+    throw new ForbiddenError("Invalid signature");
   }
 
   return await db.user.create({ data: { name, email, publicKey } });

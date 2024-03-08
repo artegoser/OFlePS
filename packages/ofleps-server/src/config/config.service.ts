@@ -14,11 +14,13 @@
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 import { config } from "dotenv";
+import { HexString } from "ofleps-utils";
 
 export class ConfigService {
   public readonly db_url: string;
   public readonly host: string;
   public readonly port: number;
+  public readonly root_public_key: HexString;
 
   constructor() {
     config();
@@ -26,5 +28,11 @@ export class ConfigService {
     this.db_url = process.env.DATABASE_URL || "file:./dev.db";
     this.host = process.env.HOST || "0.0.0.0";
     this.port = Number(process.env.PORT) || 8080;
+
+    if (process.env.ROOT_PUBLIC_KEY === undefined) {
+      throw new Error("ROOT_PUBLIC_KEY is not defined, please set it");
+    }
+
+    this.root_public_key = process.env.ROOT_PUBLIC_KEY as HexString;
   }
 }
