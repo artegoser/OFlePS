@@ -1,7 +1,7 @@
 import type { AppRouter } from "ofleps-server";
 import { createTRPCProxyClient, httpBatchLink } from "@trpc/client";
 
-import { ec, HexString } from "ofleps-utils";
+import { ec, genSalt, HexString } from "ofleps-utils";
 import { ITransferArgs } from "./types/client.js";
 
 export default class Client {
@@ -72,8 +72,10 @@ export default class Client {
       throw this._noPrivateKey;
     }
 
-    const sign = ec.sign(
-      { from, to, amount, comment, type: "transfer" },
+    const salt = genSalt();
+
+    const signature = ec.sign(
+      { from, to, amount, comment, salt, type: "transfer" },
       this._privateKey
     );
 
@@ -82,7 +84,8 @@ export default class Client {
       to,
       amount,
       comment,
-      signature: sign,
+      salt,
+      signature,
     });
   }
 

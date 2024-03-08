@@ -1,7 +1,7 @@
 import type { AppRouter } from "ofleps-server";
 import { createTRPCProxyClient, httpBatchLink } from "@trpc/client";
 
-import { ec, HexString } from "ofleps-utils";
+import { ec, genSalt, HexString } from "ofleps-utils";
 
 export default class Root {
   private _t;
@@ -54,16 +54,27 @@ export default class Root {
    * @return {ReturnType} the result of the issue operation
    */
   issue(to: string, amount: number, comment?: string) {
+    const salt = genSalt();
+    const commentTx = `Issued by root${comment ? `: ${comment}` : ""}`;
+
     const sign = ec.sign(
-      { from: "root", to, amount, comment, type: "issue" },
+      {
+        from: "root",
+        to,
+        amount,
+        comment: commentTx,
+        salt,
+        type: "issue",
+      },
       this._privateKey
     );
 
     return this._t.root.issue.mutate({
       to,
       amount,
-      comment,
+      comment: commentTx,
       signature: sign,
+      salt,
     });
   }
 }

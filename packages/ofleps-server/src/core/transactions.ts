@@ -33,12 +33,14 @@ export async function transfer({
   amount,
   signature,
   comment,
+  salt,
 }: {
   from: string;
   to: string;
   amount: number;
   signature: HexString;
   comment?: string;
+  salt: string;
 }) {
   if (from === to) {
     throw new BadRequestError("You can't transfer money to same account");
@@ -47,8 +49,6 @@ export async function transfer({
   if (amount <= 0) {
     throw new BadRequestError("Amount must be > 0");
   }
-
-  const salt = genSalt();
 
   return db.$transaction(async (tx) => {
     const senderAccount = await tx.account.update({
@@ -84,7 +84,7 @@ export async function transfer({
     if (
       !ec.verify(
         signature,
-        { from, to, amount, comment, type: "transfer" },
+        { from, to, amount, comment, salt, type: "transfer" },
         senderAccount.User.publicKey as HexString
       )
     ) {
@@ -132,17 +132,7 @@ export async function transfer({
         from,
         to,
         comment,
-        signature: ec.sign(
-          {
-            from,
-            to,
-            amount,
-            comment,
-            type: "transfer",
-            salt,
-          },
-          config.server_private_key
-        ),
+        signature,
         salt,
       },
     });

@@ -45,6 +45,7 @@ export const root = router({
         amount: z.number(),
         comment: z.string().optional(),
         signature: z.string(),
+        salt: z.string(),
       })
     )
     .mutation(({ input }) => {
@@ -52,6 +53,7 @@ export const root = router({
         to: input.to,
         amount: input.amount,
         comment: input.comment,
+        salt: input.salt,
         signature: input.signature as HexString,
       });
     }),

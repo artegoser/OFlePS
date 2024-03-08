@@ -127,24 +127,23 @@ export async function issue({
   amount,
   comment,
   signature,
+  salt,
 }: {
   to: string;
   amount: number;
   comment?: string;
   signature: HexString;
+  salt: string;
 }) {
   if (
     !ec.verify(
       signature,
-      { from: "root", to, amount, comment, type: "issue" },
+      { from: "root", to, amount, comment, salt, type: "issue" },
       config.root_public_key
     )
   ) {
     throw invalidSign;
   }
-
-  const salt = genSalt();
-  const commentTx = `Issued by root${comment ? `: ${comment}` : ""}`;
 
   return db.$transaction([
     db.account.update({
@@ -163,20 +162,10 @@ export async function issue({
         from: to,
         to,
         amount,
-        comment: commentTx,
+        comment,
         type: "issue",
         salt,
-        signature: ec.sign(
-          {
-            from: to,
-            to,
-            amount,
-            comment: commentTx,
-            type: "issue",
-            salt,
-          },
-          config.server_private_key
-        ),
+        signature,
       },
     }),
   ]);
