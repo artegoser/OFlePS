@@ -44,7 +44,7 @@ model Transaction {
   to     String
 
   signature String
-  salt      Int    @unique
+  salt      String @unique
 
   comment String   @default("")
   date    DateTime @default(now())

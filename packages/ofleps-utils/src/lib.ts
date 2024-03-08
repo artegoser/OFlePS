@@ -15,6 +15,8 @@ export function stringify(obj: any) {
 
 import { sha512 } from "@noble/hashes/sha512";
 import * as ed from "@noble/ed25519";
+import { createId } from "@paralleldrive/cuid2";
+
 ed.etc.sha512Sync = (...m) => sha512(ed.etc.concatBytes(...m));
 
 export interface IECMessage {
@@ -28,7 +30,7 @@ export function hash(str: string) {
 }
 
 export function genSalt() {
-  return Math.floor(Math.random() * 100000);
+  return createId();
 }
 
 export const ec = {
