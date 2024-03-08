@@ -17,6 +17,62 @@ import { HexString, ec } from "ofleps-utils";
 import { db, config } from "../config/app.service.js";
 import { ForbiddenError } from "../errors/main.js";
 
+const invalidSign = new ForbiddenError("Invalid signature for root");
+
+export function setBlockUser(
+  userId: string,
+  block: boolean,
+  signature: HexString
+) {
+  if (!ec.verify(signature, { userId, block }, config.root_public_key)) {
+    throw invalidSign;
+  }
+
+  return db.user.update({
+    where: {
+      id: userId,
+    },
+    data: {
+      blocked: block,
+    },
+  });
+}
+export function approveUser(userId: string, signature: HexString) {
+  if (
+    !ec.verify(signature, { userId, approved: true }, config.root_public_key)
+  ) {
+    throw invalidSign;
+  }
+
+  return db.user.update({
+    where: {
+      id: userId,
+    },
+    data: {
+      approved: true,
+    },
+  });
+}
+
+export function setBlockAccount(
+  accountId: string,
+  block: boolean,
+  signature: HexString
+) {
+  if (!ec.verify(signature, { accountId, block }, config.root_public_key)) {
+    throw invalidSign;
+  }
+
+  return db.account.update({
+    where: {
+      id: accountId,
+    },
+    data: {
+      blocked: block,
+    },
+  });
+}
+
 export function addCurrency({
   symbol,
   name,
@@ -37,7 +93,7 @@ export function addCurrency({
       config.root_public_key
     )
   ) {
-    throw new ForbiddenError("Invalid signature for root");
+    throw invalidSign;
   }
 
   return db.currency.create({
@@ -68,7 +124,7 @@ export async function issue({
       config.root_public_key
     )
   ) {
-    throw new ForbiddenError("Invalid signature for root");
+    throw invalidSign;
   }
 
   return db.$transaction([
