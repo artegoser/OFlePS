@@ -64,17 +64,18 @@ export default class Client {
     return this._t.transactions.get.query({ from, to });
   }
 
-  transfer(from: string, to: string, amount: number) {
+  transfer(from: string, to: string, amount: number, comment?: string) {
     if (!this._privateKey || !this._publicKey) {
       throw this._noPrivateKey;
     }
 
-    const sign = ec.sign({ from, to, amount }, this._privateKey);
+    const sign = ec.sign({ from, to, amount, comment }, this._privateKey);
 
     return this._t.transactions.transfer.mutate({
       from,
       to,
       amount,
+      comment,
       signature: sign,
     });
   }

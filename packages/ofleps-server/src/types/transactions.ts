@@ -13,9 +13,10 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-export type TransactionType =
-  | "transfer"
-  | "issue"
-  | "burn"
-  | "interIncome"
-  | "interOutcome";
+export enum TransactionType {
+  TRANSFER = "transfer",
+  ISSUE = "issue",
+  BURN = "burn",
+  INTERINCOME = "interIncome",
+  INTEROUTCOME = "interOutcome",
+}

@@ -64,11 +64,13 @@ export async function transfer(
     if (
       !ec.verify(
         signature,
-        { from, to, amount },
+        { from, to, amount, comment },
         sender.User.publicKey as HexString
       )
     ) {
-      throw new ForbiddenError("Invalid signature");
+      throw new ForbiddenError(
+        "Invalid signature (Maybe you're not sending from your account)"
+      );
     }
 
     const recipient = await tx.account.update({
@@ -99,10 +101,6 @@ export async function transfer(
       },
     });
 
-    return {
-      transaction,
-      sender,
-      recipient,
-    };
+    return transaction;
   });
 }
