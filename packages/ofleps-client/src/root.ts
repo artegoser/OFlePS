@@ -28,20 +28,62 @@ export default class Root {
     return this._publicKey;
   }
 
+  setBlockUser(userId: string, block: boolean) {
+    const signature = ec.sign({ userId, block }, this._privateKey);
+
+    return this._t.root.setBlockUser.mutate({
+      userId,
+      block,
+      signature,
+    });
+  }
+
+  setBlockAccount(accountId: string, block: boolean) {
+    const signature = ec.sign({ accountId, block }, this._privateKey);
+
+    return this._t.root.setBlockAccount.mutate({
+      accountId,
+      block,
+      signature,
+    });
+  }
+
+  setApproveUser(userId: string, approve: boolean) {
+    const signature = ec.sign({ userId, approve }, this._privateKey);
+
+    return this._t.root.setApproveUser.mutate({
+      userId,
+      approve,
+      signature,
+    });
+  }
+
+  /**
+   * A function to add a new currency.
+   *
+   * @param {string} symbol - the symbol of the currency
+   * @param {string} name - the name of the currency
+   * @param {string} description - the description of the currency
+   * @param {string} [type] - the type of the currency (optional)
+   * @return {ReturnType} the result of adding the currency
+   */
   addCurrency(
     symbol: string,
     name: string,
     description: string,
     type?: string
   ) {
-    const sign = ec.sign({ symbol, name, description, type }, this._privateKey);
+    const signature = ec.sign(
+      { symbol, name, description, type },
+      this._privateKey
+    );
 
     return this._t.root.addCurrency.mutate({
       symbol,
       name,
       description,
       type,
-      signature: sign,
+      signature,
     });
   }
 
@@ -57,7 +99,7 @@ export default class Root {
     const salt = genSalt();
     const commentTx = `Issued by root${comment ? `: ${comment}` : ""}`;
 
-    const sign = ec.sign(
+    const signature = ec.sign(
       {
         from: "root",
         to,
@@ -73,7 +115,7 @@ export default class Root {
       to,
       amount,
       comment: commentTx,
-      signature: sign,
+      signature,
       salt,
     });
   }

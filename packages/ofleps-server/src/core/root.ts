@@ -24,13 +24,7 @@ export function setBlockUser(
   block: boolean,
   signature: HexString
 ) {
-  if (
-    !ec.verify(
-      signature,
-      { userId, block, rootId: "setBlockUser" },
-      config.root_public_key
-    )
-  ) {
+  if (!ec.verify(signature, { userId, block }, config.root_public_key)) {
     throw invalidSign;
   }
 
@@ -43,14 +37,12 @@ export function setBlockUser(
     },
   });
 }
-export function approveUser(userId: string, signature: HexString) {
-  if (
-    !ec.verify(
-      signature,
-      { userId, rootId: "approveUser" },
-      config.root_public_key
-    )
-  ) {
+export function setApproveUser(
+  userId: string,
+  approve: boolean,
+  signature: HexString
+) {
+  if (!ec.verify(signature, { userId, approve }, config.root_public_key)) {
     throw invalidSign;
   }
 
@@ -59,7 +51,7 @@ export function approveUser(userId: string, signature: HexString) {
       id: userId,
     },
     data: {
-      approved: true,
+      approved: approve,
     },
   });
 }
@@ -69,13 +61,7 @@ export function setBlockAccount(
   block: boolean,
   signature: HexString
 ) {
-  if (
-    !ec.verify(
-      signature,
-      { accountId, block, rootId: "setBlockAccount" },
-      config.root_public_key
-    )
-  ) {
+  if (!ec.verify(signature, { accountId, block }, config.root_public_key)) {
     throw invalidSign;
   }
 

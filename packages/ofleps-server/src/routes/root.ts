@@ -17,8 +17,54 @@ import { router, publicProcedure } from "../config/trpc.js";
 import { z } from "zod";
 import core from "../core/main.js";
 import { HexString } from "ofleps-utils";
+import { setApproveUser, setBlockAccount, setBlockUser } from "../core/root.js";
 
 export const root = router({
+  setBlockUser: publicProcedure
+    .input(
+      z.object({
+        userId: z.string(),
+        block: z.boolean(),
+        signature: z.string(),
+      })
+    )
+    .mutation(({ input }) => {
+      return setBlockUser(
+        input.userId,
+        input.block,
+        input.signature as HexString
+      );
+    }),
+  setApproveUser: publicProcedure
+    .input(
+      z.object({
+        userId: z.string(),
+        approve: z.boolean(),
+        signature: z.string(),
+      })
+    )
+    .mutation(({ input }) => {
+      return setApproveUser(
+        input.userId,
+        input.approve,
+        input.signature as HexString
+      );
+    }),
+  setBlockAccount: publicProcedure
+    .input(
+      z.object({
+        accountId: z.string(),
+        block: z.boolean(),
+        signature: z.string(),
+      })
+    )
+    .mutation(({ input }) => {
+      return setBlockAccount(
+        input.accountId,
+        input.block,
+        input.signature as HexString
+      );
+    }),
   addCurrency: publicProcedure
     .input(
       z.object({
