@@ -49,7 +49,7 @@ export async function transfer({
   }
 
   return db.$transaction(async (tx) => {
-    const sender = await tx.account.update({
+    const senderAccount = await tx.account.update({
       data: {
         balance: {
           decrement: amount,
@@ -63,37 +63,64 @@ export async function transfer({
       },
     });
 
-    if (sender.balance < 0) {
+    if (senderAccount.blocked) {
+      throw new ForbiddenError("Sender account is blocked");
+    }
+
+    if (senderAccount.balance < 0) {
       throw new ForbiddenError("transfer more amount than your balance");
+    }
+
+    if (!senderAccount.User.approved) {
+      throw new ForbiddenError("Sender account's user is not approved");
+    }
+
+    if (senderAccount.User.blocked) {
+      throw new ForbiddenError("Sender account's user is blocked");
     }
 
     if (
       !ec.verify(
         signature,
         { from, to, amount, comment, type: "transfer" },
-        sender.User.publicKey as HexString
+        senderAccount.User.publicKey as HexString
       )
     ) {
       throw new ForbiddenError(
-        "Invalid signature (Maybe you're not sending from your account)"
+        "Invalid signature (Maybe you're sending not from your account)"
       );
     }
 
-    const recipient = await tx.account.update({
+    const recipientAccount = await tx.account.update({
       data: {
         balance: {
           increment: amount,
         },
+      },
+      include: {
+        User: true,
       },
       where: {
         id: to,
       },
     });
 
-    if (sender.currencySymbol !== recipient.currencySymbol) {
+    if (senderAccount.currencySymbol !== recipientAccount.currencySymbol) {
       throw new ForbiddenError(
         "Cannot perform transaction between different currencies"
       );
+    }
+
+    if (recipientAccount.blocked) {
+      throw new ForbiddenError("Recipient account is blocked");
+    }
+
+    if (!recipientAccount.User.approved) {
+      throw new ForbiddenError("Recipient account's user is not approved");
+    }
+
+    if (recipientAccount.User.blocked) {
+      throw new ForbiddenError("Recipient account's user is blocked");
     }
 
     const transaction = await tx.transaction.create({

@@ -8,10 +8,14 @@ datasource db {
 }
 
 model User {
-  id             String          @id @default(cuid())
-  email          String          @unique
-  publicKey      String          @unique
-  name           String
+  id        String @id @default(cuid())
+  email     String @unique
+  publicKey String @unique
+  name      String
+
+  blocked  Boolean @default(false)
+  approved Boolean
+
   accounts       Account[]
   SmartContracts SmartContract[]
 }
@@ -23,6 +27,8 @@ model Account {
   currencySymbol String
   balance        Float
   userId         String
+
+  blocked Boolean @default(false)
 
   User                 User          @relation(fields: [userId], references: [id])
   transactionSender    Transaction[] @relation("TransactionSender")

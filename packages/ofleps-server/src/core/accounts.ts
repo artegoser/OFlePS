@@ -49,6 +49,12 @@ export async function createAccount({
     throw new NotFoundError(`Currency with symbol "${currencySymbol}"`);
   }
 
+  if (user.blocked) {
+    throw new ForbiddenError(
+      `User with id "${userId}" is blocked and cannot create an account`
+    );
+  }
+
   if (
     !ec.verify(
       signature,

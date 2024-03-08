@@ -21,6 +21,7 @@ export class ConfigService {
   public readonly host: string;
   public readonly port: number;
   public readonly root_public_key: HexString;
+  public readonly auto_approve: boolean;
 
   constructor() {
     config();
@@ -34,5 +35,12 @@ export class ConfigService {
     }
 
     this.root_public_key = process.env.ROOT_PUBLIC_KEY as HexString;
+
+    this.auto_approve = parseBool(process.env.AUTO_APPROVE, true);
   }
+}
+
+function parseBool(value: string | undefined, def: boolean): boolean {
+  if (!value) return def;
+  return value === "true" || value === "1";
 }

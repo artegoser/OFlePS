@@ -13,7 +13,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-import { db } from "../config/app.service.js";
+import { db, config } from "../config/app.service.js";
 import { ForbiddenError } from "../errors/main.js";
 import { ec } from "ofleps-utils";
 
@@ -30,7 +30,9 @@ export async function registerUser(
     throw new ForbiddenError("Invalid signature");
   }
 
-  return await db.user.create({ data: { name, email, publicKey } });
+  return await db.user.create({
+    data: { name, email, publicKey, approved: config.auto_approve },
+  });
 }
 
 export async function getUserById(id: string) {
