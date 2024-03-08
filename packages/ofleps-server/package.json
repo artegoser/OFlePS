@@ -20,6 +20,7 @@
     "@paralleldrive/cuid2": "^2.2.2",
     "@prisma/client": "^5.10.2",
     "dotenv": "^16.3.1",
+    "isolated-vm": "^4.7.2",
     "number-precision": "^1.6.0",
     "ofleps-utils": "../ofleps-utils",
     "zod": "^3.22.4"

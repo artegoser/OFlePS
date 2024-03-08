@@ -22,6 +22,7 @@ import user from "./routes/user.js";
 import transactions from "./routes/transactions.js";
 import accounts from "./routes/accounts.js";
 import currencies from "./routes/currencies.js";
+import smartContracts from "./routes/smartContracts.js";
 
 const appRouter = router({
   root,
@@ -29,6 +30,7 @@ const appRouter = router({
   user,
   accounts,
   currencies,
+  smartContracts,
 });
 
 const server = createHTTPServer({

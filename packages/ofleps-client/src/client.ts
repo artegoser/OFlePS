@@ -178,4 +178,49 @@ export default class Client {
   getAccountById(id: string) {
     return this._t.accounts.getById.query(id);
   }
+
+  async createSmartContract(name: string, description: string, code: string) {
+    if (!this._privateKey || !this._publicKey) {
+      throw this._noPrivateKey;
+    }
+
+    if (!this._userId) {
+      throw this._noUser;
+    }
+
+    const sign = ec.sign(
+      { name, description, code, authorId: this._userId },
+      this._privateKey
+    );
+
+    return this._t.smartContracts.create.mutate({
+      name,
+      description,
+      code,
+      authorId: this._userId,
+      signature: sign,
+    });
+  }
+
+  async executeSmartContract(id: string, request: string) {
+    if (!this._privateKey || !this._publicKey) {
+      throw this._noPrivateKey;
+    }
+
+    if (!this._userId) {
+      throw this._noUser;
+    }
+
+    const signature = ec.sign(
+      { smartContractId: id, reqData: request, callerId: this._userId },
+      this._privateKey
+    );
+
+    return this._t.smartContracts.execute.mutate({
+      id,
+      request,
+      callerId: this._userId,
+      signature,
+    });
+  }
 }

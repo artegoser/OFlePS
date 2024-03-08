@@ -18,5 +18,13 @@ import * as user from "./user.js";
 import * as currencies from "./currencies.js";
 import * as account from "./accounts.js";
 import * as root from "./root.js";
+import * as smartContracts from "./smartContracts.js";
 
-export default { transactions, user, currencies, account, root };
+export default {
+  transactions,
+  user,
+  currencies,
+  account,
+  root,
+  smartContracts,
+};
