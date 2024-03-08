@@ -37,12 +37,14 @@ model Account {
 }
 
 model Transaction {
-  id        String @id @default(cuid())
-  amount    Float
-  type      String
-  from      String
-  to        String
+  id     String @id @default(cuid())
+  amount Float
+  type   String
+  from   String
+  to     String
+
   signature String
+  salt      Int    @unique
 
   comment String   @default("")
   date    DateTime @default(now())

@@ -13,7 +13,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-import { HexString, ec } from "ofleps-utils";
+import { HexString, ec, genSalt } from "ofleps-utils";
 import { db, config } from "../config/app.service.js";
 import { ForbiddenError } from "../errors/main.js";
 
@@ -24,7 +24,13 @@ export function setBlockUser(
   block: boolean,
   signature: HexString
 ) {
-  if (!ec.verify(signature, { userId, block }, config.root_public_key)) {
+  if (
+    !ec.verify(
+      signature,
+      { userId, block, rootId: "setBlockUser" },
+      config.root_public_key
+    )
+  ) {
     throw invalidSign;
   }
 
@@ -39,7 +45,11 @@ export function setBlockUser(
 }
 export function approveUser(userId: string, signature: HexString) {
   if (
-    !ec.verify(signature, { userId, approved: true }, config.root_public_key)
+    !ec.verify(
+      signature,
+      { userId, rootId: "approveUser" },
+      config.root_public_key
+    )
   ) {
     throw invalidSign;
   }
@@ -59,7 +69,13 @@ export function setBlockAccount(
   block: boolean,
   signature: HexString
 ) {
-  if (!ec.verify(signature, { accountId, block }, config.root_public_key)) {
+  if (
+    !ec.verify(
+      signature,
+      { accountId, block, rootId: "setBlockAccount" },
+      config.root_public_key
+    )
+  ) {
     throw invalidSign;
   }
 
@@ -127,6 +143,9 @@ export async function issue({
     throw invalidSign;
   }
 
+  const salt = genSalt();
+  const commentTx = `Issued by root${comment ? `: ${comment}` : ""}`;
+
   return db.$transaction([
     db.account.update({
       where: {
@@ -144,9 +163,20 @@ export async function issue({
         from: to,
         to,
         amount,
-        comment: `Issued by root${comment ? `: ${comment}` : ""}`,
+        comment: commentTx,
         type: "issue",
-        signature,
+        salt,
+        signature: ec.sign(
+          {
+            from: to,
+            to,
+            amount,
+            comment: commentTx,
+            type: "issue",
+            salt,
+          },
+          config.server_private_key
+        ),
       },
     }),
   ]);

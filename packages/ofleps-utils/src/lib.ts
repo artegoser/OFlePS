@@ -23,6 +23,14 @@ export interface IECMessage {
 
 export type HexString = string & { __isHexString__: true };
 
+export function hash(str: string) {
+  return ec.b2h(sha512(str)) as HexString;
+}
+
+export function genSalt() {
+  return Math.floor(Math.random() * 100000);
+}
+
 export const ec = {
   h2b(hex: HexString): Uint8Array {
     return ed.etc.hexToBytes(hex);

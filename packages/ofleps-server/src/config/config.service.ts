@@ -14,13 +14,15 @@
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 import { config } from "dotenv";
-import { HexString } from "ofleps-utils";
+import { HexString, ec } from "ofleps-utils";
 
 export class ConfigService {
   public readonly db_url: string;
   public readonly host: string;
   public readonly port: number;
   public readonly root_public_key: HexString;
+  public readonly server_private_key: HexString;
+  public readonly server_public_key: HexString;
   public readonly auto_approve: boolean;
 
   constructor() {
@@ -35,6 +37,13 @@ export class ConfigService {
     }
 
     this.root_public_key = process.env.ROOT_PUBLIC_KEY as HexString;
+
+    if (process.env.SERVER_PRIVATE_KEY === undefined) {
+      throw new Error("SERVER_PRIVATE_KEY is not defined, please set it");
+    }
+
+    this.server_private_key = process.env.SERVER_PRIVATE_KEY as HexString;
+    this.server_public_key = ec.getPublicKey(this.server_private_key);
 
     this.auto_approve = parseBool(process.env.AUTO_APPROVE, true);
   }

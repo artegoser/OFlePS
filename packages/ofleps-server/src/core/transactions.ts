@@ -13,8 +13,8 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-import { HexString, ec } from "ofleps-utils";
-import { db } from "../config/app.service.js";
+import { HexString, ec, genSalt, hash } from "ofleps-utils";
+import { db, config } from "../config/app.service.js";
 import { BadRequestError, ForbiddenError } from "../errors/main.js";
 import { checkFromTo } from "./utils.js";
 
@@ -47,6 +47,8 @@ export async function transfer({
   if (amount <= 0) {
     throw new BadRequestError("Amount must be > 0");
   }
+
+  const salt = genSalt();
 
   return db.$transaction(async (tx) => {
     const senderAccount = await tx.account.update({
@@ -127,10 +129,21 @@ export async function transfer({
       data: {
         amount,
         type: "transfer",
-        signature,
         from,
         to,
         comment,
+        signature: ec.sign(
+          {
+            from,
+            to,
+            amount,
+            comment,
+            type: "transfer",
+            salt,
+          },
+          config.server_private_key
+        ),
+        salt,
       },
     });
 
