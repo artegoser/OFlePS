@@ -10,14 +10,35 @@ import { Client, Root } from "../lib.js";
     "Test sc",
     "Set requested data",
     `
-      const parsed = JSON.parse(data);
+      class Contract {
+        constructor(owner) {
+          this.owner = owner;
+        }
 
-      await storageSet("key", parsed.value);
+        setToOwner(data) {
+          gs_set(this.owner, data); // this add task to queue for execute post smart contract, not execute immediately
+
+          return \`Setted to \${this.owner} "\${data}"\`;
+        }
+
+        getFromOwner() {
+          return gMem[this.owner];
+        }
+      }
     `
   );
 
-  const result = await user.executeSmartContract(
-    smartContract.id,
-    `{"value":"hello world"}`
-  );
+  const result = await user.executeSmartContract(smartContract.id, {
+    method: "setToOwner",
+    params: ["hello world"],
+  });
+
+  console.log(result);
+
+  const result2 = await user.executeSmartContract(smartContract.id, {
+    method: "getFromOwner",
+    params: [],
+  });
+
+  console.log(result2);
 })();

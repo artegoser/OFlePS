@@ -24,6 +24,12 @@ export interface IECMessage {
 }
 
 export type HexString = string & { __isHexString__: true };
+export type ParamTypes = string | number | boolean;
+
+export interface SmartRequest {
+  method: string;
+  params: ParamTypes[];
+}
 
 export function hash(str: string) {
   return ec.b2h(sha512(str)) as HexString;

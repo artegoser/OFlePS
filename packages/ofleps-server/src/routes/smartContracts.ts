@@ -18,6 +18,8 @@ import { z } from "zod";
 import core from "../core/main.js";
 import { HexString } from "ofleps-utils";
 
+import { SmartRequest } from "ofleps-utils";
+
 const smartContracts = router({
   create: publicProcedure
     .input(
@@ -42,9 +44,11 @@ const smartContracts = router({
     .input(
       z.object({
         id: z.string(),
-        request: z.string(),
+        request: z.object({
+          method: z.string(),
+          params: z.array(z.string().or(z.number()).or(z.boolean())),
+        }),
         callerId: z.string(),
-
         signature: z.string(),
       })
     )

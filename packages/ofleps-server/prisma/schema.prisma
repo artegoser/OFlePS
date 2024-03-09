@@ -87,14 +87,13 @@ model SmartContract {
 
   signature String
 
-  author              User                 @relation(fields: [authorId], references: [id])
-  SmartContractMemory SmartContractMemory?
+  author              User                       @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  SmartContractMemory SmartContractGlobalMemory?
 }
 
-model SmartContractMemory {
+model SmartContractGlobalMemory {
   smartContractId String @unique
-  key             String
-  value           String
+  value           String @default("{}")
 
-  SmartContract SmartContract @relation(fields: [smartContractId], references: [id])
+  SmartContract SmartContract @relation(fields: [smartContractId], references: [id], onDelete: Cascade)
 }

@@ -1,7 +1,7 @@
 import type { AppRouter } from "ofleps-server";
 import { createTRPCProxyClient, httpBatchLink } from "@trpc/client";
 
-import { ec, genSalt, HexString } from "ofleps-utils";
+import { ec, genSalt, HexString, SmartRequest } from "ofleps-utils";
 import { ITransferArgs } from "./types/client.js";
 
 export default class Client {
@@ -202,7 +202,7 @@ export default class Client {
     });
   }
 
-  async executeSmartContract(id: string, request: string) {
+  async executeSmartContract(id: string, request: SmartRequest) {
     if (!this._privateKey || !this._publicKey) {
       throw this._noPrivateKey;
     }

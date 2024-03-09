@@ -16,18 +16,19 @@
 import { HexString, ec } from "ofleps-utils";
 import { db, config } from "../config/app.service.js";
 import { ForbiddenError, NotFoundError } from "../errors/main.js";
-import { execute } from "./smartIsolate.js";
+import { SmartIsolate } from "./smartIsolate.js";
+import { SmartRequest } from "ofleps-utils";
 
 export async function executeSmartContract(
   smartContractId: string,
-  reqData: string,
+  reqData: SmartRequest,
   callerId: string,
   signature: HexString
 ) {
   const caller = await db.user.findUnique({ where: { id: callerId } });
 
   if (!caller) {
-    throw new NotFoundError(`User with id "${callerId}" not found`);
+    throw new NotFoundError(`User with id "${callerId}"`);
   }
 
   if (
@@ -45,12 +46,26 @@ export async function executeSmartContract(
   });
 
   if (!smartContract) {
+    throw new NotFoundError(`Smart contract with id "${smartContractId}"`);
+  }
+
+  const globalMemory = await db.smartContractGlobalMemory.findUnique({
+    where: { smartContractId },
+  });
+
+  if (!globalMemory) {
     throw new NotFoundError(
-      `Smart contract with id "${smartContractId}" not found`
+      `Global memory for smart contract with id "${smartContractId}"`
     );
   }
 
-  return await execute(smartContract.code, reqData, smartContractId);
+  const isolate = new SmartIsolate(smartContract.id, smartContract.authorId);
+
+  return await isolate.execute(
+    smartContract.code,
+    reqData,
+    JSON.parse(globalMemory.value)
+  );
 }
 
 export async function createSmartContract(
@@ -76,14 +91,24 @@ export async function createSmartContract(
     throw new ForbiddenError("Invalid signature");
   }
 
-  const smartContract = await db.smartContract.create({
-    data: {
-      name,
-      description,
-      code,
-      authorId,
-      signature,
-    },
+  const smartContract = await db.$transaction(async (tx) => {
+    const sc = await tx.smartContract.create({
+      data: {
+        name,
+        description,
+        code,
+        authorId,
+        signature,
+      },
+    });
+
+    await tx.smartContractGlobalMemory.create({
+      data: {
+        smartContractId: sc.id,
+      },
+    });
+
+    return sc;
   });
 
   return smartContract;

@@ -14,6 +14,7 @@
   "author": "artegoser",
   "license": "GPL-3.0-or-later",
   "devDependencies": {
+    "@types/deasync": "^0.1.5",
     "prisma": "^5.3.1"
   },
   "dependencies": {
