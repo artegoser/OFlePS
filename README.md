@@ -8,7 +8,7 @@
 
 > [!WARNING]  
 > Current project is not production ready and work in progress. There are many things that need to be done before it's ready for production, and you should not use it in production environment until it's stable enough.
-> Also, this project will be refactored before it's stable enough.
+> Also, this project will be refactored or rewritten to rust before it will be ready for production.
 
 ## Description
 
