@@ -13,8 +13,8 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-import { db, config } from "../config/app.service.js";
-import { ForbiddenError } from "../errors/main.js";
+import { db, config } from "../../config/app.service.js";
+import { ForbiddenError } from "../../errors/main.js";
 import { ec } from "ofleps-utils";
 
 import type { HexString } from "ofleps-utils";

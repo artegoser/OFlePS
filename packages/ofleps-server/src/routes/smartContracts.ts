@@ -15,7 +15,7 @@
 
 import { router, publicProcedure } from "../config/trpc.js";
 import { z } from "zod";
-import core from "../core/main.js";
+import core from "../core/main/main.js";
 import { HexString } from "ofleps-utils";
 
 import { SmartRequest } from "ofleps-utils";

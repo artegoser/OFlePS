@@ -14,7 +14,7 @@
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 import ivm from "isolated-vm";
-import { db } from "../config/app.service.js";
+import { db } from "../../config/app.service.js";
 import { ParamTypes, SmartRequest } from "ofleps-utils";
 
 interface PostSmartContractTask {

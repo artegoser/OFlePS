@@ -13,10 +13,15 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-import { BadRequestError } from "../errors/main.js";
+import { db } from "../../config/app.service.js";
+import { checkFromTo } from "./utils.js";
 
-export function checkFromTo(from: number, to: number): void {
-  if (from < 0 || to < 0) throw new BadRequestError("from and to must be > 0");
-  if (from > to) throw new BadRequestError("from must be <= to");
-  if (to - from > 50) throw new BadRequestError("from and to must be <= 50");
+export async function getCurrencyBySymbol(symbol: string) {
+  return await db.currency.findUnique({ where: { symbol } });
+}
+
+export async function getCurrencies(from: number, to: number) {
+  checkFromTo(from, to);
+
+  return await db.currency.findMany({ skip: from, take: to - from });
 }

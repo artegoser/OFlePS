@@ -15,7 +15,7 @@
 
 import { router, publicProcedure } from "../config/trpc.js";
 import { z } from "zod";
-import core from "../core/main.js";
+import core from "../core/main/main.js";
 
 const currencies = router({
   getBySymbol: publicProcedure.input(z.string()).query(({ input }) => {

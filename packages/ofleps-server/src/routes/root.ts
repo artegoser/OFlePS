@@ -15,9 +15,13 @@
 
 import { router, publicProcedure } from "../config/trpc.js";
 import { z } from "zod";
-import core from "../core/main.js";
+import core from "../core/main/main.js";
 import { HexString } from "ofleps-utils";
-import { setApproveUser, setBlockAccount, setBlockUser } from "../core/root.js";
+import {
+  setApproveUser,
+  setBlockAccount,
+  setBlockUser,
+} from "../core/main/root.js";
 
 export const root = router({
   setBlockUser: publicProcedure

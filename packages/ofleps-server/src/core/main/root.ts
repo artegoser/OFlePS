@@ -14,8 +14,8 @@
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 import { HexString, ec } from "ofleps-utils";
-import { db, config } from "../config/app.service.js";
-import { ForbiddenError } from "../errors/main.js";
+import { db, config } from "../../config/app.service.js";
+import { ForbiddenError } from "../../errors/main.js";
 
 const invalidSign = new ForbiddenError("Invalid signature for root");
 

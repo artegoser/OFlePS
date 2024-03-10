@@ -14,9 +14,9 @@
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 import { HexString, ec } from "ofleps-utils";
-import { db, config } from "../config/app.service.js";
-import { ForbiddenError, NotFoundError } from "../errors/main.js";
-import { SmartIsolate } from "./smartIsolate.js";
+import { db, config } from "../../config/app.service.js";
+import { ForbiddenError, NotFoundError } from "../../errors/main.js";
+import { SmartIsolate } from "../helpers/smartIsolate.js";
 import { SmartRequest } from "ofleps-utils";
 
 export async function executeSmartContract(
