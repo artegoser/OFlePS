@@ -20,6 +20,7 @@ import {
   ForbiddenError,
   NotFoundError,
 } from "../../errors/main.js";
+import { TransactionReq, txTransaction } from "../helpers/txTrans.js";
 
 export async function getTransactions(
   page: number,
@@ -68,14 +69,7 @@ export async function transfer({
   signature,
   comment,
   salt,
-}: {
-  from: string;
-  to: string;
-  amount: number;
-  signature: HexString;
-  comment?: string;
-  salt: string;
-}) {
+}: TransactionReq) {
   if (from === to) {
     throw new BadRequestError("You can't transfer money to same account");
   }
@@ -85,92 +79,13 @@ export async function transfer({
   }
 
   return db.$transaction(async (tx) => {
-    const senderAccount = await tx.account.update({
-      data: {
-        balance: {
-          decrement: amount,
-        },
-      },
-      include: {
-        User: true,
-      },
-      where: {
-        id: from,
-      },
+    return await txTransaction(tx, {
+      from,
+      to,
+      amount,
+      signature,
+      comment,
+      salt,
     });
-
-    if (senderAccount.blocked) {
-      throw new ForbiddenError("Sender account is blocked");
-    }
-
-    if (senderAccount.balance < 0) {
-      throw new ForbiddenError("transfer more amount than your balance");
-    }
-
-    if (!senderAccount.User.approved) {
-      throw new ForbiddenError("Sender account's user is not approved");
-    }
-
-    if (senderAccount.User.blocked) {
-      throw new ForbiddenError("Sender account's user is blocked");
-    }
-
-    if (
-      !ec.verify(
-        signature,
-        { from, to, amount, comment, salt, type: "transfer" },
-        senderAccount.User.pk as HexString
-      )
-    ) {
-      throw new ForbiddenError(
-        "Invalid signature (Maybe you're sending not from your account)"
-      );
-    }
-
-    const recipientAccount = await tx.account.update({
-      data: {
-        balance: {
-          increment: amount,
-        },
-      },
-      include: {
-        User: true,
-      },
-      where: {
-        id: to,
-      },
-    });
-
-    if (senderAccount.currencySymbol !== recipientAccount.currencySymbol) {
-      throw new ForbiddenError(
-        "Cannot perform transaction between different currencies"
-      );
-    }
-
-    if (recipientAccount.blocked) {
-      throw new ForbiddenError("Recipient account is blocked");
-    }
-
-    if (!recipientAccount.User.approved) {
-      throw new ForbiddenError("Recipient account's user is not approved");
-    }
-
-    if (recipientAccount.User.blocked) {
-      throw new ForbiddenError("Recipient account's user is blocked");
-    }
-
-    const transaction = await tx.transaction.create({
-      data: {
-        amount,
-        type: "transfer",
-        from,
-        to,
-        comment,
-        signature,
-        salt,
-      },
-    });
-
-    return transaction;
   });
 }
