@@ -49,10 +49,13 @@ model Account {
 
   blocked Boolean @default(false)
 
-  User                 User          @relation(fields: [userPk], references: [pk])
-  transactionSender    Transaction[] @relation("TransactionSender")
-  transactionRecipient Transaction[] @relation("TransactionRecipient")
-  currency             Currency      @relation(fields: [currencySymbol], references: [symbol])
+  User     User     @relation(fields: [userPk], references: [pk])
+  Currency Currency @relation(fields: [currencySymbol], references: [symbol])
+
+  transactionsSender    Transaction[] @relation("TransactionSender")
+  transactionsRecipient Transaction[] @relation("TransactionRecipient")
+
+  Orders Order[]
 }
 
 model Transaction {
@@ -79,6 +82,46 @@ model Currency {
   type        String @default("fiat")
 
   Accounts Account[]
+
+  OrdersFrom Order[] @relation("OrderFrom")
+  OrdersTo   Order[] @relation("OrderTo")
+
+  ExchangeChartFrom ExchangeChart[] @relation("ExchangeChartFrom")
+  ExchangeChartTo   ExchangeChart[] @relation("ExchangeChartTo")
+}
+
+model Order {
+  id   String   @id @default(cuid())
+  date DateTime @default(now())
+
+  accountId String
+
+  quantity Float
+  price    Float
+
+  type Boolean /// true - buy, false - sell
+
+  fromCurrencySymbol String
+  toCurrencySymbol   String
+
+  fromCurrency Currency @relation(name: "OrderFrom", fields: [fromCurrencySymbol], references: [symbol])
+  toCurrency   Currency @relation(name: "OrderTo", fields: [toCurrencySymbol], references: [symbol])
+
+  Account Account @relation(fields: [accountId], references: [id])
+}
+
+model ExchangeChart {
+  date DateTime
+
+  price Float
+
+  fromCurrencySymbol String
+  toCurrencySymbol   String
+
+  fromCurrency Currency @relation(name: "ExchangeChartFrom", fields: [fromCurrencySymbol], references: [symbol])
+  toCurrency   Currency @relation(name: "ExchangeChartTo", fields: [toCurrencySymbol], references: [symbol])
+
+  @@unique([fromCurrencySymbol, toCurrencySymbol])
 }
 
 model SmartContract {
