@@ -143,7 +143,7 @@ export async function issue({
       },
     });
 
-    tx.transaction.create({
+    return await tx.transaction.create({
       data: {
         from: to,
         to,
