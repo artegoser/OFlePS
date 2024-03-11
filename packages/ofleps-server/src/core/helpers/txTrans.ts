@@ -1,18 +1,21 @@
-import { PrismaClient } from "@prisma/client/extension";
 import { HexString, ec } from "ofleps-utils";
 import { ForbiddenError } from "../../errors/main.js";
+import { txDb } from "../../config/app.service.js";
 
 export interface TransactionReq {
   from: string;
   to: string;
   amount: number;
-  signature: HexString;
+  signature?: HexString;
   comment?: string;
-  salt: string;
 }
 
-export async function txTransaction(tx: PrismaClient, req: TransactionReq) {
-  const { from, to, amount, signature, comment, salt } = req;
+export async function txTransfer(
+  tx: txDb,
+  req: TransactionReq,
+  force: boolean = false
+) {
+  const { from, to, amount, signature, comment } = req;
 
   const senderAccount = await tx.account.update({
     data: {
@@ -45,9 +48,11 @@ export async function txTransaction(tx: PrismaClient, req: TransactionReq) {
   }
 
   if (
+    !force &&
+    signature &&
     !ec.verify(
       signature,
-      { from, to, amount, comment, salt, type: "transfer" },
+      { from, to, amount, comment, type: "transfer" },
       senderAccount.userPk as HexString
     )
   ) {
@@ -95,8 +100,7 @@ export async function txTransaction(tx: PrismaClient, req: TransactionReq) {
       from,
       to,
       comment,
-      signature,
-      salt,
+      currencySymbol: senderAccount.currencySymbol,
     },
   });
 

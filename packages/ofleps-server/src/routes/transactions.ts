@@ -41,7 +41,6 @@ const transactions = router({
         to: z.string(),
         amount: z.number(),
         signature: z.string(),
-        salt: z.string(),
         comment: z.string().optional(),
       })
     )
@@ -51,7 +50,6 @@ const transactions = router({
         to: input.to,
         amount: input.amount,
         comment: input.comment,
-        salt: input.salt,
         signature: input.signature as HexString,
       });
     }),

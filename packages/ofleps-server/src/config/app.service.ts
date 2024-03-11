@@ -18,3 +18,9 @@ import { PrismaClient } from "@prisma/client";
 
 export const db = new PrismaClient();
 export const config = new ConfigService();
+
+export type Db = typeof db;
+export type txDb = Omit<
+  Db,
+  "$on" | "$connect" | "$disconnect" | "$use" | "$transaction" | "$extends"
+>;

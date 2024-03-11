@@ -131,8 +131,8 @@ export async function issue({
     throw invalidSign;
   }
 
-  return db.$transaction([
-    db.account.update({
+  return db.$transaction(async (tx) => {
+    const account = await tx.account.update({
       where: {
         id: to,
       },
@@ -141,18 +141,17 @@ export async function issue({
           increment: amount,
         },
       },
-    }),
+    });
 
-    db.transaction.create({
+    tx.transaction.create({
       data: {
         from: to,
         to,
         amount,
         comment,
         type: "issue",
-        salt,
-        signature,
+        currencySymbol: account.currencySymbol,
       },
-    }),
-  ]);
+    });
+  });
 }

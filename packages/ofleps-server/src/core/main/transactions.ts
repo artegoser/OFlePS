@@ -20,7 +20,7 @@ import {
   ForbiddenError,
   NotFoundError,
 } from "../../errors/main.js";
-import { TransactionReq, txTransaction } from "../helpers/txTrans.js";
+import { TransactionReq, txTransfer } from "../helpers/txTrans.js";
 
 export async function getTransactions(
   page: number,
@@ -68,7 +68,6 @@ export async function transfer({
   amount,
   signature,
   comment,
-  salt,
 }: TransactionReq) {
   if (from === to) {
     throw new BadRequestError("You can't transfer money to same account");
@@ -79,13 +78,12 @@ export async function transfer({
   }
 
   return db.$transaction(async (tx) => {
-    return await txTransaction(tx, {
+    return await txTransfer(tx, {
       from,
       to,
       amount,
       signature,
       comment,
-      salt,
     });
   });
 }
