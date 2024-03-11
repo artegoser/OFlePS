@@ -128,6 +128,7 @@ dist
 
 #prisma
 prisma/migrations
+prisma/dbml
 prisma/dev.db
 prisma/dev.db-journal
 
