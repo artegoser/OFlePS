@@ -51,7 +51,9 @@ export async function txTransfer(
   }
 
   if (senderAccount.balance < 0) {
-    throw new ForbiddenError("transfer more amount than your balance");
+    throw new ForbiddenError(
+      `transfer more amount than your balance (${senderAccount.name}, ${amount})`
+    );
   }
 
   if (!senderAccount.User.approved) {

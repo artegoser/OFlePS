@@ -22,44 +22,67 @@ import { Client, Root } from "../lib.js";
     "ac601a987ab9a5fcfa076190f4a0643be1ac53842f05f65047240dc8b679f452" as HexString
   );
 
+  // await admin.addCurrency("USD", "United States Dollar", "Currency of the US");
+  // await admin.addCurrency(
+  //   "RUB",
+  //   "Russian ruble",
+  //   "Currency of Russian Federation"
+  // );
+
   const sender = new Client("http://localhost:3000");
   const recipient = new Client("http://localhost:3000");
 
   await sender.registerUser("sender", "sender@ofleps.io");
   await recipient.registerUser("recipient", "recipient@ofleps.io");
 
-  const { id: senderId } = await sender.createAccount(
-    "sender",
+  const { id: senderFromId } = await sender.createAccount(
+    "sender usd",
     "sender account",
     "USD"
   );
 
-  //now admin issues money to sender
-  await admin.issue(senderId, 100, "issue money to sender");
+  const { id: senderToId } = await sender.createAccount(
+    "sender rub",
+    "sender account",
+    "RUB"
+  );
 
-  const { id: recipientId } = await recipient.createAccount(
-    "recipient",
+  const { id: recipientFromId } = await recipient.createAccount(
+    "recipient usd",
     "recipient account",
     "USD"
   );
 
+  const { id: recipientToId } = await recipient.createAccount(
+    "recipient rub",
+    "recipient account",
+    "RUB"
+  );
+
+  //now admin issues money
+  await admin.issue(senderFromId, 5, "issue usd to sender");
+  await admin.issue(recipientToId, 500, "issue rub to sender");
+
   //now sender transfers money to recipient
-  const transaction1 = await sender.transfer({
-    from: senderId,
-    to: recipientId,
-    amount: 42.42,
-    comment: "Give me the answer to life, the universe, and everything",
-  });
+  const order1 = await sender.sell(
+    senderFromId,
+    senderToId,
+    "USD",
+    "RUB",
+    1,
+    90
+  );
 
-  console.log(transaction1);
+  console.log(order1);
 
-  //now recipient transfers money to sender
-  const transaction2 = await recipient.transfer({
-    from: recipientId,
-    to: senderId,
-    amount: 0.42,
-    comment: "I don't know",
-  });
+  const order2 = await recipient.buy(
+    recipientFromId,
+    recipientToId,
+    "USD",
+    "RUB",
+    1,
+    90
+  );
 
-  console.log(transaction2);
+  console.log(order2);
 })();

@@ -95,6 +95,92 @@ export default class Client {
     });
   }
 
+  buy(
+    fromAccountId: string,
+    toAccountId: string,
+    fromCurrencySymbol: string,
+    toCurrencySymbol: string,
+    quantity: number,
+    price: number
+  ) {
+    return this._createOrder(
+      fromAccountId,
+      toAccountId,
+      fromCurrencySymbol,
+      toCurrencySymbol,
+      quantity,
+      price,
+      true
+    );
+  }
+
+  sell(
+    fromAccountId: string,
+    toAccountId: string,
+    fromCurrencySymbol: string,
+    toCurrencySymbol: string,
+    quantity: number,
+    price: number
+  ) {
+    return this._createOrder(
+      fromAccountId,
+      toAccountId,
+      fromCurrencySymbol,
+      toCurrencySymbol,
+      quantity,
+      price,
+      false
+    );
+  }
+
+  private _createOrder(
+    fromAccountId: string,
+    toAccountId: string,
+    fromCurrencySymbol: string,
+    toCurrencySymbol: string,
+    quantity: number,
+    price: number,
+    type: boolean
+  ) {
+    if (!this._privateKey || !this._publicKey) {
+      throw this._noPrivateKey;
+    }
+
+    const signature = ec.sign(
+      {
+        fromAccountId,
+        toAccountId,
+        fromCurrencySymbol,
+        toCurrencySymbol,
+        quantity,
+        price,
+        type,
+      },
+      this._privateKey
+    );
+
+    if (type)
+      return this._t.exchange.buy.mutate({
+        fromAccountId,
+        toAccountId,
+        fromCurrencySymbol,
+        toCurrencySymbol,
+        quantity,
+        price,
+        signature,
+      });
+
+    return this._t.exchange.sell.mutate({
+      fromAccountId,
+      toAccountId,
+      fromCurrencySymbol,
+      toCurrencySymbol,
+      quantity,
+      price,
+      signature,
+    });
+  }
+
   getCurrencies(page: number = 1) {
     return this._t.currencies.get.query({ page });
   }

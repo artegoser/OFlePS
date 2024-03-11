@@ -24,6 +24,7 @@ export class ConfigService {
   public readonly server_private_key: HexString;
   public readonly server_public_key: HexString;
   public readonly auto_approve: boolean;
+  public readonly currencies: string;
 
   constructor() {
     config();
@@ -46,6 +47,8 @@ export class ConfigService {
     this.server_public_key = ec.getPublicKey(this.server_private_key);
 
     this.auto_approve = parseBool(process.env.AUTO_APPROVE, true);
+
+    this.currencies = process.env.CURRENCIES || "";
   }
 }
 

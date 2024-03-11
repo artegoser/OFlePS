@@ -23,7 +23,7 @@ Open and flexible payment system (OFlePS) is a federated payment system based on
 - [x] JavaScript smart contracts: OFlePS uses [isolated-vm](https://github.com/laverdet/isolated-vm) to run JavaScript smart contracts
 - [x] OFlePS uses ed25519 cryptography for secure transactions and data exchange, each transaction is signed with user's private key
 - [ ] Support for currency types: (fiat, crypto, stock, )
-- [ ] Stock exchange
+- [x] Stock exchange (really unstable)
 - [ ] Federated inter-server transactions
 
 ## License

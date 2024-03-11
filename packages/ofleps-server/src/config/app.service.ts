@@ -19,6 +19,47 @@ import { PrismaClient } from "@prisma/client";
 export const db = new PrismaClient();
 export const config = new ConfigService();
 
+let exchange;
+try {
+  exchange = await db.user.create({
+    data: {
+      pk: "OFLEPS_EXCHANGE",
+      email: "none",
+      name: "ofleps exchange",
+      approved: true,
+    },
+  });
+} catch {
+  exchange = await db.user.findUnique({ where: { pk: "OFLEPS_EXCHANGE" } });
+}
+
+if (!exchange) throw new Error("Unknown");
+
+for (const currency of config.currencies.split(",")) {
+  try {
+    await db.currency.create({
+      data: {
+        name: currency,
+        symbol: currency,
+        description: "Auto generated",
+      },
+    });
+
+    await db.account.create({
+      data: {
+        id: "ofleps_exchange_" + currency,
+        name: "oe_" + currency,
+        currencySymbol: currency,
+        userPk: exchange.pk,
+      },
+    });
+
+    console.log("generated " + currency);
+  } catch {
+    console.log("already generated");
+  }
+}
+
 export type Db = typeof db;
 export type txDb = Omit<
   Db,

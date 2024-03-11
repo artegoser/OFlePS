@@ -23,6 +23,7 @@ import transactions from "./routes/transactions.js";
 import accounts from "./routes/accounts.js";
 import currencies from "./routes/currencies.js";
 import smartContracts from "./routes/smartContracts.js";
+import exchange from "./routes/exchange.js";
 
 const appRouter = router({
   root,
@@ -31,6 +32,7 @@ const appRouter = router({
   accounts,
   currencies,
   smartContracts,
+  exchange,
 });
 
 const server = createHTTPServer({

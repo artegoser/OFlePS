@@ -41,10 +41,10 @@ model User {
 
 model Account {
   id             String @id @default(cuid())
-  name           String @unique
+  name           String
   description    String @default("")
   currencySymbol String
-  balance        Float
+  balance        Float  @default(0)
   userPk         String
 
   blocked Boolean @default(false)
