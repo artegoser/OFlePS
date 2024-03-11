@@ -33,6 +33,9 @@ async function createOrder(
   type: boolean, // true - buy, false - sell
   signature: HexString
 ) {
+
+  if (quantity <= 0) throw new ForbiddenError("Set quantity <= 0");
+  
   const account = await db.account.findUniqueOrThrow({
     where: {
       id: type ? toAccountId : fromAccountId,
@@ -76,6 +79,7 @@ async function createOrder(
   });
 
   const realAmount = type ? NP.times(quantity, price) : quantity;
+  const antiRealAmount = !type ? NP.times(quantity, price) : quantity;
 
   return await db.$transaction(async (tx) => {
     await txTransfer(tx, {
@@ -113,12 +117,12 @@ async function createOrder(
           type: (!type ? "buy" : "sell") + " success",
           pair: `${fromCurrencySymbol}/${toCurrencySymbol}`,
           price,
-          quantity: realAmount,
+          quantity,
         }),
       });
 
       const transaction = await txTransfer(tx, {
-        amount: quantity,
+        amount: antiRealAmount,
         from: !type ? exchange_account_id_to : exchange_account_id_from,
         to: !type ? toAccountId : fromAccountId,
         comment: genComment({
