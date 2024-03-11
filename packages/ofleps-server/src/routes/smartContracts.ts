@@ -18,8 +18,6 @@ import { z } from "zod";
 import core from "../core/main/main.js";
 import { HexString } from "ofleps-utils";
 
-import { SmartRequest } from "ofleps-utils";
-
 const smartContracts = router({
   create: publicProcedure
     .input(

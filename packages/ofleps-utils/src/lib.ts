@@ -38,6 +38,10 @@ export interface IECMessage {
   [key: string]: any;
 }
 
+export interface SmartContractGlobalMemory {
+  [key: string]: ParamTypes;
+}
+
 export type HexString = string & { __isHexString__: true };
 export type ParamTypes = string | number | boolean;
 

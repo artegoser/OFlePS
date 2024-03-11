@@ -15,7 +15,11 @@
 
 import ivm from "isolated-vm";
 import { db } from "../../config/app.service.js";
-import { ParamTypes, SmartRequest } from "ofleps-utils";
+import {
+  ParamTypes,
+  SmartContractGlobalMemory,
+  SmartRequest,
+} from "ofleps-utils";
 
 interface PostSmartContractTask {
   method: "gs_set";
@@ -35,7 +39,11 @@ export class SmartIsolate {
     this._tasks.push({ method: "gs_set", params: [key, value] });
   }
 
-  async execute(code: string, request: SmartRequest, globalMemory: any) {
+  async execute(
+    code: string,
+    request: SmartRequest,
+    globalMemory: SmartContractGlobalMemory
+  ) {
     const isolate = new ivm.Isolate({
       memoryLimit: 8,
     });
@@ -109,7 +117,7 @@ class TaskExecutor {
         });
       }
 
-      let memVal = JSON.parse(memory.value);
+      const memVal = JSON.parse(memory.value);
 
       memVal[key] = value;
 

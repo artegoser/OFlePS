@@ -6,15 +6,19 @@
   "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "tsc",
+    "build": "npm run lint && tsc",
     "dev": "tsc-watch --onSuccess \"node ./server-dist/app.js\"",
-    "start": "node server-dist/app.js"
+    "start": "node server-dist/app.js",
+    "lint": "eslint \"src/**\""
   },
   "keywords": [],
   "author": "artegoser",
   "license": "GPL-3.0-or-later",
   "devDependencies": {
     "@types/deasync": "^0.1.5",
+    "@typescript-eslint/eslint-plugin": "^7.1.1",
+    "@typescript-eslint/parser": "^7.1.1",
+    "eslint": "^8.57.0",
     "prisma": "^5.3.1"
   },
   "dependencies": {

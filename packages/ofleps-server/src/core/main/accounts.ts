@@ -14,11 +14,7 @@
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 import { db } from "../../config/app.service.js";
-import {
-  BadRequestError,
-  ForbiddenError,
-  NotFoundError,
-} from "../../errors/main.js";
+import { ForbiddenError, NotFoundError } from "../../errors/main.js";
 import { ec } from "ofleps-utils";
 import { getUserById } from "./user.js";
 import { getCurrencyBySymbol } from "./currencies.js";
