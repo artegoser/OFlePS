@@ -28,7 +28,7 @@ const accounts = router({
         name: z.string(),
         description: z.string(),
         currencySymbol: z.string(),
-        userId: z.string(),
+        userPk: z.string(),
         signature: z.string(),
       })
     )
@@ -37,7 +37,7 @@ const accounts = router({
         name: input.name,
         description: input.description,
         currencySymbol: input.currencySymbol,
-        userId: input.userId,
+        userPk: input.userPk as HexString,
         signature: input.signature as HexString,
       });
     }),

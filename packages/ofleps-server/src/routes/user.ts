@@ -36,17 +36,6 @@ const user = router({
         input.signature as HexString
       );
     }),
-  get: publicProcedure
-    .input(z.object({ from: z.number(), to: z.number() }))
-    .query(({ input }) => {
-      return core.user.getUsers(input.from, input.to);
-    }),
-  getById: publicProcedure.input(z.string()).query(({ input }) => {
-    return core.user.getUserById(input);
-  }),
-  getByEmail: publicProcedure.input(z.string()).query(({ input }) => {
-    return core.user.getUserByEmail(input);
-  }),
   getByPublicKey: publicProcedure.input(z.string()).query(({ input }) => {
     return core.user.getUserByPublicKey(input as HexString);
   }),

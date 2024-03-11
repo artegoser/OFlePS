@@ -20,9 +20,19 @@ import { HexString } from "ofleps-utils";
 
 const transactions = router({
   get: publicProcedure
-    .input(z.object({ from: z.number(), to: z.number() }))
+    .input(
+      z.object({
+        page: z.number(),
+        accountId: z.string(),
+        signature: z.string(),
+      })
+    )
     .query(({ input }) => {
-      return core.transactions.getTransactions(input.from, input.to);
+      return core.transactions.getTransactions(
+        input.page,
+        input.accountId,
+        input.signature as HexString
+      );
     }),
   transfer: publicProcedure
     .input(

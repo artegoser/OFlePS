@@ -16,7 +16,7 @@
 import { db } from "../../config/app.service.js";
 import { ForbiddenError, NotFoundError } from "../../errors/main.js";
 import { ec } from "ofleps-utils";
-import { getUserById } from "./user.js";
+import { getUserByPublicKey } from "./user.js";
 import { getCurrencyBySymbol } from "./currencies.js";
 
 import type { HexString } from "ofleps-utils";
@@ -25,20 +25,20 @@ export async function createAccount({
   name,
   description,
   currencySymbol,
-  userId,
+  userPk,
   signature,
 }: {
   name: string;
   description: string;
   currencySymbol: string;
-  userId: string;
+  userPk: HexString;
   signature: HexString;
 }) {
-  const user = await getUserById(userId);
+  const user = await getUserByPublicKey(userPk);
   const currency = await getCurrencyBySymbol(currencySymbol);
 
   if (!user) {
-    throw new NotFoundError(`User with id "${userId}"`);
+    throw new NotFoundError(`User with public key "${userPk}"`);
   }
 
   if (!currency) {
@@ -47,15 +47,15 @@ export async function createAccount({
 
   if (user.blocked) {
     throw new ForbiddenError(
-      `User with id "${userId}" is blocked and cannot create an account`
+      `User with id "${userPk}" is blocked and cannot create an account`
     );
   }
 
   if (
     !ec.verify(
       signature,
-      { name, description, currencySymbol, userId },
-      user.publicKey as HexString
+      { name, description, currencySymbol, userPk },
+      user.pk as HexString
     )
   ) {
     throw new ForbiddenError("Invalid signature");
@@ -67,7 +67,7 @@ export async function createAccount({
       description,
       currencySymbol,
       balance: 0,
-      userId,
+      userPk,
     },
   });
 }

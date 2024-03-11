@@ -23,14 +23,10 @@ export default class Client {
   private _t;
   private _privateKey?: HexString;
   private _publicKey?: HexString;
-  private _userId?: string;
   private _noPrivateKey = new Error("No private key, generate or set first");
   private _noUser = new Error("No user id, register or login first");
-  private _userNotExist = new Error("User not exist, login or register first");
-  private _invalidPrivateKey = new Error(
-    "Invalid private key provided for user"
-  );
-  constructor(baseUrl: string, privateKey?: HexString, userId?: string) {
+  private _userNotExist = new Error("User not exist, register first");
+  constructor(baseUrl: string, privateKey?: HexString) {
     this._t = createTRPCProxyClient<AppRouter>({
       links: [
         httpBatchLink({
@@ -42,10 +38,6 @@ export default class Client {
     if (privateKey) {
       this.setPrivateKey(privateKey);
     }
-
-    if (userId) {
-      this._userId = userId;
-    }
   }
 
   get publicKey() {
@@ -54,10 +46,6 @@ export default class Client {
 
   get privateKey() {
     return this._privateKey;
-  }
-
-  get userId() {
-    return this._userId;
   }
 
   setPrivateKey(privateKey: HexString) {
@@ -69,8 +57,14 @@ export default class Client {
     return this._publicKey;
   }
 
-  getTransactions(from: number, to: number) {
-    return this._t.transactions.get.query({ from, to });
+  getTransactions(accountId: string, page: number = 1) {
+    if (!this._privateKey || !this._publicKey) {
+      throw this._noPrivateKey;
+    }
+
+    const signature = ec.sign({ accountId, page }, this._privateKey);
+
+    return this._t.transactions.get.query({ accountId, page, signature });
   }
 
   /**
@@ -104,8 +98,8 @@ export default class Client {
     });
   }
 
-  getCurrencies(from: number, to: number) {
-    return this._t.currencies.get.query({ from, to });
+  getCurrencies(page: number = 1) {
+    return this._t.currencies.get.query({ page });
   }
 
   getCurrencyBySymbol(symbol: string) {
@@ -120,47 +114,29 @@ export default class Client {
       this._publicKey = publicKey;
     }
 
-    const sign = ec.sign(
+    const signature = ec.sign(
       { name, email, publicKey: this._publicKey },
       this._privateKey
     );
 
-    const resp = await this._t.user.register.mutate({
+    return await this._t.user.register.mutate({
       name,
       email,
       publicKey: this._publicKey,
-      signature: sign,
+      signature,
     });
-
-    this._userId = resp.id;
-
-    return resp;
   }
 
-  async login(id: string, privateKey: HexString) {
+  async login(privateKey: HexString) {
     this.setPrivateKey(privateKey);
 
-    const user = await this.getUserById(id);
+    const user = await this.getUserByPublicKey(this._publicKey as HexString);
 
     if (!user) {
       throw this._userNotExist;
     }
 
-    if (user.publicKey !== this._publicKey) {
-      throw this._invalidPrivateKey;
-    }
-  }
-
-  getUsers(from: number, to: number) {
-    return this._t.user.get.query({ from, to });
-  }
-
-  getUserById(id: string) {
-    return this._t.user.getById.query(id);
-  }
-
-  getUserByEmail(email: string) {
-    return this._t.user.getByEmail.query(email);
+    return user;
   }
 
   getUserByPublicKey(publicKey: HexString) {
@@ -172,12 +148,8 @@ export default class Client {
       throw this._noPrivateKey;
     }
 
-    if (!this._userId) {
-      throw this._noUser;
-    }
-
     const sign = ec.sign(
-      { name, description, currencySymbol, userId: this._userId },
+      { name, description, currencySymbol, userPk: this._publicKey },
       this._privateKey
     );
 
@@ -185,7 +157,7 @@ export default class Client {
       name,
       description,
       currencySymbol,
-      userId: this._userId,
+      userPk: this._publicKey,
       signature: sign,
     });
   }
@@ -199,12 +171,8 @@ export default class Client {
       throw this._noPrivateKey;
     }
 
-    if (!this._userId) {
-      throw this._noUser;
-    }
-
     const sign = ec.sign(
-      { name, description, code, authorId: this._userId },
+      { name, description, code, authorPk: this._publicKey },
       this._privateKey
     );
 
@@ -212,7 +180,7 @@ export default class Client {
       name,
       description,
       code,
-      authorId: this._userId,
+      authorPk: this._publicKey,
       signature: sign,
     });
   }
@@ -222,19 +190,15 @@ export default class Client {
       throw this._noPrivateKey;
     }
 
-    if (!this._userId) {
-      throw this._noUser;
-    }
-
     const signature = ec.sign(
-      { smartContractId: id, reqData: request, callerId: this._userId },
+      { smartContractId: id, reqData: request, callerPk: this._publicKey },
       this._privateKey
     );
 
     return this._t.smartContracts.execute.mutate({
       id,
       request,
-      callerId: this._userId,
+      callerPk: this._publicKey,
       signature,
     });
   }

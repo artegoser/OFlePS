@@ -15,15 +15,49 @@
 
 import { HexString, ec } from "ofleps-utils";
 import { db } from "../../config/app.service.js";
-import { BadRequestError, ForbiddenError } from "../../errors/main.js";
-import { checkFromTo } from "./utils.js";
+import {
+  BadRequestError,
+  ForbiddenError,
+  NotFoundError,
+} from "../../errors/main.js";
 
-export function getTransactions(from: number, to: number) {
-  checkFromTo(from, to);
+export async function getTransactions(
+  page: number,
+  accountId: string,
+  signature: HexString
+) {
+  const account = await db.account.findUnique({
+    where: {
+      id: accountId,
+    },
+  });
 
-  return db.transaction.findMany({
-    skip: from,
-    take: to - from,
+  if (!account) {
+    throw new NotFoundError(`Account with id "${accountId}"`);
+  }
+
+  if (!ec.verify(signature, { accountId, page }, account.userPk as HexString)) {
+    throw new ForbiddenError(
+      "Invalid signature (possibly you requested not your transactions)"
+    );
+  }
+
+  return await db.transaction.findMany({
+    skip: (page - 1) * 50,
+    take: 50,
+    where: {
+      OR: [
+        {
+          from: accountId,
+        },
+        {
+          to: accountId,
+        },
+      ],
+    },
+    orderBy: {
+      date: "desc",
+    },
   });
 }
 
@@ -85,7 +119,7 @@ export async function transfer({
       !ec.verify(
         signature,
         { from, to, amount, comment, salt, type: "transfer" },
-        senderAccount.User.publicKey as HexString
+        senderAccount.User.pk as HexString
       )
     ) {
       throw new ForbiddenError(

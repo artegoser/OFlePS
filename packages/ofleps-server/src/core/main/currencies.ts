@@ -14,14 +14,11 @@
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 import { db } from "../../config/app.service.js";
-import { checkFromTo } from "./utils.js";
 
 export async function getCurrencyBySymbol(symbol: string) {
   return await db.currency.findUnique({ where: { symbol } });
 }
 
-export async function getCurrencies(from: number, to: number) {
-  checkFromTo(from, to);
-
-  return await db.currency.findMany({ skip: from, take: to - from });
+export async function getCurrencies(page: number) {
+  return await db.currency.findMany({ skip: (page - 1) * 50, take: 50 });
 }

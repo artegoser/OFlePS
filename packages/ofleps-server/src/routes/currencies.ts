@@ -22,9 +22,9 @@ const currencies = router({
     return core.currencies.getCurrencyBySymbol(input);
   }),
   get: publicProcedure
-    .input(z.object({ from: z.number(), to: z.number() }))
+    .input(z.object({ page: z.number() }))
     .query(({ input }) => {
-      return core.currencies.getCurrencies(input.from, input.to);
+      return core.currencies.getCurrencies(input.page);
     }),
 });
 

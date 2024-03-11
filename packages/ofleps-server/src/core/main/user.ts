@@ -18,7 +18,6 @@ import { ForbiddenError } from "../../errors/main.js";
 import { ec } from "ofleps-utils";
 
 import type { HexString } from "ofleps-utils";
-import { checkFromTo } from "./utils.js";
 
 export async function registerUser(
   name: string,
@@ -31,24 +30,10 @@ export async function registerUser(
   }
 
   return await db.user.create({
-    data: { name, email, publicKey, approved: config.auto_approve },
+    data: { name, email, pk: publicKey, approved: config.auto_approve },
   });
 }
 
-export async function getUserById(id: string) {
-  return await db.user.findUnique({ where: { id } });
-}
-
-export async function getUserByEmail(email: string) {
-  return await db.user.findUnique({ where: { email } });
-}
-
 export async function getUserByPublicKey(publicKey: HexString) {
-  return await db.user.findUnique({ where: { publicKey } });
-}
-
-export async function getUsers(from: number, to: number) {
-  checkFromTo(from, to);
-
-  return await db.user.findMany({ skip: from, take: to - from });
+  return await db.user.findUnique({ where: { pk: publicKey } });
 }

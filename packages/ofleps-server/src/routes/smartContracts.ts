@@ -25,7 +25,7 @@ const smartContracts = router({
         name: z.string(),
         description: z.string(),
         code: z.string(),
-        authorId: z.string(),
+        authorPk: z.string(),
         signature: z.string(),
       })
     )
@@ -34,7 +34,7 @@ const smartContracts = router({
         input.name,
         input.description,
         input.code,
-        input.authorId,
+        input.authorPk as HexString,
         input.signature as HexString
       );
     }),
@@ -46,7 +46,7 @@ const smartContracts = router({
           method: z.string(),
           params: z.array(z.string().or(z.number()).or(z.boolean())),
         }),
-        callerId: z.string(),
+        callerPk: z.string(),
         signature: z.string(),
       })
     )
@@ -54,7 +54,7 @@ const smartContracts = router({
       return core.smartContracts.executeSmartContract(
         input.id,
         input.request,
-        input.callerId,
+        input.callerPk as HexString,
         input.signature as HexString
       );
     }),

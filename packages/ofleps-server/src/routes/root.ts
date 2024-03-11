@@ -27,14 +27,14 @@ export const root = router({
   setBlockUser: publicProcedure
     .input(
       z.object({
-        userId: z.string(),
+        userPk: z.string(),
         block: z.boolean(),
         signature: z.string(),
       })
     )
     .mutation(({ input }) => {
       return setBlockUser(
-        input.userId,
+        input.userPk as HexString,
         input.block,
         input.signature as HexString
       );
@@ -42,14 +42,14 @@ export const root = router({
   setApproveUser: publicProcedure
     .input(
       z.object({
-        userId: z.string(),
+        userPk: z.string(),
         approve: z.boolean(),
         signature: z.string(),
       })
     )
     .mutation(({ input }) => {
       return setApproveUser(
-        input.userId,
+        input.userPk as HexString,
         input.approve,
         input.signature as HexString
       );

@@ -22,20 +22,14 @@ import { SmartRequest } from "ofleps-utils";
 export async function executeSmartContract(
   smartContractId: string,
   reqData: SmartRequest,
-  callerId: string,
+  callerPk: HexString,
   signature: HexString
 ) {
-  const caller = await db.user.findUnique({ where: { id: callerId } });
-
-  if (!caller) {
-    throw new NotFoundError(`User with id "${callerId}"`);
-  }
-
   if (
     !ec.verify(
       signature,
-      { smartContractId, reqData, callerId },
-      caller.publicKey as HexString
+      { smartContractId, reqData, callerPk },
+      callerPk as HexString
     )
   ) {
     throw new ForbiddenError("Invalid signature");
@@ -59,7 +53,7 @@ export async function executeSmartContract(
     );
   }
 
-  const isolate = new SmartIsolate(smartContract.id, smartContract.authorId);
+  const isolate = new SmartIsolate(smartContract.id, smartContract.authorPk);
 
   return await isolate.execute(
     smartContract.code,
@@ -72,20 +66,14 @@ export async function createSmartContract(
   name: string,
   description: string,
   code: string,
-  authorId: string,
+  authorPk: HexString,
   signature: HexString
 ) {
-  const author = await db.user.findUnique({ where: { id: authorId } });
-
-  if (!author) {
-    throw new NotFoundError(`User with id "${authorId}" not found`);
-  }
-
   if (
     !ec.verify(
       signature,
-      { name, description, code, authorId },
-      author.publicKey as HexString
+      { name, description, code, authorPk },
+      authorPk as HexString
     )
   ) {
     throw new ForbiddenError("Invalid signature");
@@ -97,7 +85,7 @@ export async function createSmartContract(
         name,
         description,
         code,
-        authorId,
+        authorPk,
         signature,
       },
     });

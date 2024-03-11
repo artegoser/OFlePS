@@ -43,11 +43,11 @@ export default class Root {
     return this._publicKey;
   }
 
-  setBlockUser(userId: string, block: boolean) {
-    const signature = ec.sign({ userId, block }, this._privateKey);
+  setBlockUser(userPk: HexString, block: boolean) {
+    const signature = ec.sign({ userPk, block }, this._privateKey);
 
     return this._t.root.setBlockUser.mutate({
-      userId,
+      userPk,
       block,
       signature,
     });
@@ -63,11 +63,11 @@ export default class Root {
     });
   }
 
-  setApproveUser(userId: string, approve: boolean) {
-    const signature = ec.sign({ userId, approve }, this._privateKey);
+  setApproveUser(userPk: HexString, approve: boolean) {
+    const signature = ec.sign({ userPk, approve }, this._privateKey);
 
     return this._t.root.setApproveUser.mutate({
-      userId,
+      userPk,
       approve,
       signature,
     });
