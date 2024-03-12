@@ -54,6 +54,9 @@ export async function orderMatch(
 
     const price = lowestSellOrder.price;
 
+    const sellerAmount = NP.times(quantityToTrade, lowestSellOrder.price);
+    const buyerAmount = NP.times(quantityToTrade, highestBuyOrder.price);
+
     // Update the quantities of the matched orders
     if (highestBuyOrder.quantity > quantityToTrade) {
       await tx.order.update({
@@ -76,7 +79,7 @@ export async function orderMatch(
     //Perform transactions from exchange accounts
     // Seller gets the money
     await txTransfer(tx, {
-      amount: NP.times(quantityToTrade, price),
+      amount: sellerAmount,
       from: "ofleps_exchange_" + toCurrencySymbol,
       to: lowestSellOrder.accountId,
       comment: genComment({
@@ -99,6 +102,21 @@ export async function orderMatch(
         quantity: quantityToTrade,
       }),
     });
+
+    // Refund unused funds
+    if (buyerAmount > sellerAmount) {
+      await txTransfer(tx, {
+        amount: NP.minus(buyerAmount, sellerAmount),
+        from: "ofleps_exchange_" + toCurrencySymbol,
+        to: highestBuyOrder.returnAccountId,
+        comment: genComment({
+          type: "refund_unutilized_funds",
+          pair: `${fromCurrencySymbol}/${toCurrencySymbol}`,
+          price,
+          quantity: quantityToTrade,
+        }),
+      });
+    }
 
     await tx.completeOrder.create({
       data: {

@@ -16,73 +16,93 @@
 import { HexString } from "ofleps-utils";
 import { Client, Root } from "../lib.js";
 
+function wait(ms: number) {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve(ms);
+    }, ms);
+  });
+}
+
 (async () => {
   const admin = new Root(
     "http://localhost:3000",
     "ac601a987ab9a5fcfa076190f4a0643be1ac53842f05f65047240dc8b679f452" as HexString
   );
 
-  // await admin.addCurrency("USD", "United States Dollar", "Currency of the US");
-  // await admin.addCurrency(
-  //   "RUB",
-  //   "Russian ruble",
-  //   "Currency of Russian Federation"
-  // );
+  const alice = new Client("http://localhost:3000");
+  const bob = new Client("http://localhost:3000");
 
-  const sender = new Client("http://localhost:3000");
-  const recipient = new Client("http://localhost:3000");
+  await alice.registerUser("sender", "sender@ofleps.io");
+  await bob.registerUser("recipient", "recipient@ofleps.io");
 
-  await sender.registerUser("sender", "sender@ofleps.io");
-  await recipient.registerUser("recipient", "recipient@ofleps.io");
-
-  const { id: senderFromId } = await sender.createAccount(
+  const { id: afid } = await alice.createAccount(
     "sender usd",
     "sender account",
     "USD"
   );
 
-  const { id: senderToId } = await sender.createAccount(
+  const { id: atid } = await alice.createAccount(
     "sender rub",
     "sender account",
     "RUB"
   );
 
-  const { id: recipientFromId } = await recipient.createAccount(
+  const { id: bfid } = await bob.createAccount(
     "recipient usd",
     "recipient account",
     "USD"
   );
 
-  const { id: recipientToId } = await recipient.createAccount(
+  const { id: btid } = await bob.createAccount(
     "recipient rub",
     "recipient account",
     "RUB"
   );
 
   //now admin issues money
-  await admin.issue(senderFromId, 5, "issue usd to sender");
-  await admin.issue(recipientToId, 500, "issue rub to recipient");
+  await admin.issue(afid, 5, "issue usd to sender");
+  await admin.issue(btid, 500, "issue rub to recipient");
 
-  //now sender transfers money to recipient
-  const order1 = await sender.sell(
-    senderFromId,
-    senderToId,
-    "USD",
-    "RUB",
-    1,
-    90
+  // Place multiple limit orders
+  await alice.sell(afid, atid, "USD", "RUB", 1, 90);
+  await alice.sell(afid, atid, "USD", "RUB", 1, 95);
+  await alice.sell(afid, atid, "USD", "RUB", 2, 99);
+  await alice.sell(afid, atid, "USD", "RUB", 1, 110);
+
+  // Place limit order
+  // Buys 3 USD for 90,95,99
+  await bob.buy(bfid, btid, "USD", "RUB", 3, 100);
+
+  // Wait some time for exchange to settle
+  await wait(1000);
+
+  // Order fullfiled(probably), now we can see transactions
+  const transactions_alice = await alice.getTransactions(atid);
+  const transactions_bob = await bob.getTransactions(bfid);
+
+  console.log(`\nSender transactions (${atid}):`);
+  console.log(
+    transactions_alice
+      .map(
+        (t) =>
+          `sender: ${t.amount} ${t.currencySymbol} ${
+            atid === t.from ? "->" : "<-"
+          } ${t.type}`
+      )
+      .join("\n")
   );
 
-  console.log(order1);
+  console.log(`\nRecipient transactions (${bfid}):`);
 
-  const order2 = await recipient.buy(
-    recipientFromId,
-    recipientToId,
-    "USD",
-    "RUB",
-    1,
-    90
+  console.log(
+    transactions_bob
+      .map(
+        (t) =>
+          `recipient: ${t.amount} ${t.currencySymbol} ${
+            bfid === t.from ? "->" : "<-"
+          } ${t.type}`
+      )
+      .join("\n")
   );
-
-  console.log(order2);
 })();

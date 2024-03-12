@@ -116,6 +116,8 @@ model Order {
 }
 
 model CompleteOrder {
+  id String @id @default(cuid())
+
   date DateTime @default(now())
 
   price              Float
@@ -125,8 +127,6 @@ model CompleteOrder {
 
   fromCurrency Currency @relation(name: "CompleteOrderFrom", fields: [fromCurrencySymbol], references: [symbol])
   toCurrency   Currency @relation(name: "CompleteOrderTo", fields: [toCurrencySymbol], references: [symbol])
-
-  @@unique([fromCurrencySymbol, toCurrencySymbol])
 }
 
 model SmartContract {
