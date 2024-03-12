@@ -13,19 +13,25 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-import type { AppRouter } from "ofleps-server";
-import { createTRPCProxyClient, httpBatchLink } from "@trpc/client";
+import { createTRPCProxyClient, httpBatchLink } from '@trpc/client';
+import type { AppRouter } from 'ofleps-server';
 
-import { ec, HexString, SmartRequest } from "ofleps-utils";
-import { ITransferArgs } from "./types/client.js";
+import { ec, HexString, SmartRequest } from 'ofleps-utils';
+import { ITransferArgs } from './types/client.js';
 
 export default class Client {
-  private _t;
+  // #region Properties (5)
+
+  private _noPrivateKey = new Error('No private key, generate or set first');
   private _privateKey?: HexString;
   private _publicKey?: HexString;
-  private _noPrivateKey = new Error("No private key, generate or set first");
-  private _noUser = new Error("No user id, register or login first");
-  private _userNotExist = new Error("User not exist, register first");
+  private _t;
+  private _userNotExist = new Error('User not exist, register first');
+
+  // #endregion Properties (5)
+
+  // #region Constructors (1)
+
   constructor(baseUrl: string, privateKey?: HexString) {
     this._t = createTRPCProxyClient<AppRouter>({
       links: [
@@ -40,62 +46,23 @@ export default class Client {
     }
   }
 
-  get publicKey() {
-    return this._publicKey;
-  }
+  // #endregion Constructors (1)
 
-  get privateKey() {
+  // #region Public Getters And Setters (2)
+
+  public get privateKey() {
     return this._privateKey;
   }
 
-  setPrivateKey(privateKey: HexString) {
-    const publicKey = ec.getPublicKey(privateKey);
-
-    this._privateKey = privateKey;
-    this._publicKey = publicKey;
-
+  public get publicKey() {
     return this._publicKey;
   }
 
-  getTransactions(accountId: string, page: number = 1) {
-    if (!this._privateKey || !this._publicKey) {
-      throw this._noPrivateKey;
-    }
+  // #endregion Public Getters And Setters (2)
 
-    const signature = ec.sign({ accountId, page }, this._privateKey);
+  // #region Public Methods (17)
 
-    return this._t.transactions.get.query({ accountId, page, signature });
-  }
-
-  /**
-   * A function that transfers an amount from one account to another.
-   *
-   * @param {ITransferArgs} from - the account to transfer from (id)
-   * @param {ITransferArgs} to - the account to transfer to (id)
-   * @param {ITransferArgs} amount - the amount to transfer
-   * @param {ITransferArgs} [comment] - the comment associated with the transfer
-   * @return {ReturnType} the result of the transfer operation
-   */
-  transfer({ from, to, amount, comment }: ITransferArgs) {
-    if (!this._privateKey || !this._publicKey) {
-      throw this._noPrivateKey;
-    }
-
-    const signature = ec.sign(
-      { from, to, amount, comment, type: "transfer" },
-      this._privateKey
-    );
-
-    return this._t.transactions.transfer.mutate({
-      from,
-      to,
-      amount,
-      comment,
-      signature,
-    });
-  }
-
-  buy(
+  public buy(
     fromAccountId: string,
     toAccountId: string,
     fromCurrencySymbol: string,
@@ -114,38 +81,7 @@ export default class Client {
     );
   }
 
-  sell(
-    fromAccountId: string,
-    toAccountId: string,
-    fromCurrencySymbol: string,
-    toCurrencySymbol: string,
-    quantity: number,
-    price: number
-  ) {
-    return this._createOrder(
-      fromAccountId,
-      toAccountId,
-      fromCurrencySymbol,
-      toCurrencySymbol,
-      quantity,
-      price,
-      false
-    );
-  }
-
-  getOrderBook(
-    fromCurrencySymbol: string,
-    toCurrencySymbol: string,
-    page: number = 1
-  ) {
-    return this._t.exchange.getOrderBook.query({
-      fromCurrencySymbol,
-      toCurrencySymbol,
-      page,
-    });
-  }
-
-  cancelOrder(orderToCancelId: string) {
+  public cancelOrder(orderToCancelId: string) {
     if (!this._privateKey || !this._publicKey) {
       throw this._noPrivateKey;
     }
@@ -163,15 +99,125 @@ export default class Client {
     });
   }
 
-  getCurrencies(page: number = 1) {
+  public createAccount(
+    name: string,
+    description: string,
+    currencySymbol: string
+  ) {
+    if (!this._privateKey || !this._publicKey) {
+      throw this._noPrivateKey;
+    }
+
+    const sign = ec.sign(
+      { name, description, currencySymbol, userPk: this._publicKey },
+      this._privateKey
+    );
+
+    return this._t.accounts.create.mutate({
+      name,
+      description,
+      currencySymbol,
+      userPk: this._publicKey,
+      signature: sign,
+    });
+  }
+
+  public async createSmartContract(
+    name: string,
+    description: string,
+    code: string
+  ) {
+    if (!this._privateKey || !this._publicKey) {
+      throw this._noPrivateKey;
+    }
+
+    const sign = ec.sign(
+      { name, description, code, authorPk: this._publicKey },
+      this._privateKey
+    );
+
+    return this._t.smartContracts.create.mutate({
+      name,
+      description,
+      code,
+      authorPk: this._publicKey,
+      signature: sign,
+    });
+  }
+
+  public async executeSmartContract(id: string, request: SmartRequest) {
+    if (!this._privateKey || !this._publicKey) {
+      throw this._noPrivateKey;
+    }
+
+    const signature = ec.sign(
+      { smartContractId: id, reqData: request, callerPk: this._publicKey },
+      this._privateKey
+    );
+
+    return this._t.smartContracts.execute.mutate({
+      id,
+      request,
+      callerPk: this._publicKey,
+      signature,
+    });
+  }
+
+  public getAccountById(id: string) {
+    return this._t.accounts.getById.query(id);
+  }
+
+  public getCurrencies(page: number = 1) {
     return this._t.currencies.get.query({ page });
   }
 
-  getCurrencyBySymbol(symbol: string) {
+  public getCurrencyBySymbol(symbol: string) {
     return this._t.currencies.getBySymbol.query(symbol);
   }
 
-  async registerUser(name: string, email: string) {
+  public getOrderBook(
+    fromCurrencySymbol: string,
+    toCurrencySymbol: string,
+    page: number = 1
+  ) {
+    return this._t.exchange.getOrderBook.query({
+      fromCurrencySymbol,
+      toCurrencySymbol,
+      page,
+    });
+  }
+
+  public getSmartContractById(id: string) {
+    return this._t.smartContracts.getById.query(id);
+  }
+
+  public getTransactions(accountId: string, page: number = 1) {
+    if (!this._privateKey || !this._publicKey) {
+      throw this._noPrivateKey;
+    }
+
+    const signature = ec.sign({ accountId, page }, this._privateKey);
+
+    return this._t.transactions.get.query({ accountId, page, signature });
+  }
+
+  public getUserByPublicKey(publicKey: HexString) {
+    return this._t.user.getByPublicKey.query(publicKey);
+  }
+
+  public async login(privateKey: HexString) {
+    this.setPrivateKey(privateKey);
+
+    const user = await this.getUserByPublicKey(this._publicKey as HexString);
+
+    if (!user) {
+      throw this._userNotExist;
+    }
+
+    return user;
+  }
+
+  public async registerUser(name: string, email: string) {
     if (!this._privateKey || !this._publicKey) {
       const { privateKey, publicKey } = ec.generateKeyPair();
 
@@ -192,85 +238,65 @@ export default class Client {
     });
   }
 
-  async login(privateKey: HexString) {
-    this.setPrivateKey(privateKey);
-
-    const user = await this.getUserByPublicKey(this._publicKey as HexString);
-
-    if (!user) {
-      throw this._userNotExist;
-    }
-
-    return user;
-  }
-
-  getUserByPublicKey(publicKey: HexString) {
-    return this._t.user.getByPublicKey.query(publicKey);
-  }
-
-  getSmartContractById(id: string) {
-    return this._t.smartContracts.getById.query(id);
-  }
-
-  createAccount(name: string, description: string, currencySymbol: string) {
-    if (!this._privateKey || !this._publicKey) {
-      throw this._noPrivateKey;
-    }
-
-    const sign = ec.sign(
-      { name, description, currencySymbol, userPk: this._publicKey },
-      this._privateKey
+  public sell(
+    fromAccountId: string,
+    toAccountId: string,
+    fromCurrencySymbol: string,
+    toCurrencySymbol: string,
+    quantity: number,
+    price: number
+  ) {
+    return this._createOrder(
+      fromAccountId,
+      toAccountId,
+      fromCurrencySymbol,
+      toCurrencySymbol,
+      quantity,
+      price,
+      false
     );
-
-    return this._t.accounts.create.mutate({
-      name,
-      description,
-      currencySymbol,
-      userPk: this._publicKey,
-      signature: sign,
-    });
   }
 
-  getAccountById(id: string) {
-    return this._t.accounts.getById.query(id);
+  public setPrivateKey(privateKey: HexString) {
+    const publicKey = ec.getPublicKey(privateKey);
+
+    this._privateKey = privateKey;
+    this._publicKey = publicKey;
+
+    return this._publicKey;
   }
 
-  async createSmartContract(name: string, description: string, code: string) {
-    if (!this._privateKey || !this._publicKey) {
-      throw this._noPrivateKey;
-    }
-
-    const sign = ec.sign(
-      { name, description, code, authorPk: this._publicKey },
-      this._privateKey
-    );
-
-    return this._t.smartContracts.create.mutate({
-      name,
-      description,
-      code,
-      authorPk: this._publicKey,
-      signature: sign,
-    });
-  }
-
-  async executeSmartContract(id: string, request: SmartRequest) {
+  /**
+   * A function that transfers an amount from one account to another.
+   *
+   * @param {ITransferArgs} from - the account to transfer from (id)
+   * @param {ITransferArgs} to - the account to transfer to (id)
+   * @param {ITransferArgs} amount - the amount to transfer
+   * @param {ITransferArgs} [comment] - the comment associated with the transfer
+   * @return {ReturnType} the result of the transfer operation
+   */
+  public transfer({ from, to, amount, comment }: ITransferArgs) {
     if (!this._privateKey || !this._publicKey) {
       throw this._noPrivateKey;
     }
 
     const signature = ec.sign(
-      { smartContractId: id, reqData: request, callerPk: this._publicKey },
+      { from, to, amount, comment, type: 'transfer' },
       this._privateKey
     );
 
-    return this._t.smartContracts.execute.mutate({
-      id,
-      request,
-      callerPk: this._publicKey,
+    return this._t.transactions.transfer.mutate({
+      from,
+      to,
+      amount,
+      comment,
       signature,
     });
   }
+
+  // #endregion Public Methods (17)
+
+  // #region Private Methods (1)
 
   private _createOrder(
     fromAccountId: string,
@@ -319,4 +345,6 @@ export default class Client {
       signature,
     });
   }
+
+  // #endregion Private Methods (1)
 }
