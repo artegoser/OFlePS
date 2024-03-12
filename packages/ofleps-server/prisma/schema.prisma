@@ -55,7 +55,8 @@ model Account {
   transactionsSender    Transaction[] @relation("TransactionSender")
   transactionsRecipient Transaction[] @relation("TransactionRecipient")
 
-  Orders Order[]
+  Orders       Order[] @relation("OrderAccount")
+  returnOrders Order[] @relation("OrderReturnAccount")
 }
 
 model Transaction {
@@ -96,7 +97,8 @@ model Order {
   id   String   @id @default(cuid())
   date DateTime @default(now())
 
-  accountId String
+  accountId       String
+  returnAccountId String
 
   quantity Float
   price    Float
@@ -109,13 +111,15 @@ model Order {
   fromCurrency Currency @relation(name: "OrderFrom", fields: [fromCurrencySymbol], references: [symbol])
   toCurrency   Currency @relation(name: "OrderTo", fields: [toCurrencySymbol], references: [symbol])
 
-  Account Account @relation(fields: [accountId], references: [id])
+  Account       Account @relation(name: "OrderAccount", fields: [accountId], references: [id])
+  returnAccount Account @relation(name: "OrderReturnAccount", fields: [returnAccountId], references: [id])
 }
 
 model CompleteOrder {
   date DateTime @default(now())
 
   price              Float
+  quantity           Float
   fromCurrencySymbol String
   toCurrencySymbol   String
 

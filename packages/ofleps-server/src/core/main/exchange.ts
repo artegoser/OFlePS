@@ -20,7 +20,7 @@ import { txTransfer } from "../helpers/txTrans.js";
 import NP from "number-precision";
 
 function genComment(obj: any) {
-  return `@ofleps${JSON.stringify(obj)}`;
+  return `@ofleps_exchange${JSON.stringify(obj)}`;
 }
 
 async function createOrder(
@@ -33,9 +33,8 @@ async function createOrder(
   type: boolean, // true - buy, false - sell
   signature: HexString
 ) {
-
   if (quantity <= 0) throw new ForbiddenError("Set quantity <= 0");
-  
+
   const account = await db.account.findUniqueOrThrow({
     where: {
       id: type ? toAccountId : fromAccountId,
@@ -136,6 +135,7 @@ async function createOrder(
       await tx.completeOrder.create({
         data: {
           price,
+          quantity,
           fromCurrencySymbol,
           toCurrencySymbol,
         },
@@ -146,7 +146,8 @@ async function createOrder(
 
     return await tx.order.create({
       data: {
-        accountId: type ? fromAccountId : toAccountId,
+        accountId: !type ? toAccountId : fromAccountId,
+        returnAccountId: type ? toAccountId : fromAccountId,
         quantity,
         price,
         type,

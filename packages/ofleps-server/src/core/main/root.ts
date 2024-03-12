@@ -98,8 +98,16 @@ export function addCurrency({
     throw invalidSign;
   }
 
-  return db.currency.create({
-    data: {
+  return db.currency.upsert({
+    where: {
+      symbol,
+    },
+    update: {
+      name,
+      description,
+      type,
+    },
+    create: {
       symbol,
       name,
       description,
