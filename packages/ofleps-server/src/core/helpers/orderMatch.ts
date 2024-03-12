@@ -21,7 +21,15 @@ export interface MatchResult {
   type: "all_matched" | "match_success";
 }
 
-export function genComment(obj: any) {
+interface CommentData {
+  type: string;
+  orderId: string;
+  pair: string;
+  price: number;
+  quantity: number;
+}
+
+export function genComment(obj: CommentData) {
   return `@exchange${JSON.stringify(obj)}`;
 }
 
@@ -84,6 +92,7 @@ export async function orderMatch(
       to: lowestSellOrder.accountId,
       comment: genComment({
         type: "sell_success",
+        orderId: lowestSellOrder.id,
         pair: `${fromCurrencySymbol}/${toCurrencySymbol}`,
         price,
         quantity: quantityToTrade,
@@ -97,13 +106,14 @@ export async function orderMatch(
       to: highestBuyOrder.accountId,
       comment: genComment({
         type: "buy_success",
+        orderId: highestBuyOrder.id,
         pair: `${fromCurrencySymbol}/${toCurrencySymbol}`,
         price,
         quantity: quantityToTrade,
       }),
     });
 
-    // Refund unused funds
+    // Refund unused funds to the buyer
     if (buyerAmount > sellerAmount) {
       await txTransfer(tx, {
         amount: NP.minus(buyerAmount, sellerAmount),
@@ -111,6 +121,7 @@ export async function orderMatch(
         to: highestBuyOrder.returnAccountId,
         comment: genComment({
           type: "refund_unutilized_funds",
+          orderId: highestBuyOrder.id,
           pair: `${fromCurrencySymbol}/${toCurrencySymbol}`,
           price,
           quantity: quantityToTrade,

@@ -88,18 +88,6 @@ async function createOrder(
   // const antiRealAmount = !type ? NP.times(quantity, price) : quantity;
 
   return await db.$transaction(async (tx) => {
-    await txTransfer(tx, {
-      amount: realAmount,
-      from: type ? toAccountId : fromAccountId,
-      to: type ? exchange_account_id_to : exchange_account_id_from,
-      comment: genComment({
-        type: type ? "buy" : "sell",
-        pair: `${fromCurrencySymbol}/${toCurrencySymbol}`,
-        price,
-        quantity,
-      }),
-    });
-
     const new_order = await tx.order.create({
       data: {
         accountId: !type ? toAccountId : fromAccountId,
@@ -111,6 +99,19 @@ async function createOrder(
         fromCurrencySymbol,
         toCurrencySymbol,
       },
+    });
+
+    await txTransfer(tx, {
+      amount: realAmount,
+      from: type ? toAccountId : fromAccountId,
+      to: type ? exchange_account_id_to : exchange_account_id_from,
+      comment: genComment({
+        type: type ? "buy" : "sell",
+        orderId: new_order.id,
+        pair: `${fromCurrencySymbol}/${toCurrencySymbol}`,
+        price,
+        quantity,
+      }),
     });
 
     orderEmitter.emit("new_order", { fromCurrencySymbol, toCurrencySymbol });
