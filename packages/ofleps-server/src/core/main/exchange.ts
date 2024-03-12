@@ -18,6 +18,83 @@ import { db } from "../../config/app.service.js";
 import { ForbiddenError } from "../../errors/main.js";
 import { txTransfer } from "../helpers/txTrans.js";
 import NP from "number-precision";
+import EventEmitter from "events";
+
+const orderEmitter = new EventEmitter();
+
+orderEmitter.on("new_order", async (id) => {
+  await db.$transaction(async (tx) => {
+    const new_order = await tx.order.findFirstOrThrow({
+      where: {
+        id,
+      },
+    });
+
+    const {
+      price,
+      quantity,
+      fromCurrencySymbol,
+      toCurrencySymbol,
+      type,
+      accountId,
+    } = new_order;
+
+    const exchange_account_id_from = "ofleps_exchange_" + fromCurrencySymbol;
+    const exchange_account_id_to = "ofleps_exchange_" + toCurrencySymbol;
+
+    const realAmount = type ? NP.times(quantity, price) : quantity;
+    const antiRealAmount = !type ? NP.times(quantity, price) : quantity;
+
+    const orderSell = await tx.order.findFirst({
+      where: {
+        quantity,
+        price,
+        type: !type,
+      },
+    });
+
+    if (orderSell) {
+      await tx.order.delete({
+        where: {
+          id: orderSell.id,
+        },
+      });
+
+      await txTransfer(tx, {
+        amount: realAmount,
+        from: type ? exchange_account_id_to : exchange_account_id_from,
+        to: orderSell.accountId,
+        comment: genComment({
+          type: (!type ? "buy" : "sell") + " success",
+          pair: `${fromCurrencySymbol}/${toCurrencySymbol}`,
+          price,
+          quantity,
+        }),
+      });
+
+      await txTransfer(tx, {
+        amount: antiRealAmount,
+        from: !type ? exchange_account_id_to : exchange_account_id_from,
+        to: accountId,
+        comment: genComment({
+          type: (type ? "buy" : "sell") + " success",
+          pair: `${fromCurrencySymbol}/${toCurrencySymbol}`,
+          price,
+          quantity,
+        }),
+      });
+
+      await tx.completeOrder.create({
+        data: {
+          price,
+          quantity,
+          fromCurrencySymbol,
+          toCurrencySymbol,
+        },
+      });
+    }
+  });
+});
 
 function genComment(obj: any) {
   return `@ofleps_exchange${JSON.stringify(obj)}`;
@@ -65,20 +142,11 @@ async function createOrder(
     throw new ForbiddenError("Invalid signature");
   }
 
-  const { id: exchange_account_id_from } = await db.account.findUniqueOrThrow({
-    where: {
-      id: "ofleps_exchange_" + fromCurrencySymbol,
-    },
-  });
-
-  const { id: exchange_account_id_to } = await db.account.findUniqueOrThrow({
-    where: {
-      id: "ofleps_exchange_" + toCurrencySymbol,
-    },
-  });
+  const exchange_account_id_from = "ofleps_exchange_" + fromCurrencySymbol;
+  const exchange_account_id_to = "ofleps_exchange_" + toCurrencySymbol;
 
   const realAmount = type ? NP.times(quantity, price) : quantity;
-  const antiRealAmount = !type ? NP.times(quantity, price) : quantity;
+  // const antiRealAmount = !type ? NP.times(quantity, price) : quantity;
 
   return await db.$transaction(async (tx) => {
     await txTransfer(tx, {
@@ -93,58 +161,7 @@ async function createOrder(
       }),
     });
 
-    const order = await tx.order.findFirst({
-      where: {
-        quantity,
-        price,
-        type: !type,
-      },
-    });
-
-    if (order) {
-      await tx.order.delete({
-        where: {
-          id: order.id,
-        },
-      });
-
-      await txTransfer(tx, {
-        amount: realAmount,
-        from: type ? exchange_account_id_to : exchange_account_id_from,
-        to: order.accountId,
-        comment: genComment({
-          type: (!type ? "buy" : "sell") + " success",
-          pair: `${fromCurrencySymbol}/${toCurrencySymbol}`,
-          price,
-          quantity,
-        }),
-      });
-
-      const transaction = await txTransfer(tx, {
-        amount: antiRealAmount,
-        from: !type ? exchange_account_id_to : exchange_account_id_from,
-        to: !type ? toAccountId : fromAccountId,
-        comment: genComment({
-          type: (type ? "buy" : "sell") + " success",
-          pair: `${fromCurrencySymbol}/${toCurrencySymbol}`,
-          price,
-          quantity,
-        }),
-      });
-
-      await tx.completeOrder.create({
-        data: {
-          price,
-          quantity,
-          fromCurrencySymbol,
-          toCurrencySymbol,
-        },
-      });
-
-      return transaction;
-    }
-
-    return await tx.order.create({
+    const new_order = await tx.order.create({
       data: {
         accountId: !type ? toAccountId : fromAccountId,
         returnAccountId: type ? toAccountId : fromAccountId,
@@ -156,6 +173,10 @@ async function createOrder(
         toCurrencySymbol,
       },
     });
+
+    orderEmitter.emit("new_order", new_order.id);
+
+    return new_order;
   });
 }
 

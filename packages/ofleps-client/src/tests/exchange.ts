@@ -61,7 +61,7 @@ import { Client, Root } from "../lib.js";
 
   //now admin issues money
   await admin.issue(senderFromId, 5, "issue usd to sender");
-  await admin.issue(recipientToId, 500, "issue rub to sender");
+  await admin.issue(recipientToId, 500, "issue rub to recipient");
 
   //now sender transfers money to recipient
   const order1 = await sender.sell(
