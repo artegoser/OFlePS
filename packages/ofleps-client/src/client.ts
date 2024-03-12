@@ -181,6 +181,18 @@ export default class Client {
     });
   }
 
+  getOrderBook(
+    fromCurrencySymbol: string,
+    toCurrencySymbol: string,
+    page: number = 1
+  ) {
+    return this._t.exchange.getOrderBook.query({
+      fromCurrencySymbol,
+      toCurrencySymbol,
+      page,
+    });
+  }
+
   cancelOrder(orderToCancelId: string) {
     if (!this._privateKey || !this._publicKey) {
       throw this._noPrivateKey;

@@ -24,6 +24,19 @@ function wait(ms: number) {
   });
 }
 
+function mapOrderBook(orderBook: any) {
+  return {
+    bids: orderBook.bids.map(
+      ({ price, quantity }: { price: number; quantity: number }) =>
+        `price: ${price} quantity: ${quantity}`
+    ),
+    asks: orderBook.asks.map(
+      ({ price, quantity }: { price: number; quantity: number }) =>
+        `price: ${price} quantity: ${quantity}`
+    ),
+  };
+}
+
 (async () => {
   const admin = new Root(
     "http://localhost:3000",
@@ -66,18 +79,31 @@ function wait(ms: number) {
   // Buys 3 USD for 90,95,99
   await bob.buy(bfid, btid, "USD", "RUB", 3, 100);
 
+  console.log("Order book before matching:");
+  console.table(mapOrderBook(await bob.getOrderBook("USD", "RUB")));
+
   // Wait some time for exchange to settle
   await wait(1000);
+
+  console.log("Order book after matching:");
+  console.table(mapOrderBook(await bob.getOrderBook("USD", "RUB")));
 
   // Cancel alice sell orders
   await alice.cancelOrder(unfulfilled.id);
   await alice.cancelOrder(unfulfilled2.id);
 
+  console.log("Order book after canceling:");
+  console.table(mapOrderBook(await bob.getOrderBook("USD", "RUB")));
+
   // Order fullfiled(probably), now we can see transactions
   const transactions_alice = await alice.getTransactions(atid);
   const transactions_bob = await bob.getTransactions(bfid);
 
-  console.log(`\nAlice transactions (${atid}):`);
+  const aa = await alice.getAccountById(atid);
+  const ba = await bob.getAccountById(bfid);
+
+  console.log("\nTransactions after exchange:\n");
+  console.log(`\nAlice transactions (${aa?.balance} ${aa?.currencySymbol}):`);
   console.log(
     transactions_alice
       .map(
@@ -89,7 +115,7 @@ function wait(ms: number) {
       .join("\n")
   );
 
-  console.log(`\nBob transactions (${bfid}):`);
+  console.log(`\nBob transactions (${ba?.balance} ${ba?.currencySymbol}):`);
 
   console.log(
     transactions_bob

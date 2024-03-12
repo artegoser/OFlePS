@@ -37,6 +37,47 @@ orderEmitter.on("new_order", async (data) => {
   }
 });
 
+export async function getOrderBook(
+  fromCurrencySymbol: string,
+  toCurrencySymbol: string,
+  page: number
+) {
+  const [bids, asks] = await db.$transaction([
+    db.order.findMany({
+      where: {
+        fromCurrencySymbol,
+        toCurrencySymbol,
+        type: true,
+      },
+      select: {
+        price: true,
+        quantity: true,
+        date: true,
+      },
+      orderBy: [{ price: "desc" }, { date: "asc" }],
+      skip: (page - 1) * 50,
+      take: 50,
+    }),
+    db.order.findMany({
+      where: {
+        fromCurrencySymbol,
+        toCurrencySymbol,
+        type: false,
+      },
+      select: {
+        price: true,
+        quantity: true,
+        date: true,
+      },
+      orderBy: [{ price: "asc" }, { date: "asc" }],
+      skip: (page - 1) * 50,
+      take: 50,
+    }),
+  ]);
+
+  return { bids, asks };
+}
+
 export async function cancelOrder(
   orderToCancelId: string,
   signature: HexString

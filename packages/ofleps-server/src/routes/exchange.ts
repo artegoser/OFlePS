@@ -19,6 +19,21 @@ import core from "../core/main/main.js";
 import { HexString } from "ofleps-utils";
 
 const exchange = router({
+  getOrderBook: publicProcedure
+    .input(
+      z.object({
+        fromCurrencySymbol: z.string(),
+        toCurrencySymbol: z.string(),
+        page: z.number(),
+      })
+    )
+    .query(({ input }) => {
+      return core.exchange.getOrderBook(
+        input.fromCurrencySymbol,
+        input.toCurrencySymbol,
+        input.page
+      );
+    }),
   cancel: publicProcedure
     .input(
       z.object({
