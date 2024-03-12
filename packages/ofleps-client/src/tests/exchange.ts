@@ -33,36 +33,28 @@ function wait(ms: number) {
   const alice = new Client("http://localhost:3000");
   const bob = new Client("http://localhost:3000");
 
-  await alice.registerUser("sender", "sender@ofleps.io");
-  await bob.registerUser("recipient", "recipient@ofleps.io");
+  await alice.registerUser("alice", "alice@ofleps.io");
+  await bob.registerUser("bob", "bob@ofleps.io");
 
   const { id: afid } = await alice.createAccount(
-    "sender usd",
-    "sender account",
+    "alice usd",
+    "alice account",
     "USD"
   );
 
   const { id: atid } = await alice.createAccount(
-    "sender rub",
-    "sender account",
+    "alice rub",
+    "alice account",
     "RUB"
   );
 
-  const { id: bfid } = await bob.createAccount(
-    "recipient usd",
-    "recipient account",
-    "USD"
-  );
+  const { id: bfid } = await bob.createAccount("bob usd", "bob account", "USD");
 
-  const { id: btid } = await bob.createAccount(
-    "recipient rub",
-    "recipient account",
-    "RUB"
-  );
+  const { id: btid } = await bob.createAccount("bob rub", "bob account", "RUB");
 
   //now admin issues money
-  await admin.issue(afid, 5, "issue usd to sender");
-  await admin.issue(btid, 500, "issue rub to recipient");
+  await admin.issue(afid, 5, "issue usd to alice");
+  await admin.issue(btid, 500, "issue rub to bob");
 
   // Place multiple limit orders
   await alice.sell(afid, atid, "USD", "RUB", 1, 90);
@@ -81,27 +73,27 @@ function wait(ms: number) {
   const transactions_alice = await alice.getTransactions(atid);
   const transactions_bob = await bob.getTransactions(bfid);
 
-  console.log(`\nSender transactions (${atid}):`);
+  console.log(`\nAlice transactions (${atid}):`);
   console.log(
     transactions_alice
       .map(
         (t) =>
-          `sender: ${t.amount} ${t.currencySymbol} ${
-            atid === t.from ? "->" : "<-"
-          } ${t.type}`
+          `${t.amount} ${t.currencySymbol} ${atid === t.from ? "->" : "<-"} ${
+            t.type
+          }`
       )
       .join("\n")
   );
 
-  console.log(`\nRecipient transactions (${bfid}):`);
+  console.log(`\nBob transactions (${bfid}):`);
 
   console.log(
     transactions_bob
       .map(
         (t) =>
-          `recipient: ${t.amount} ${t.currencySymbol} ${
-            bfid === t.from ? "->" : "<-"
-          } ${t.type}`
+          `${t.amount} ${t.currencySymbol} ${bfid === t.from ? "->" : "<-"} ${
+            t.type
+          }`
       )
       .join("\n")
   );

@@ -14,12 +14,12 @@
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 import { HexString, ec } from "ofleps-utils";
-import { db } from "../../config/app.service.js";
+import { db, config } from "../../config/app.service.js";
 import { ForbiddenError } from "../../errors/main.js";
 import { txTransfer } from "../helpers/txTrans.js";
 import NP from "number-precision";
 import EventEmitter from "events";
-import { MatchResult, orderMatch } from "../helpers/orderMatch.js";
+import { MatchResult, genComment, orderMatch } from "../helpers/orderMatch.js";
 
 const orderEmitter = new EventEmitter();
 
@@ -36,10 +36,6 @@ orderEmitter.on("new_order", async (data) => {
     });
   }
 });
-
-function genComment(obj: any) {
-  return `@ofleps_exchange${JSON.stringify(obj)}`;
-}
 
 async function createOrder(
   fromAccountId: string,
@@ -83,8 +79,10 @@ async function createOrder(
     throw new ForbiddenError("Invalid signature");
   }
 
-  const exchange_account_id_from = "ofleps_exchange_" + fromCurrencySymbol;
-  const exchange_account_id_to = "ofleps_exchange_" + toCurrencySymbol;
+  const exchange_account_id_from =
+    config.exchange_account_prefix + fromCurrencySymbol;
+  const exchange_account_id_to =
+    config.exchange_account_prefix + toCurrencySymbol;
 
   const realAmount = type ? NP.times(quantity, price) : quantity;
   // const antiRealAmount = !type ? NP.times(quantity, price) : quantity;

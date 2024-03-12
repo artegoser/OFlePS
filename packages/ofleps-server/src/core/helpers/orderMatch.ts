@@ -13,7 +13,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-import type { txDb } from "../../config/app.service.js";
+import { config, type txDb } from "../../config/app.service.js";
 import NP from "number-precision";
 import { txTransfer } from "./txTrans.js";
 
@@ -21,8 +21,8 @@ export interface MatchResult {
   type: "all_matched" | "match_success";
 }
 
-function genComment(obj: any) {
-  return `@ofleps_exchange${JSON.stringify(obj)}`;
+export function genComment(obj: any) {
+  return `@exchange${JSON.stringify(obj)}`;
 }
 
 export async function orderMatch(
@@ -80,7 +80,7 @@ export async function orderMatch(
     // Seller gets the money
     await txTransfer(tx, {
       amount: sellerAmount,
-      from: "ofleps_exchange_" + toCurrencySymbol,
+      from: config.exchange_account_prefix + toCurrencySymbol,
       to: lowestSellOrder.accountId,
       comment: genComment({
         type: "sell_success",
@@ -93,7 +93,7 @@ export async function orderMatch(
     // Buyer gets the money
     await txTransfer(tx, {
       amount: quantityToTrade,
-      from: "ofleps_exchange_" + fromCurrencySymbol,
+      from: config.exchange_account_prefix + fromCurrencySymbol,
       to: highestBuyOrder.accountId,
       comment: genComment({
         type: "buy_success",
@@ -107,7 +107,7 @@ export async function orderMatch(
     if (buyerAmount > sellerAmount) {
       await txTransfer(tx, {
         amount: NP.minus(buyerAmount, sellerAmount),
-        from: "ofleps_exchange_" + toCurrencySymbol,
+        from: config.exchange_account_prefix + toCurrencySymbol,
         to: highestBuyOrder.returnAccountId,
         comment: genComment({
           type: "refund_unutilized_funds",

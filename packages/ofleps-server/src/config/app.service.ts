@@ -23,14 +23,16 @@ let exchange;
 try {
   exchange = await db.user.create({
     data: {
-      pk: "OFLEPS_EXCHANGE",
+      pk: config.exchange_account_prefix + "user",
       email: "none",
-      name: "ofleps exchange",
+      name: "none",
       approved: true,
     },
   });
 } catch {
-  exchange = await db.user.findUnique({ where: { pk: "OFLEPS_EXCHANGE" } });
+  exchange = await db.user.findUnique({
+    where: { pk: config.exchange_account_prefix + "user" },
+  });
 }
 
 if (!exchange) throw new Error("Unknown");
@@ -47,8 +49,8 @@ for (const currency of config.currencies.split(",")) {
 
     await db.account.create({
       data: {
-        id: "ofleps_exchange_" + currency,
-        name: "oe_" + currency,
+        id: config.exchange_account_prefix + currency,
+        name: currency,
         currencySymbol: currency,
         userPk: exchange.pk,
       },

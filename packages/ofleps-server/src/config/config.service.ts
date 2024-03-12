@@ -25,6 +25,7 @@ export class ConfigService {
   public readonly server_public_key: HexString;
   public readonly auto_approve: boolean;
   public readonly currencies: string;
+  public readonly exchange_account_prefix: string;
 
   constructor() {
     config();
@@ -49,6 +50,9 @@ export class ConfigService {
     this.auto_approve = parseBool(process.env.AUTO_APPROVE, true);
 
     this.currencies = process.env.CURRENCIES || "";
+
+    this.exchange_account_prefix =
+      process.env.EXCHANGE_ACCOUNT_PREFIX || "exchange_";
   }
 }
 
