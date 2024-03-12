@@ -19,81 +19,22 @@ import { ForbiddenError } from "../../errors/main.js";
 import { txTransfer } from "../helpers/txTrans.js";
 import NP from "number-precision";
 import EventEmitter from "events";
+import { MatchResult, orderMatch } from "../helpers/orderMatch.js";
 
 const orderEmitter = new EventEmitter();
 
-orderEmitter.on("new_order", async (id) => {
-  await db.$transaction(async (tx) => {
-    const new_order = await tx.order.findFirstOrThrow({
-      where: {
-        id,
-      },
+orderEmitter.on("new_order", async (data) => {
+  let result: MatchResult | undefined;
+
+  while (result?.type !== "all_matched") {
+    await db.$transaction(async (tx) => {
+      result = await orderMatch(
+        tx,
+        data.fromCurrencySymbol,
+        data.toCurrencySymbol
+      );
     });
-
-    const {
-      price,
-      quantity,
-      fromCurrencySymbol,
-      toCurrencySymbol,
-      type,
-      accountId,
-    } = new_order;
-
-    const exchange_account_id_from = "ofleps_exchange_" + fromCurrencySymbol;
-    const exchange_account_id_to = "ofleps_exchange_" + toCurrencySymbol;
-
-    const realAmount = type ? NP.times(quantity, price) : quantity;
-    const antiRealAmount = !type ? NP.times(quantity, price) : quantity;
-
-    const orderSell = await tx.order.findFirst({
-      where: {
-        quantity,
-        price,
-        type: !type,
-      },
-    });
-
-    if (orderSell) {
-      await tx.order.delete({
-        where: {
-          id: orderSell.id,
-        },
-      });
-
-      await txTransfer(tx, {
-        amount: realAmount,
-        from: type ? exchange_account_id_to : exchange_account_id_from,
-        to: orderSell.accountId,
-        comment: genComment({
-          type: (!type ? "buy" : "sell") + " success",
-          pair: `${fromCurrencySymbol}/${toCurrencySymbol}`,
-          price,
-          quantity,
-        }),
-      });
-
-      await txTransfer(tx, {
-        amount: antiRealAmount,
-        from: !type ? exchange_account_id_to : exchange_account_id_from,
-        to: accountId,
-        comment: genComment({
-          type: (type ? "buy" : "sell") + " success",
-          pair: `${fromCurrencySymbol}/${toCurrencySymbol}`,
-          price,
-          quantity,
-        }),
-      });
-
-      await tx.completeOrder.create({
-        data: {
-          price,
-          quantity,
-          fromCurrencySymbol,
-          toCurrencySymbol,
-        },
-      });
-    }
-  });
+  }
 });
 
 function genComment(obj: any) {
@@ -174,7 +115,7 @@ async function createOrder(
       },
     });
 
-    orderEmitter.emit("new_order", new_order.id);
+    orderEmitter.emit("new_order", { fromCurrencySymbol, toCurrencySymbol });
 
     return new_order;
   });
