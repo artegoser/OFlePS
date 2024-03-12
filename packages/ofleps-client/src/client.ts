@@ -181,6 +181,24 @@ export default class Client {
     });
   }
 
+  cancelOrder(orderToCancelId: string) {
+    if (!this._privateKey || !this._publicKey) {
+      throw this._noPrivateKey;
+    }
+
+    const signature = ec.sign(
+      {
+        orderToCancelId,
+      },
+      this._privateKey
+    );
+
+    return this._t.exchange.cancel.mutate({
+      orderToCancelId,
+      signature,
+    });
+  }
+
   getCurrencies(page: number = 1) {
     return this._t.currencies.get.query({ page });
   }

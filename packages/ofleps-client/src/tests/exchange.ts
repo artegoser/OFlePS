@@ -59,8 +59,8 @@ function wait(ms: number) {
   // Place multiple limit orders
   await alice.sell(afid, atid, "USD", "RUB", 1, 90);
   await alice.sell(afid, atid, "USD", "RUB", 1, 95);
-  await alice.sell(afid, atid, "USD", "RUB", 2, 99);
-  await alice.sell(afid, atid, "USD", "RUB", 1, 110);
+  const unfulfilled = await alice.sell(afid, atid, "USD", "RUB", 2, 99);
+  const unfulfilled2 = await alice.sell(afid, atid, "USD", "RUB", 1, 110);
 
   // Place limit order
   // Buys 3 USD for 90,95,99
@@ -68,6 +68,10 @@ function wait(ms: number) {
 
   // Wait some time for exchange to settle
   await wait(1000);
+
+  // Cancel alice sell orders
+  await alice.cancelOrder(unfulfilled.id);
+  await alice.cancelOrder(unfulfilled2.id);
 
   // Order fullfiled(probably), now we can see transactions
   const transactions_alice = await alice.getTransactions(atid);

@@ -19,6 +19,20 @@ import core from "../core/main/main.js";
 import { HexString } from "ofleps-utils";
 
 const exchange = router({
+  cancel: publicProcedure
+    .input(
+      z.object({
+        orderToCancelId: z.string(),
+        signature: z.string(),
+      })
+    )
+    .mutation(({ input }) => {
+      return core.exchange.cancelOrder(
+        input.orderToCancelId,
+        input.signature as HexString
+      );
+    }),
+
   sell: publicProcedure
     .input(
       z.object({

@@ -37,6 +37,53 @@ orderEmitter.on("new_order", async (data) => {
   }
 });
 
+export async function cancelOrder(
+  orderToCancelId: string,
+  signature: HexString
+) {
+  return await db.$transaction(async (tx) => {
+    const order = await tx.order.delete({
+      where: {
+        id: orderToCancelId,
+      },
+      include: {
+        returnAccount: true,
+      },
+    });
+
+    if (
+      !ec.verify(
+        signature,
+        { orderToCancelId },
+        order.returnAccount.userPk as HexString
+      )
+    ) {
+      throw new ForbiddenError("Invalid signature");
+    }
+
+    if (!order) {
+      throw new ForbiddenError(`Order with id ${orderToCancelId} not found`);
+    }
+
+    await txTransfer(tx, {
+      from:
+        config.exchange_account_prefix +
+        (order.type ? order.toCurrencySymbol : order.fromCurrencySymbol),
+      to: order.returnAccountId,
+      amount: order.type
+        ? NP.times(order.quantity, order.price)
+        : order.quantity,
+      comment: genComment({
+        type: "cancel",
+        orderId: order.id,
+        pair: order.fromCurrencySymbol + "/" + order.toCurrencySymbol,
+        price: order.price,
+        quantity: order.quantity,
+      }),
+    });
+  });
+}
+
 async function createOrder(
   fromAccountId: string,
   toAccountId: string,
