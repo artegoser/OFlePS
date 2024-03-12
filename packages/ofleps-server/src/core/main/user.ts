@@ -35,5 +35,8 @@ export async function registerUser(
 }
 
 export async function getUserByPublicKey(publicKey: HexString) {
-  return await db.user.findUnique({ where: { pk: publicKey } });
+  return await db.user.findUnique({
+    where: { pk: publicKey },
+    select: { pk: true, name: true, blocked: true, approved: true },
+  });
 }

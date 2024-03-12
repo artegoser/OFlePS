@@ -133,54 +133,6 @@ export default class Client {
     );
   }
 
-  private _createOrder(
-    fromAccountId: string,
-    toAccountId: string,
-    fromCurrencySymbol: string,
-    toCurrencySymbol: string,
-    quantity: number,
-    price: number,
-    type: boolean
-  ) {
-    if (!this._privateKey || !this._publicKey) {
-      throw this._noPrivateKey;
-    }
-
-    const signature = ec.sign(
-      {
-        fromAccountId,
-        toAccountId,
-        fromCurrencySymbol,
-        toCurrencySymbol,
-        quantity,
-        price,
-        type,
-      },
-      this._privateKey
-    );
-
-    if (type)
-      return this._t.exchange.buy.mutate({
-        fromAccountId,
-        toAccountId,
-        fromCurrencySymbol,
-        toCurrencySymbol,
-        quantity,
-        price,
-        signature,
-      });
-
-    return this._t.exchange.sell.mutate({
-      fromAccountId,
-      toAccountId,
-      fromCurrencySymbol,
-      toCurrencySymbol,
-      quantity,
-      price,
-      signature,
-    });
-  }
-
   getOrderBook(
     fromCurrencySymbol: string,
     toCurrencySymbol: string,
@@ -256,6 +208,10 @@ export default class Client {
     return this._t.user.getByPublicKey.query(publicKey);
   }
 
+  getSmartContractById(id: string) {
+    return this._t.smartContracts.getById.query(id);
+  }
+
   createAccount(name: string, description: string, currencySymbol: string) {
     if (!this._privateKey || !this._publicKey) {
       throw this._noPrivateKey;
@@ -312,6 +268,54 @@ export default class Client {
       id,
       request,
       callerPk: this._publicKey,
+      signature,
+    });
+  }
+
+  private _createOrder(
+    fromAccountId: string,
+    toAccountId: string,
+    fromCurrencySymbol: string,
+    toCurrencySymbol: string,
+    quantity: number,
+    price: number,
+    type: boolean
+  ) {
+    if (!this._privateKey || !this._publicKey) {
+      throw this._noPrivateKey;
+    }
+
+    const signature = ec.sign(
+      {
+        fromAccountId,
+        toAccountId,
+        fromCurrencySymbol,
+        toCurrencySymbol,
+        quantity,
+        price,
+        type,
+      },
+      this._privateKey
+    );
+
+    if (type)
+      return this._t.exchange.buy.mutate({
+        fromAccountId,
+        toAccountId,
+        fromCurrencySymbol,
+        toCurrencySymbol,
+        quantity,
+        price,
+        signature,
+      });
+
+    return this._t.exchange.sell.mutate({
+      fromAccountId,
+      toAccountId,
+      fromCurrencySymbol,
+      toCurrencySymbol,
+      quantity,
+      price,
       signature,
     });
   }

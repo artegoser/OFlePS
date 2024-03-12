@@ -19,6 +19,12 @@ import { ForbiddenError, NotFoundError } from "../../errors/main.js";
 import { SmartIsolate } from "../helpers/smartIsolate.js";
 import { SmartRequest } from "ofleps-utils";
 
+export function getSmartContractById(smartContractId: string) {
+  return db.smartContract.findUnique({
+    where: { id: smartContractId },
+  });
+}
+
 export async function executeSmartContract(
   smartContractId: string,
   reqData: SmartRequest,

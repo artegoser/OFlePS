@@ -19,6 +19,9 @@ import core from "../core/main/main.js";
 import { HexString } from "ofleps-utils";
 
 const smartContracts = router({
+  getById: publicProcedure.input(z.string()).query(({ input }) => {
+    return core.smartContracts.getSmartContractById(input);
+  }),
   create: publicProcedure
     .input(
       z.object({
