@@ -93,3 +93,30 @@ export const ec = {
     return { privateKey, publicKey };
   },
 };
+
+export function parseGranularity(granularity: string) {
+  const periods: any = {
+    s: 1,
+    m: 60,
+    h: 60 * 60,
+    d: 24 * 60 * 60,
+    w: 7 * 24 * 60 * 60,
+    M: 30 * 24 * 60 * 60,
+    Y: 365 * 24 * 60 * 60,
+  };
+
+  const [value, unit] = [
+    parseInt(granularity.slice(0, granularity.length - 1)),
+    granularity.slice(-1),
+  ];
+
+  if (!periods[unit]) {
+    throw new Error(`Invalid granularity: ${granularity}`);
+  }
+
+  const ms = value * periods[unit] * 1000;
+
+  const cutoff = unit === 'M' || unit === 'Y' ? null : ms * 1440;
+
+  return { value, unit, ms, cutoff, granularity };
+}

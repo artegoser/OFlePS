@@ -99,6 +99,7 @@ function mapOrderBook(orderBook: any) {
 
   console.log('Buying again');
   await bob.buy(bfid, btid, 'USD', 'RUB', 1, 120);
+  await wait(1000);
 
   console.log('Order book after bying all:');
   console.table(mapOrderBook(await bob.getOrderBook('USD', 'RUB')));

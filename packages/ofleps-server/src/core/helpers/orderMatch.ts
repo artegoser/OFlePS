@@ -164,123 +164,21 @@ export async function updateTradingSchedule(
   price: number,
   quantity: number
 ) {
-  const granularities = ['1m', '5m', '15m', '30m', '1h', '4h', '1d', '1w'];
+  for (const { ms, cutoff, granularity } of config.granularities) {
+    const dateStartMs = Math.floor(Date.now() / ms) * ms;
+    const dateStart = new Date(dateStartMs);
 
-  for (const granularity of granularities) {
-    const dateStart = new Date();
-
-    if (granularity === '1m') {
-      dateStart.setSeconds(0, 0);
+    if (cutoff) {
       await db.tradingSchedule.deleteMany({
         where: {
           fromCurrencySymbol,
           toCurrencySymbol,
           granularity,
           dateStart: {
-            lte: new Date(dateStart.getDate() - 1),
+            lte: new Date(dateStartMs - cutoff),
           },
         },
       });
-    }
-
-    if (granularity === '5m') {
-      const roundedMinutes = Math.floor(dateStart.getMinutes() / 5) * 5;
-      dateStart.setMinutes(roundedMinutes, 0, 0);
-      await db.tradingSchedule.deleteMany({
-        where: {
-          fromCurrencySymbol,
-          toCurrencySymbol,
-          granularity,
-          dateStart: {
-            lte: new Date(dateStart.getDate() - 2),
-          },
-        },
-      });
-    }
-
-    if (granularity === '15m') {
-      const roundedMinutes = Math.floor(dateStart.getMinutes() / 15) * 15;
-      dateStart.setMinutes(roundedMinutes, 0, 0);
-
-      await db.tradingSchedule.deleteMany({
-        where: {
-          fromCurrencySymbol,
-          toCurrencySymbol,
-          granularity,
-          dateStart: {
-            lte: new Date(dateStart.getDate() - 7),
-          },
-        },
-      });
-    }
-
-    if (granularity === '30m') {
-      const roundedMinutes = Math.floor(dateStart.getMinutes() / 30) * 30;
-      dateStart.setMinutes(roundedMinutes, 0, 0);
-
-      await db.tradingSchedule.deleteMany({
-        where: {
-          fromCurrencySymbol,
-          toCurrencySymbol,
-          granularity,
-          dateStart: {
-            lte: new Date(dateStart.getDate() - 15),
-          },
-        },
-      });
-    }
-
-    if (granularity === '1h') {
-      dateStart.setMinutes(0, 0, 0);
-
-      await db.tradingSchedule.deleteMany({
-        where: {
-          fromCurrencySymbol,
-          toCurrencySymbol,
-          granularity,
-          dateStart: {
-            lte: new Date(dateStart.getDate() - 30),
-          },
-        },
-      });
-    }
-
-    if (granularity === '4h') {
-      const roundedHours = Math.floor(dateStart.getHours() / 4) * 4;
-      dateStart.setHours(roundedHours, 0, 0, 0);
-
-      await db.tradingSchedule.deleteMany({
-        where: {
-          fromCurrencySymbol,
-          toCurrencySymbol,
-          granularity,
-          dateStart: {
-            lte: new Date(dateStart.getDate() - 60),
-          },
-        },
-      });
-    }
-
-    if (granularity === '1d') {
-      dateStart.setHours(0, 0, 0, 0);
-
-      await db.tradingSchedule.deleteMany({
-        where: {
-          fromCurrencySymbol,
-          toCurrencySymbol,
-          granularity,
-          dateStart: {
-            lte: new Date(dateStart.getDate() - 180),
-          },
-        },
-      });
-    }
-
-    if (granularity === '1w') {
-      const roundedWeeks = Math.floor(dateStart.getDay() / 7) * 7;
-      dateStart.setDate(dateStart.getDate() - roundedWeeks);
-
-      dateStart.setHours(0, 0, 0, 0);
     }
 
     await db.$transaction(async (tx) => {

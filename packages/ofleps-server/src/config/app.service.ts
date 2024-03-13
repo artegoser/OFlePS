@@ -37,7 +37,7 @@ try {
 
 if (!exchange) throw new Error('Unknown');
 
-for (const currency of config.currencies.split(',')) {
+for (const currency of config.currencies) {
   try {
     await db.currency.create({
       data: {
@@ -56,9 +56,9 @@ for (const currency of config.currencies.split(',')) {
       },
     });
 
-    console.log('generated ' + currency);
+    console.log(`generated ${currency}`);
   } catch {
-    console.log('already generated');
+    console.log(`already generated ${currency}`);
   }
 }
 

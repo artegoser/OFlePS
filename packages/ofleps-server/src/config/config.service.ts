@@ -14,7 +14,7 @@
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 import { config } from 'dotenv';
-import { HexString, ec } from 'ofleps-utils';
+import { HexString, ec, parseGranularity } from 'ofleps-utils';
 
 export class ConfigService {
   public readonly db_url: string;
@@ -24,8 +24,9 @@ export class ConfigService {
   public readonly server_private_key: HexString;
   public readonly server_public_key: HexString;
   public readonly auto_approve: boolean;
-  public readonly currencies: string;
+  public readonly currencies: string[];
   public readonly exchange_account_prefix: string;
+  public readonly granularities;
 
   constructor() {
     config();
@@ -49,7 +50,10 @@ export class ConfigService {
 
     this.auto_approve = parseBool(process.env.AUTO_APPROVE, true);
 
-    this.currencies = process.env.CURRENCIES || '';
+    this.currencies = process.env.CURRENCIES?.split(',') || [];
+    this.granularities = (process.env.GRANULARITIES?.split(',') || []).map(
+      (granularity) => parseGranularity(granularity)
+    );
 
     this.exchange_account_prefix =
       process.env.EXCHANGE_ACCOUNT_PREFIX || 'exchange_';
