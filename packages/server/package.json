@@ -31,5 +31,8 @@
     "prisma": "^5.11.0",
     "prisma-dbml-generator": "^0.12.0",
     "zod": "^3.22.4"
+  },
+  "dependencies": {
+    "@trpc/server": "^10.45.1"
   }
 }
