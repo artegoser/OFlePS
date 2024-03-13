@@ -15,9 +15,9 @@
 
 import { db, config } from '../../config/app.service.js';
 import { ForbiddenError } from '../../errors/main.js';
-import { ec } from 'ofleps-utils';
+import { ec } from '@ofleps/utils';
 
-import type { HexString } from 'ofleps-utils';
+import type { HexString } from '@ofleps/utils';
 
 export async function registerUser(
   name: string,

@@ -16,7 +16,7 @@
 import { router, publicProcedure } from '../config/trpc.js';
 import { z } from 'zod';
 import core from '../core/main/main.js';
-import { HexString } from 'ofleps-utils';
+import { HexString } from '@ofleps/utils';
 
 const accounts = router({
   getById: publicProcedure.input(z.string()).query(({ input }) => {

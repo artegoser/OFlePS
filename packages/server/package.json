@@ -1,9 +1,10 @@
 {
   "name": "@ofleps/server",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Types for Open and Flexible Payment System",
   "types": "dist/app.d.ts",
   "type": "module",
+  "repository": "https://github.com/artegoser/OFlePS/tree/main/packages/server",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "npm run lint && tsc",
@@ -12,26 +13,24 @@
     "start": "node server-dist/app.js",
     "lint": "eslint \"src/**\""
   },
-  "keywords": [],
+  "keywords": [
+    "types"
+  ],
   "author": "artegoser",
   "license": "GPL-3.0-or-later",
   "devDependencies": {
     "@types/cors": "^2.8.17",
     "@types/deasync": "^0.1.5",
-    "@typescript-eslint/eslint-plugin": "^7.1.1",
-    "@typescript-eslint/parser": "^7.1.1",
-    "eslint": "^8.57.0",
     "prisma": "^5.11.0",
-    "prisma-dbml-generator": "^0.12.0"
-  },
-  "dependencies": {
+    "prisma-dbml-generator": "^0.12.0",
     "@paralleldrive/cuid2": "^2.2.2",
     "@prisma/client": "^5.11.0",
     "cors": "^2.8.5",
     "dotenv": "^16.3.1",
     "isolated-vm": "^4.7.2",
     "number-precision": "^1.6.0",
-    "ofleps-utils": "../utils",
+    "@ofleps/utils": "workspace:*",
     "zod": "^3.22.4"
-  }
+  },
+  "dependencies": {}
 }

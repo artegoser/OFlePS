@@ -13,10 +13,10 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-import type { AppRouter } from 'ofleps-server';
+import type { AppRouter } from '@ofleps/server';
 import { createTRPCProxyClient, httpBatchLink } from '@trpc/client';
 
-import { ec, genSalt, HexString } from 'ofleps-utils';
+import { ec, genSalt, HexString } from '@ofleps/utils';
 
 export default class Root {
   private _t;

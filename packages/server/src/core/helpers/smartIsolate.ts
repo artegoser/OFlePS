@@ -19,7 +19,7 @@ import {
   ParamTypes,
   SmartContractGlobalMemory,
   SmartRequest,
-} from 'ofleps-utils';
+} from '@ofleps/utils';
 
 interface PostSmartContractTask {
   method: 'gs_set';

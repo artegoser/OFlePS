@@ -15,7 +15,7 @@
     BaselineSeries,
   } from 'svelte-lightweight-charts';
 
-  import type { Client } from 'ofleps-client';
+  import type { Client } from '@ofleps/client';
 
   export let data;
 

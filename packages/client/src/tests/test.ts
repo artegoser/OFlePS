@@ -13,7 +13,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-import { HexString } from 'ofleps-utils';
+import { HexString } from '@ofleps/utils';
 import { Client, Root } from '../lib.js';
 
 (async () => {

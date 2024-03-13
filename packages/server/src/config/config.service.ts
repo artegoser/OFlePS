@@ -14,7 +14,7 @@
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 import { config } from 'dotenv';
-import { HexString, ec, parseGranularity } from 'ofleps-utils';
+import { HexString, ec, parseGranularity } from '@ofleps/utils';
 
 export class ConfigService {
   public readonly db_url: string;

@@ -14,9 +14,9 @@
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 import { createTRPCProxyClient, httpBatchLink } from '@trpc/client';
-import type { AppRouter } from 'ofleps-server';
+import type { AppRouter } from '@ofleps/server';
 
-import { ec, HexString, SmartRequest } from 'ofleps-utils';
+import { ec, HexString, SmartRequest } from '@ofleps/utils';
 import { ITransferArgs } from './types/client.js';
 
 export default class Client {

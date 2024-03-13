@@ -1,6 +1,6 @@
 {
   "name": "@ofleps/frontend",
-  "version": "0.0.1",
+  "version": "1.0.1",
   "private": true,
   "scripts": {
     "dev": "vite dev",
@@ -18,12 +18,10 @@
     "@sveltejs/vite-plugin-svelte": "^3.0.0",
     "@tailwindcss/forms": "0.5.7",
     "@tailwindcss/typography": "0.5.10",
-    "@types/eslint": "8.56.0",
     "@types/node": "20.11.26",
     "@typescript-eslint/eslint-plugin": "^6.0.0",
     "@typescript-eslint/parser": "^6.0.0",
     "autoprefixer": "10.4.18",
-    "eslint": "^8.56.0",
     "eslint-plugin-svelte": "^2.35.1",
     "postcss": "8.4.35",
     "svelte": "^4.2.7",
@@ -38,8 +36,8 @@
   "dependencies": {
     "@floating-ui/dom": "1.6.3",
     "lightweight-charts": "^4.1.3",
-    "ofleps-client": "../client",
-    "ofleps-utils": "../utils",
+    "@ofleps/client": "workspace:*",
+    "@ofleps/utils": "workspace:*",
     "svelte-lightweight-charts": "^2.2.0"
   }
 }

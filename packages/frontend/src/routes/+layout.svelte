@@ -15,7 +15,7 @@
   storePopup.set({ computePosition, autoUpdate, flip, shift, offset, arrow });
 
   import { env } from '$env/dynamic/public';
-  import { Client } from 'ofleps-client';
+  import { Client } from '@ofleps/client';
   import { writable } from 'svelte/store';
   import { setContext } from 'svelte';
 

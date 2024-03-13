@@ -1,10 +1,11 @@
 {
   "name": "@ofleps/client",
-  "version": "1.0.0",
-  "description": "",
+  "version": "1.0.1",
+  "description": "Ofleps client",
   "main": "dist/lib.js",
   "types": "dist/lib.d.ts",
   "type": "module",
+  "repository": "https://github.com/artegoser/OFlePS/tree/main/packages/client",
   "scripts": {
     "btest": "npm run build && npm run test",
     "test": "node dist/tests/test.js",
@@ -15,15 +16,10 @@
     "lint": "eslint \"src/**\""
   },
   "dependencies": {
-    "ofleps-server": "../server",
-    "ofleps-utils": "../utils"
+    "@ofleps/server": "workspace:*",
+    "@ofleps/utils": "workspace:*"
   },
   "keywords": [],
   "author": "artegoser",
-  "license": "GPL-3.0-or-later",
-  "devDependencies": {
-    "@typescript-eslint/eslint-plugin": "^7.1.1",
-    "@typescript-eslint/parser": "^7.1.1",
-    "eslint": "^8.57.0"
-  }
+  "license": "GPL-3.0-or-later"
 }

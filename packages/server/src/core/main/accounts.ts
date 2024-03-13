@@ -15,11 +15,11 @@
 
 import { db } from '../../config/app.service.js';
 import { ForbiddenError, NotFoundError } from '../../errors/main.js';
-import { ec } from 'ofleps-utils';
+import { ec } from '@ofleps/utils';
 import { getUserByPublicKey } from './user.js';
 import { getCurrencyBySymbol } from './currencies.js';
 
-import type { HexString } from 'ofleps-utils';
+import type { HexString } from '@ofleps/utils';
 
 export async function createAccount({
   name,
