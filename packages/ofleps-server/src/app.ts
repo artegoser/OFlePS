@@ -16,6 +16,7 @@
 import { router } from './config/trpc.js';
 import { config } from './config/app.service.js';
 import { createHTTPServer } from '@trpc/server/adapters/standalone';
+import cors from 'cors';
 
 import root from './routes/root.js';
 import user from './routes/user.js';
@@ -36,6 +37,7 @@ const appRouter = router({
 });
 
 const server = createHTTPServer({
+  middleware: cors(),
   router: appRouter,
 });
 

@@ -1,12 +1,5 @@
-packages/ofleps-utils/dist/
-packages/ofleps-server/dist/
-packages/ofleps-server/server-dist/
-packages/ofleps-client/dist/
-packages/docs/dist/
-
-packages/ofleps-client/node_modules/
-packages/ofleps-server/node_modules
-packages/ofleps-utils/node_modules
-packages/docs/node_modules
-
-packages/docs/.next/
+dist/
+server-dist/
+node_modules/
+.next/
+.svelte-kit/

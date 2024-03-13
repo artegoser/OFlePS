@@ -16,6 +16,7 @@
   "author": "artegoser",
   "license": "GPL-3.0-or-later",
   "devDependencies": {
+    "@types/cors": "^2.8.17",
     "@types/deasync": "^0.1.5",
     "@typescript-eslint/eslint-plugin": "^7.1.1",
     "@typescript-eslint/parser": "^7.1.1",
@@ -26,6 +27,7 @@
   "dependencies": {
     "@paralleldrive/cuid2": "^2.2.2",
     "@prisma/client": "^5.11.0",
+    "cors": "^2.8.5",
     "dotenv": "^16.3.1",
     "isolated-vm": "^4.7.2",
     "number-precision": "^1.6.0",
