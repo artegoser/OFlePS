@@ -1,6 +1,6 @@
 {
   "name": "@ofleps/server",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Types for Open and Flexible Payment System",
   "types": "dist/app.d.ts",
   "type": "module",
@@ -19,18 +19,17 @@
   "author": "artegoser",
   "license": "GPL-3.0-or-later",
   "devDependencies": {
-    "@types/cors": "^2.8.17",
-    "@types/deasync": "^0.1.5",
-    "prisma": "^5.11.0",
-    "prisma-dbml-generator": "^0.12.0",
+    "@ofleps/utils": "workspace:*",
     "@paralleldrive/cuid2": "^2.2.2",
     "@prisma/client": "^5.11.0",
+    "@types/cors": "^2.8.17",
+    "@types/deasync": "^0.1.5",
     "cors": "^2.8.5",
     "dotenv": "^16.3.1",
     "isolated-vm": "^4.7.2",
     "number-precision": "^1.6.0",
-    "@ofleps/utils": "workspace:*",
+    "prisma": "^5.11.0",
+    "prisma-dbml-generator": "^0.12.0",
     "zod": "^3.22.4"
-  },
-  "dependencies": {}
+  }
 }

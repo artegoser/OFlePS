@@ -1,6 +1,6 @@
 {
   "name": "@ofleps/utils",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Utils for ofleps",
   "main": "dist/lib.js",
   "types": "dist/lib.d.ts",
