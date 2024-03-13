@@ -75,17 +75,14 @@ function mapOrderBook(orderBook: any) {
   const unfulfilled = await alice.sell(afid, atid, 'USD', 'RUB', 2, 99);
   await alice.sell(afid, atid, 'USD', 'RUB', 1, 110);
 
+  console.log('Order book before buy:');
+  console.table(mapOrderBook(await bob.getOrderBook('USD', 'RUB')));
+
   // Place limit order
   // Buys 3 USD for 90,95,99
   await bob.buy(bfid, btid, 'USD', 'RUB', 3, 100);
 
-  console.log('Order book before matching:');
-  console.table(mapOrderBook(await bob.getOrderBook('USD', 'RUB')));
-
-  // Wait some time for exchange to settle
-  await wait(1000);
-
-  console.log('Order book after matching:');
+  console.log('Order book after buy:');
   console.table(mapOrderBook(await bob.getOrderBook('USD', 'RUB')));
 
   // Cancel alice sell order
@@ -99,7 +96,6 @@ function mapOrderBook(orderBook: any) {
 
   console.log('Buying again');
   await bob.buy(bfid, btid, 'USD', 'RUB', 1, 120);
-  await wait(1000);
 
   console.log('Order book after bying all:');
   console.table(mapOrderBook(await bob.getOrderBook('USD', 'RUB')));

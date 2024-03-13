@@ -18,42 +18,12 @@ import { db, config } from '../../config/app.service.js';
 import { ForbiddenError } from '../../errors/main.js';
 import { txTransfer } from '../helpers/txTrans.js';
 import NP from 'number-precision';
-import EventEmitter from 'events';
 import {
   MatchResult,
   genComment,
   orderMatch,
   updateTradingSchedule,
 } from '../helpers/orderMatch.js';
-
-const orderEmitter = new EventEmitter();
-
-orderEmitter.on('new_order', async (data) => {
-  let result: MatchResult | undefined;
-
-  while (result?.type !== 'all_matched') {
-    await db.$transaction(async (tx) => {
-      result = await orderMatch(
-        tx,
-        data.fromCurrencySymbol,
-        data.toCurrencySymbol
-      );
-    });
-
-    if (!result) continue;
-
-    if (result.type === 'match_success') {
-      if (!result.data) continue;
-
-      await updateTradingSchedule(
-        result.data.fromCurrencySymbol,
-        result.data.toCurrencySymbol,
-        result.data.price,
-        result.data.quantity
-      );
-    }
-  }
-});
 
 export async function getTradingSchedule(
   fromCurrencySymbol: string,
@@ -207,7 +177,7 @@ async function createOrder(
   const realAmount = type ? NP.times(quantity, price) : quantity;
   // const antiRealAmount = !type ? NP.times(quantity, price) : quantity;
 
-  return await db.$transaction(async (tx) => {
+  const order = await db.$transaction(async (tx) => {
     const new_order = await tx.order.create({
       data: {
         accountId: !type ? toAccountId : fromAccountId,
@@ -234,10 +204,32 @@ async function createOrder(
       }),
     });
 
-    orderEmitter.emit('new_order', { fromCurrencySymbol, toCurrencySymbol });
-
     return new_order;
   });
+
+  // Start matching
+  let result: MatchResult | undefined;
+
+  while (result?.type !== 'all_matched') {
+    await db.$transaction(async (tx) => {
+      result = await orderMatch(tx, fromCurrencySymbol, toCurrencySymbol);
+    });
+
+    if (!result) continue;
+
+    if (result.type === 'match_success') {
+      if (!result.data) continue;
+
+      await updateTradingSchedule(
+        result.data.fromCurrencySymbol,
+        result.data.toCurrencySymbol,
+        result.data.price,
+        result.data.quantity
+      );
+    }
+  }
+
+  return order;
 }
 
 export function makeBuyOrder(
