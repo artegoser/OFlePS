@@ -13,7 +13,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-import { db } from "../../config/app.service.js";
+import { db } from '../../config/app.service.js';
 
 export async function getCurrencyBySymbol(symbol: string) {
   return await db.currency.findUnique({ where: { symbol } });

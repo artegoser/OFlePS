@@ -13,13 +13,13 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-import { db } from "../../config/app.service.js";
-import { ForbiddenError, NotFoundError } from "../../errors/main.js";
-import { ec } from "ofleps-utils";
-import { getUserByPublicKey } from "./user.js";
-import { getCurrencyBySymbol } from "./currencies.js";
+import { db } from '../../config/app.service.js';
+import { ForbiddenError, NotFoundError } from '../../errors/main.js';
+import { ec } from 'ofleps-utils';
+import { getUserByPublicKey } from './user.js';
+import { getCurrencyBySymbol } from './currencies.js';
 
-import type { HexString } from "ofleps-utils";
+import type { HexString } from 'ofleps-utils';
 
 export async function createAccount({
   name,
@@ -58,7 +58,7 @@ export async function createAccount({
       user.pk as HexString
     )
   ) {
-    throw new ForbiddenError("Invalid signature");
+    throw new ForbiddenError('Invalid signature');
   }
 
   return await db.account.create({

@@ -60,7 +60,7 @@ export default class Client {
 
   // #endregion Public Getters And Setters (2)
 
-  // #region Public Methods (17)
+  // #region Public Methods (18)
 
   public buy(
     fromAccountId: string,
@@ -191,6 +191,18 @@ export default class Client {
     return this._t.smartContracts.getById.query(id);
   }
 
+  public getTradingSchedule(
+    fromCurrencySymbol: string,
+    toCurrencySymbol: string,
+    granularity: string
+  ) {
+    return this._t.exchange.getTradingSchedule.query({
+      fromCurrencySymbol,
+      toCurrencySymbol,
+      granularity,
+    });
+  }
+
   public getTransactions(accountId: string, page: number = 1) {
     if (!this._privateKey || !this._publicKey) {
       throw this._noPrivateKey;
@@ -294,19 +306,7 @@ export default class Client {
     });
   }
 
-  public getTradingSchedule(
-    fromCurrencySymbol: string,
-    toCurrencySymbol: string,
-    granularity: string
-  ) {
-    return this._t.exchange.getTradingSchedule.query({
-      fromCurrencySymbol,
-      toCurrencySymbol,
-      granularity,
-    });
-  }
-
-  // #endregion Public Methods (17)
+  // #endregion Public Methods (18)
 
   // #region Private Methods (1)
 

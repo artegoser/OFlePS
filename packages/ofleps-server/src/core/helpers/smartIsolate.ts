@@ -13,16 +13,16 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-import ivm from "isolated-vm";
-import { db } from "../../config/app.service.js";
+import ivm from 'isolated-vm';
+import { db } from '../../config/app.service.js';
 import {
   ParamTypes,
   SmartContractGlobalMemory,
   SmartRequest,
-} from "ofleps-utils";
+} from 'ofleps-utils';
 
 interface PostSmartContractTask {
-  method: "gs_set";
+  method: 'gs_set';
   params: ParamTypes[];
 }
 
@@ -36,7 +36,7 @@ export class SmartIsolate {
   }
 
   private _gs_set(key: string, value: string | number | boolean) {
-    this._tasks.push({ method: "gs_set", params: [key, value] });
+    this._tasks.push({ method: 'gs_set', params: [key, value] });
   }
 
   async execute(
@@ -52,20 +52,20 @@ export class SmartIsolate {
 
     const jail = context.global;
 
-    jail.setSync("global", jail.derefInto());
-    jail.setSync("__request", new ivm.ExternalCopy(request).copyInto());
-    jail.setSync("__return", undefined);
-    jail.setSync("gMem", new ivm.ExternalCopy(globalMemory).copyInto());
-    jail.setSync("__owner", this._authorId);
+    jail.setSync('global', jail.derefInto());
+    jail.setSync('__request', new ivm.ExternalCopy(request).copyInto());
+    jail.setSync('__return', undefined);
+    jail.setSync('gMem', new ivm.ExternalCopy(globalMemory).copyInto());
+    jail.setSync('__owner', this._authorId);
     jail.setSync(
-      "gs_set",
+      'gs_set',
       new ivm.Callback((key: string, value: ParamTypes) => {
         this._gs_set(key, value);
       })
     );
 
     context.evalSync(code);
-    context.evalSync("const contract = new Contract(__owner)");
+    context.evalSync('const contract = new Contract(__owner)');
 
     const script = isolate.compileScriptSync(
       `__return = contract.${request.method}(...__request.params)`
@@ -77,7 +77,7 @@ export class SmartIsolate {
 
     await postExec.execute();
 
-    return jail.getSync("__return");
+    return jail.getSync('__return');
   }
 }
 
@@ -92,7 +92,7 @@ class TaskExecutor {
   public async execute() {
     for (const task of this._tasks) {
       switch (task.method) {
-        case "gs_set": {
+        case 'gs_set': {
           await this._gs_set(task.params[0].toString(), task.params[1]);
           break;
         }

@@ -13,14 +13,14 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-import { HexString, ec } from "ofleps-utils";
-import { db } from "../../config/app.service.js";
+import { HexString, ec } from 'ofleps-utils';
+import { db } from '../../config/app.service.js';
 import {
   BadRequestError,
   ForbiddenError,
   NotFoundError,
-} from "../../errors/main.js";
-import { TransactionReq, txTransfer } from "../helpers/txTrans.js";
+} from '../../errors/main.js';
+import { TransactionReq, txTransfer } from '../helpers/txTrans.js';
 
 export async function getTransactions(
   page: number,
@@ -39,7 +39,7 @@ export async function getTransactions(
 
   if (!ec.verify(signature, { accountId, page }, account.userPk as HexString)) {
     throw new ForbiddenError(
-      "Invalid signature (possibly you requested not your transactions)"
+      'Invalid signature (possibly you requested not your transactions)'
     );
   }
 
@@ -57,7 +57,7 @@ export async function getTransactions(
       ],
     },
     orderBy: {
-      date: "desc",
+      date: 'desc',
     },
   });
 }
@@ -74,7 +74,7 @@ export async function transfer({
   }
 
   if (amount <= 0) {
-    throw new BadRequestError("Amount must be > 0");
+    throw new BadRequestError('Amount must be > 0');
   }
 
   return db.$transaction(async (tx) => {

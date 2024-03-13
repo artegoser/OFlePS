@@ -13,8 +13,8 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-import { ConfigService } from "./config.service.js";
-import { PrismaClient } from "@prisma/client";
+import { ConfigService } from './config.service.js';
+import { PrismaClient } from '@prisma/client';
 
 export const db = new PrismaClient();
 export const config = new ConfigService();
@@ -23,27 +23,27 @@ let exchange;
 try {
   exchange = await db.user.create({
     data: {
-      pk: config.exchange_account_prefix + "user",
-      email: "none",
-      name: "none",
+      pk: config.exchange_account_prefix + 'user',
+      email: 'none',
+      name: 'none',
       approved: true,
     },
   });
 } catch {
   exchange = await db.user.findUnique({
-    where: { pk: config.exchange_account_prefix + "user" },
+    where: { pk: config.exchange_account_prefix + 'user' },
   });
 }
 
-if (!exchange) throw new Error("Unknown");
+if (!exchange) throw new Error('Unknown');
 
-for (const currency of config.currencies.split(",")) {
+for (const currency of config.currencies.split(',')) {
   try {
     await db.currency.create({
       data: {
         name: currency,
         symbol: currency,
-        description: "Auto generated",
+        description: 'Auto generated',
       },
     });
 
@@ -56,14 +56,14 @@ for (const currency of config.currencies.split(",")) {
       },
     });
 
-    console.log("generated " + currency);
+    console.log('generated ' + currency);
   } catch {
-    console.log("already generated");
+    console.log('already generated');
   }
 }
 
 export type Db = typeof db;
 export type txDb = Omit<
   Db,
-  "$on" | "$connect" | "$disconnect" | "$use" | "$transaction" | "$extends"
+  '$on' | '$connect' | '$disconnect' | '$use' | '$transaction' | '$extends'
 >;

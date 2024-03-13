@@ -13,10 +13,10 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-import type { AppRouter } from "ofleps-server";
-import { createTRPCProxyClient, httpBatchLink } from "@trpc/client";
+import type { AppRouter } from 'ofleps-server';
+import { createTRPCProxyClient, httpBatchLink } from '@trpc/client';
 
-import { ec, genSalt, HexString } from "ofleps-utils";
+import { ec, genSalt, HexString } from 'ofleps-utils';
 
 export default class Root {
   private _t;
@@ -112,16 +112,16 @@ export default class Root {
    */
   issue(to: string, amount: number, comment?: string) {
     const salt = genSalt();
-    const commentTx = `Issued by root${comment ? `: ${comment}` : ""}`;
+    const commentTx = `Issued by root${comment ? `: ${comment}` : ''}`;
 
     const signature = ec.sign(
       {
-        from: "root",
+        from: 'root',
         to,
         amount,
         comment: commentTx,
         salt,
-        type: "issue",
+        type: 'issue',
       },
       this._privateKey
     );

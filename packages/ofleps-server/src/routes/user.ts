@@ -13,10 +13,10 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-import { router, publicProcedure } from "../config/trpc.js";
-import { z } from "zod";
-import { HexString } from "ofleps-utils";
-import core from "../core/main/main.js";
+import { router, publicProcedure } from '../config/trpc.js';
+import { z } from 'zod';
+import { HexString } from 'ofleps-utils';
+import core from '../core/main/main.js';
 
 const user = router({
   register: publicProcedure

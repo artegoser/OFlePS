@@ -14,9 +14,9 @@
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 export enum TransactionType {
-  TRANSFER = "transfer",
-  ISSUE = "issue",
-  BURN = "burn",
-  INTERINCOME = "interIncome",
-  INTEROUTCOME = "interOutcome",
+  TRANSFER = 'transfer',
+  ISSUE = 'issue',
+  BURN = 'burn',
+  INTERINCOME = 'interIncome',
+  INTEROUTCOME = 'interOutcome',
 }

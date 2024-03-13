@@ -13,11 +13,11 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-import { db, config } from "../../config/app.service.js";
-import { ForbiddenError } from "../../errors/main.js";
-import { ec } from "ofleps-utils";
+import { db, config } from '../../config/app.service.js';
+import { ForbiddenError } from '../../errors/main.js';
+import { ec } from 'ofleps-utils';
 
-import type { HexString } from "ofleps-utils";
+import type { HexString } from 'ofleps-utils';
 
 export async function registerUser(
   name: string,
@@ -26,7 +26,7 @@ export async function registerUser(
   signature: HexString
 ) {
   if (!ec.verify(signature, { name, email, publicKey }, publicKey)) {
-    throw new ForbiddenError("Invalid signature");
+    throw new ForbiddenError('Invalid signature');
   }
 
   return await db.user.create({

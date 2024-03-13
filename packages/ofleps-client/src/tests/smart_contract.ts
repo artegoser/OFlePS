@@ -13,16 +13,16 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-import { Client } from "../lib.js";
+import { Client } from '../lib.js';
 
 (async () => {
-  const user = new Client("http://localhost:3000");
+  const user = new Client('http://localhost:3000');
 
-  await user.registerUser("sender", "sender@ofleps.io");
+  await user.registerUser('sender', 'sender@ofleps.io');
 
   const smartContract = await user.createSmartContract(
-    "Test sc",
-    "Set requested data",
+    'Test sc',
+    'Set requested data',
     `
       class Contract {
         constructor(owner) {
@@ -43,14 +43,14 @@ import { Client } from "../lib.js";
   );
 
   const result = await user.executeSmartContract(smartContract.id, {
-    method: "setToOwner",
-    params: ["hello world"],
+    method: 'setToOwner',
+    params: ['hello world'],
   });
 
   console.log(result);
 
   const result2 = await user.executeSmartContract(smartContract.id, {
-    method: "getFromOwner",
+    method: 'getFromOwner',
     params: [],
   });
 

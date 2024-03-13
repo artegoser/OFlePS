@@ -28,9 +28,9 @@ export function stringify(obj: any) {
   return JSON.stringify(obj);
 }
 
-import { sha512 } from "@noble/hashes/sha512";
-import * as ed from "@noble/ed25519";
-import { createId } from "@paralleldrive/cuid2";
+import { sha512 } from '@noble/hashes/sha512';
+import * as ed from '@noble/ed25519';
+import { createId } from '@paralleldrive/cuid2';
 
 ed.etc.sha512Sync = (...m) => sha512(ed.etc.concatBytes(...m));
 

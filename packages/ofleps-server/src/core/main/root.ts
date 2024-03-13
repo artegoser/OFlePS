@@ -13,11 +13,11 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-import { HexString, ec } from "ofleps-utils";
-import { db, config } from "../../config/app.service.js";
-import { ForbiddenError } from "../../errors/main.js";
+import { HexString, ec } from 'ofleps-utils';
+import { db, config } from '../../config/app.service.js';
+import { ForbiddenError } from '../../errors/main.js';
 
-const invalidSign = new ForbiddenError("Invalid signature for root");
+const invalidSign = new ForbiddenError('Invalid signature for root');
 
 export function setBlockUser(
   userPk: HexString,
@@ -132,7 +132,7 @@ export async function issue({
   if (
     !ec.verify(
       signature,
-      { from: "root", to, amount, comment, salt, type: "issue" },
+      { from: 'root', to, amount, comment, salt, type: 'issue' },
       config.root_public_key
     )
   ) {
@@ -157,7 +157,7 @@ export async function issue({
         to,
         amount,
         comment,
-        type: "issue",
+        type: 'issue',
         currencySymbol: account.currencySymbol,
       },
     });

@@ -13,13 +13,13 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-import * as transactions from "./transactions.js";
-import * as user from "./user.js";
-import * as currencies from "./currencies.js";
-import * as account from "./accounts.js";
-import * as root from "./root.js";
-import * as smartContracts from "./smartContracts.js";
-import * as exchange from "./exchange.js";
+import * as transactions from './transactions.js';
+import * as user from './user.js';
+import * as currencies from './currencies.js';
+import * as account from './accounts.js';
+import * as root from './root.js';
+import * as smartContracts from './smartContracts.js';
+import * as exchange from './exchange.js';
 
 export default {
   transactions,

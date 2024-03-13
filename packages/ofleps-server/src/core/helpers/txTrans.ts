@@ -13,9 +13,9 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-import { HexString, ec } from "ofleps-utils";
-import { ForbiddenError } from "../../errors/main.js";
-import type { txDb } from "../../config/app.service.js";
+import { HexString, ec } from 'ofleps-utils';
+import { ForbiddenError } from '../../errors/main.js';
+import type { txDb } from '../../config/app.service.js';
 
 export interface TransactionReq {
   from: string;
@@ -47,7 +47,7 @@ export async function txTransfer(
   });
 
   if (senderAccount.blocked) {
-    throw new ForbiddenError("Sender account is blocked");
+    throw new ForbiddenError('Sender account is blocked');
   }
 
   if (senderAccount.balance < 0) {
@@ -69,7 +69,7 @@ export async function txTransfer(
     signature &&
     !ec.verify(
       signature,
-      { from, to, amount, comment, type: "transfer" },
+      { from, to, amount, comment, type: 'transfer' },
       senderAccount.userPk as HexString
     )
   ) {
@@ -94,12 +94,12 @@ export async function txTransfer(
 
   if (senderAccount.currencySymbol !== recipientAccount.currencySymbol) {
     throw new ForbiddenError(
-      "Cannot perform transaction between different currencies"
+      'Cannot perform transaction between different currencies'
     );
   }
 
   if (recipientAccount.blocked) {
-    throw new ForbiddenError("Recipient account is blocked");
+    throw new ForbiddenError('Recipient account is blocked');
   }
 
   if (!recipientAccount.User.approved) {
@@ -113,7 +113,7 @@ export async function txTransfer(
   const transaction = await tx.transaction.create({
     data: {
       amount,
-      type: "transfer",
+      type: 'transfer',
       from,
       to,
       comment,

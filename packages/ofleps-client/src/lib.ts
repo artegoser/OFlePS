@@ -13,7 +13,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-import Client from "./client.js";
-import Root from "./root.js";
+import Client from './client.js';
+import Root from './root.js';
 
 export { Client, Root };

@@ -13,17 +13,17 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-import { router } from "./config/trpc.js";
-import { config } from "./config/app.service.js";
-import { createHTTPServer } from "@trpc/server/adapters/standalone";
+import { router } from './config/trpc.js';
+import { config } from './config/app.service.js';
+import { createHTTPServer } from '@trpc/server/adapters/standalone';
 
-import root from "./routes/root.js";
-import user from "./routes/user.js";
-import transactions from "./routes/transactions.js";
-import accounts from "./routes/accounts.js";
-import currencies from "./routes/currencies.js";
-import smartContracts from "./routes/smartContracts.js";
-import exchange from "./routes/exchange.js";
+import root from './routes/root.js';
+import user from './routes/user.js';
+import transactions from './routes/transactions.js';
+import accounts from './routes/accounts.js';
+import currencies from './routes/currencies.js';
+import smartContracts from './routes/smartContracts.js';
+import exchange from './routes/exchange.js';
 
 const appRouter = router({
   root,

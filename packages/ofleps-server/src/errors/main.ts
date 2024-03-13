@@ -13,24 +13,24 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-import { TRPCError } from "@trpc/server";
+import { TRPCError } from '@trpc/server';
 
 type ErrorCodes =
-  | "INTERNAL_SERVER_ERROR"
-  | "PARSE_ERROR"
-  | "BAD_REQUEST"
-  | "NOT_IMPLEMENTED"
-  | "UNAUTHORIZED"
-  | "FORBIDDEN"
-  | "NOT_FOUND"
-  | "METHOD_NOT_SUPPORTED"
-  | "TIMEOUT"
-  | "CONFLICT"
-  | "PRECONDITION_FAILED"
-  | "PAYLOAD_TOO_LARGE"
-  | "UNPROCESSABLE_CONTENT"
-  | "TOO_MANY_REQUESTS"
-  | "CLIENT_CLOSED_REQUEST";
+  | 'INTERNAL_SERVER_ERROR'
+  | 'PARSE_ERROR'
+  | 'BAD_REQUEST'
+  | 'NOT_IMPLEMENTED'
+  | 'UNAUTHORIZED'
+  | 'FORBIDDEN'
+  | 'NOT_FOUND'
+  | 'METHOD_NOT_SUPPORTED'
+  | 'TIMEOUT'
+  | 'CONFLICT'
+  | 'PRECONDITION_FAILED'
+  | 'PAYLOAD_TOO_LARGE'
+  | 'UNPROCESSABLE_CONTENT'
+  | 'TOO_MANY_REQUESTS'
+  | 'CLIENT_CLOSED_REQUEST';
 
 export abstract class OflepsError extends TRPCError {
   code: ErrorCodes;
@@ -47,15 +47,15 @@ export abstract class OflepsError extends TRPCError {
 
 export class ForbiddenError extends OflepsError {
   constructor(message: string) {
-    super("FORBIDDEN", "Forbidden", `Forbidden: ${message}`);
+    super('FORBIDDEN', 'Forbidden', `Forbidden: ${message}`);
   }
 }
 
 export class NotFoundError extends OflepsError {
   constructor(message: string) {
     super(
-      "NOT_FOUND",
-      "Not found",
+      'NOT_FOUND',
+      'Not found',
       `The requested resource was not found: ${message}`
     );
   }
@@ -63,6 +63,6 @@ export class NotFoundError extends OflepsError {
 
 export class BadRequestError extends OflepsError {
   constructor(description: string) {
-    super("BAD_REQUEST", "Bad request", description);
+    super('BAD_REQUEST', 'Bad request', description);
   }
 }
