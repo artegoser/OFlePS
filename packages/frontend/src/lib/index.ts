@@ -2,3 +2,9 @@
 export function dateToUtc(date: string) {
   return new Date(date).getTime() / 1000;
 }
+
+export interface Order {
+  price: number;
+  quantity: number;
+  date: string;
+}
