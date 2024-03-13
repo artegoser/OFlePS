@@ -1,5 +1,5 @@
 {
-  "name": "ofleps-server",
+  "name": "@ofleps/server",
   "version": "1.0.0",
   "description": "Types for Open and Flexible Payment System",
   "types": "dist/app.d.ts",
@@ -31,7 +31,7 @@
     "dotenv": "^16.3.1",
     "isolated-vm": "^4.7.2",
     "number-precision": "^1.6.0",
-    "ofleps-utils": "../ofleps-utils",
+    "ofleps-utils": "../utils",
     "zod": "^3.22.4"
   }
 }

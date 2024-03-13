@@ -1,5 +1,5 @@
 {
-  "name": "ofleps-client",
+  "name": "@ofleps/client",
   "version": "1.0.0",
   "description": "",
   "main": "dist/lib.js",
@@ -15,8 +15,8 @@
     "lint": "eslint \"src/**\""
   },
   "dependencies": {
-    "ofleps-server": "../ofleps-server",
-    "ofleps-utils": "../ofleps-utils"
+    "ofleps-server": "../server",
+    "ofleps-utils": "../utils"
   },
   "keywords": [],
   "author": "artegoser",

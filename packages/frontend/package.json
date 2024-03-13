@@ -1,5 +1,5 @@
 {
-  "name": "ofleps-frontend",
+  "name": "@ofleps/frontend",
   "version": "0.0.1",
   "private": true,
   "scripts": {
@@ -38,8 +38,8 @@
   "dependencies": {
     "@floating-ui/dom": "1.6.3",
     "lightweight-charts": "^4.1.3",
-    "ofleps-client": "../ofleps-client",
-    "ofleps-utils": "../ofleps-utils",
+    "ofleps-client": "../client",
+    "ofleps-utils": "../utils",
     "svelte-lightweight-charts": "^2.2.0"
   }
 }
