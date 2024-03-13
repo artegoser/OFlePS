@@ -1,6 +1,6 @@
 {
   "name": "@ofleps/server",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Types for Open and Flexible Payment System",
   "types": "dist/app.d.ts",
   "type": "module",
