@@ -18,16 +18,16 @@ importers:
         specifier: 8.56.0
         version: 8.56.0
       '@types/node':
-        specifier: ^20.6.2
-        version: 20.11.26
+        specifier: ^20.11.27
+        version: 20.11.27
       '@typescript-eslint/eslint-plugin':
-        specifier: ^6.7.0
+        specifier: ^6.21.0
         version: 6.21.0(@typescript-eslint/parser@6.21.0)(eslint@8.57.0)(typescript@5.4.2)
       '@typescript-eslint/parser':
-        specifier: ^6.7.0
+        specifier: ^6.21.0
         version: 6.21.0(eslint@8.57.0)(typescript@5.4.2)
       eslint:
-        specifier: ^8.49.0
+        specifier: ^8.57.0
         version: 8.57.0
       lerna:
         specifier: ^8.1.2
@@ -39,7 +39,7 @@ importers:
         specifier: ^6.0.4
         version: 6.0.4(typescript@5.4.2)
       typescript:
-        specifier: ^5.2.2
+        specifier: ^5.4.2
         version: 5.4.2
 
   packages/client:
@@ -2059,13 +2059,13 @@ packages:
   /@types/cors@2.8.17:
     resolution: {integrity: sha512-8CGDvrBj1zgo2qE+oS3pOCyYNqCPryMWY2bGfwA0dcfopWGgxs+78df0Rs3rc9THP4JkOhLsAa+15VdpAqkcUA==}
     dependencies:
-      '@types/node': 20.11.26
+      '@types/node': 20.11.27
     dev: true
 
   /@types/cross-spawn@6.0.2:
     resolution: {integrity: sha512-KuwNhp3eza+Rhu8IFI5HUXRP0LIhqH5cAjubUvGXXthh4YYBuP2ntwEX+Cz8GJoZUHlKo247wPWOfA9LYEq4cw==}
     dependencies:
-      '@types/node': 20.11.26
+      '@types/node': 20.11.27
     dev: true
 
   /@types/d3-scale-chromatic@3.0.3:
@@ -2167,6 +2167,12 @@ packages:
 
   /@types/node@20.11.26:
     resolution: {integrity: sha512-YwOMmyhNnAWijOBQweOJnQPl068Oqd4K3OFbTc6AHJwzweUwwWG3GIFY74OKks2PJUDkQPeddOQES9mLn1CTEQ==}
+    dependencies:
+      undici-types: 5.26.5
+    dev: true
+
+  /@types/node@20.11.27:
+    resolution: {integrity: sha512-qyUZfMnCg1KEz57r7pzFtSGt49f6RPkPBis3Vo4PbS7roQEDn22hiHzl/Lo1q4i4hDEgBJmBF/NTNg2XR0HbFg==}
     dependencies:
       undici-types: 5.26.5
     dev: true
