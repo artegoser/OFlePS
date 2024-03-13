@@ -13,12 +13,18 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-import { config, type txDb } from "../../config/app.service.js";
-import NP from "number-precision";
-import { txTransfer } from "./txTrans.js";
+import { config, db, type txDb } from '../../config/app.service.js';
+import NP from 'number-precision';
+import { txTransfer } from './txTrans.js';
 
 export interface MatchResult {
-  type: "all_matched" | "match_success";
+  type: 'all_matched' | 'match_success';
+  data?: {
+    fromCurrencySymbol: string;
+    toCurrencySymbol: string;
+    price: number;
+    quantity: number;
+  };
 }
 
 interface CommentData {
@@ -40,17 +46,17 @@ export async function orderMatch(
 ): Promise<MatchResult> {
   const highestBuyOrder = await tx.order.findFirst({
     where: { type: true, fromCurrencySymbol, toCurrencySymbol },
-    orderBy: [{ price: "desc" }, { date: "asc" }],
+    orderBy: [{ price: 'desc' }, { date: 'asc' }],
   });
 
   const lowestSellOrder = await tx.order.findFirst({
     where: { type: false, fromCurrencySymbol, toCurrencySymbol },
-    orderBy: [{ price: "asc" }, { date: "asc" }],
+    orderBy: [{ price: 'asc' }, { date: 'asc' }],
   });
 
   if (!highestBuyOrder || !lowestSellOrder) {
     return {
-      type: "all_matched",
+      type: 'all_matched',
     };
   }
 
@@ -91,7 +97,7 @@ export async function orderMatch(
       from: config.exchange_account_prefix + toCurrencySymbol,
       to: lowestSellOrder.accountId,
       comment: genComment({
-        type: "sell_success",
+        type: 'sell_success',
         orderId: lowestSellOrder.id,
         pair: `${fromCurrencySymbol}/${toCurrencySymbol}`,
         price,
@@ -105,7 +111,7 @@ export async function orderMatch(
       from: config.exchange_account_prefix + fromCurrencySymbol,
       to: highestBuyOrder.accountId,
       comment: genComment({
-        type: "buy_success",
+        type: 'buy_success',
         orderId: highestBuyOrder.id,
         pair: `${fromCurrencySymbol}/${toCurrencySymbol}`,
         price,
@@ -120,7 +126,7 @@ export async function orderMatch(
         from: config.exchange_account_prefix + toCurrencySymbol,
         to: highestBuyOrder.returnAccountId,
         comment: genComment({
-          type: "refund_unutilized_funds",
+          type: 'refund_unutilized_funds',
           orderId: highestBuyOrder.id,
           pair: `${fromCurrencySymbol}/${toCurrencySymbol}`,
           price,
@@ -138,8 +144,192 @@ export async function orderMatch(
       },
     });
 
-    return { type: "match_success" };
+    return {
+      type: 'match_success',
+      data: {
+        fromCurrencySymbol,
+        toCurrencySymbol,
+        price,
+        quantity: quantityToTrade,
+      },
+    };
   }
 
-  return { type: "all_matched" };
+  return { type: 'all_matched' };
+}
+
+export async function updateTradingSchedule(
+  fromCurrencySymbol: string,
+  toCurrencySymbol: string,
+  price: number,
+  quantity: number
+) {
+  const granularities = ['1m', '5m', '15m', '30m', '1h', '4h', '1d', '1w'];
+
+  for (const granularity of granularities) {
+    const dateStart = new Date();
+
+    if (granularity === '1m') {
+      dateStart.setSeconds(0, 0);
+      await db.tradingSchedule.deleteMany({
+        where: {
+          fromCurrencySymbol,
+          toCurrencySymbol,
+          granularity,
+          dateStart: {
+            lte: new Date(dateStart.getDate() - 1),
+          },
+        },
+      });
+    }
+
+    if (granularity === '5m') {
+      const roundedMinutes = Math.floor(dateStart.getMinutes() / 5) * 5;
+      dateStart.setMinutes(roundedMinutes, 0, 0);
+      await db.tradingSchedule.deleteMany({
+        where: {
+          fromCurrencySymbol,
+          toCurrencySymbol,
+          granularity,
+          dateStart: {
+            lte: new Date(dateStart.getDate() - 2),
+          },
+        },
+      });
+    }
+
+    if (granularity === '15m') {
+      const roundedMinutes = Math.floor(dateStart.getMinutes() / 15) * 15;
+      dateStart.setMinutes(roundedMinutes, 0, 0);
+
+      await db.tradingSchedule.deleteMany({
+        where: {
+          fromCurrencySymbol,
+          toCurrencySymbol,
+          granularity,
+          dateStart: {
+            lte: new Date(dateStart.getDate() - 7),
+          },
+        },
+      });
+    }
+
+    if (granularity === '30m') {
+      const roundedMinutes = Math.floor(dateStart.getMinutes() / 30) * 30;
+      dateStart.setMinutes(roundedMinutes, 0, 0);
+
+      await db.tradingSchedule.deleteMany({
+        where: {
+          fromCurrencySymbol,
+          toCurrencySymbol,
+          granularity,
+          dateStart: {
+            lte: new Date(dateStart.getDate() - 15),
+          },
+        },
+      });
+    }
+
+    if (granularity === '1h') {
+      dateStart.setMinutes(0, 0, 0);
+
+      await db.tradingSchedule.deleteMany({
+        where: {
+          fromCurrencySymbol,
+          toCurrencySymbol,
+          granularity,
+          dateStart: {
+            lte: new Date(dateStart.getDate() - 30),
+          },
+        },
+      });
+    }
+
+    if (granularity === '4h') {
+      const roundedHours = Math.floor(dateStart.getHours() / 4) * 4;
+      dateStart.setHours(roundedHours, 0, 0, 0);
+
+      await db.tradingSchedule.deleteMany({
+        where: {
+          fromCurrencySymbol,
+          toCurrencySymbol,
+          granularity,
+          dateStart: {
+            lte: new Date(dateStart.getDate() - 60),
+          },
+        },
+      });
+    }
+
+    if (granularity === '1d') {
+      dateStart.setHours(0, 0, 0, 0);
+
+      await db.tradingSchedule.deleteMany({
+        where: {
+          fromCurrencySymbol,
+          toCurrencySymbol,
+          granularity,
+          dateStart: {
+            lte: new Date(dateStart.getDate() - 180),
+          },
+        },
+      });
+    }
+
+    if (granularity === '1w') {
+      const roundedWeeks = Math.floor(dateStart.getDay() / 7) * 7;
+      dateStart.setDate(dateStart.getDate() - roundedWeeks);
+
+      dateStart.setHours(0, 0, 0, 0);
+    }
+
+    await db.$transaction(async (tx) => {
+      const tradingSchedule = await tx.tradingSchedule.upsert({
+        where: {
+          fromCurrencySymbol_toCurrencySymbol_granularity_dateStart: {
+            fromCurrencySymbol,
+            toCurrencySymbol,
+            granularity,
+            dateStart,
+          },
+        },
+        create: {
+          fromCurrencySymbol,
+          toCurrencySymbol,
+          granularity,
+          dateStart,
+          open: price,
+          high: price,
+          low: price,
+          close: price,
+          volume: quantity,
+        },
+        update: {
+          volume: {
+            increment: quantity,
+          },
+          close: price,
+        },
+      });
+
+      await tx.tradingSchedule.update({
+        where: {
+          fromCurrencySymbol_toCurrencySymbol_granularity_dateStart: {
+            fromCurrencySymbol,
+            toCurrencySymbol,
+            granularity,
+            dateStart,
+          },
+        },
+        data: {
+          high: {
+            set: Math.max(tradingSchedule.high, price),
+          },
+          low: {
+            set: Math.min(tradingSchedule.low, price),
+          },
+        },
+      });
+    });
+  }
 }

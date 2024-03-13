@@ -13,8 +13,8 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-import { HexString } from "ofleps-utils";
-import { Client, Root } from "../lib.js";
+import { HexString } from 'ofleps-utils';
+import { Client, Root } from '../lib.js';
 
 function wait(ms: number) {
   return new Promise((resolve) => {
@@ -39,61 +39,72 @@ function mapOrderBook(orderBook: any) {
 
 (async () => {
   const admin = new Root(
-    "http://localhost:3000",
-    "ac601a987ab9a5fcfa076190f4a0643be1ac53842f05f65047240dc8b679f452" as HexString
+    'http://localhost:3000',
+    'ac601a987ab9a5fcfa076190f4a0643be1ac53842f05f65047240dc8b679f452' as HexString
   );
 
-  const alice = new Client("http://localhost:3000");
-  const bob = new Client("http://localhost:3000");
+  const alice = new Client('http://localhost:3000');
+  const bob = new Client('http://localhost:3000');
 
-  await alice.registerUser("alice", "alice@ofleps.io");
-  await bob.registerUser("bob", "bob@ofleps.io");
+  await alice.registerUser('alice', 'alice@ofleps.io');
+  await bob.registerUser('bob', 'bob@ofleps.io');
 
   const { id: afid } = await alice.createAccount(
-    "alice usd",
-    "alice account",
-    "USD"
+    'alice usd',
+    'alice account',
+    'USD'
   );
 
   const { id: atid } = await alice.createAccount(
-    "alice rub",
-    "alice account",
-    "RUB"
+    'alice rub',
+    'alice account',
+    'RUB'
   );
 
-  const { id: bfid } = await bob.createAccount("bob usd", "bob account", "USD");
+  const { id: bfid } = await bob.createAccount('bob usd', 'bob account', 'USD');
 
-  const { id: btid } = await bob.createAccount("bob rub", "bob account", "RUB");
+  const { id: btid } = await bob.createAccount('bob rub', 'bob account', 'RUB');
 
   //now admin issues money
-  await admin.issue(afid, 5, "issue usd to alice");
-  await admin.issue(btid, 500, "issue rub to bob");
+  await admin.issue(afid, 5, 'issue usd to alice');
+  await admin.issue(btid, 500, 'issue rub to bob');
 
   // Place multiple limit orders
-  await alice.sell(afid, atid, "USD", "RUB", 1, 90);
-  await alice.sell(afid, atid, "USD", "RUB", 1, 95);
-  const unfulfilled = await alice.sell(afid, atid, "USD", "RUB", 2, 99);
-  const unfulfilled2 = await alice.sell(afid, atid, "USD", "RUB", 1, 110);
+  await alice.sell(afid, atid, 'USD', 'RUB', 1, 90);
+  await alice.sell(afid, atid, 'USD', 'RUB', 1, 95);
+  const unfulfilled = await alice.sell(afid, atid, 'USD', 'RUB', 2, 99);
+  await alice.sell(afid, atid, 'USD', 'RUB', 1, 110);
 
   // Place limit order
   // Buys 3 USD for 90,95,99
-  await bob.buy(bfid, btid, "USD", "RUB", 3, 100);
+  await bob.buy(bfid, btid, 'USD', 'RUB', 3, 100);
 
-  console.log("Order book before matching:");
-  console.table(mapOrderBook(await bob.getOrderBook("USD", "RUB")));
+  console.log('Order book before matching:');
+  console.table(mapOrderBook(await bob.getOrderBook('USD', 'RUB')));
 
   // Wait some time for exchange to settle
   await wait(1000);
 
-  console.log("Order book after matching:");
-  console.table(mapOrderBook(await bob.getOrderBook("USD", "RUB")));
+  console.log('Order book after matching:');
+  console.table(mapOrderBook(await bob.getOrderBook('USD', 'RUB')));
 
-  // Cancel alice sell orders
+  // Cancel alice sell order
   await alice.cancelOrder(unfulfilled.id);
-  await alice.cancelOrder(unfulfilled2.id);
 
-  console.log("Order book after canceling:");
-  console.table(mapOrderBook(await bob.getOrderBook("USD", "RUB")));
+  console.log('Order book after canceling:');
+  console.table(mapOrderBook(await bob.getOrderBook('USD', 'RUB')));
+
+  console.log('Waiting one minute to update trading schedule');
+  await wait(1000 * 61);
+
+  console.log('Buying again');
+  await bob.buy(bfid, btid, 'USD', 'RUB', 1, 120);
+
+  console.log('Order book after bying all:');
+  console.table(mapOrderBook(await bob.getOrderBook('USD', 'RUB')));
+
+  console.log('Trading schedule 1m:');
+  console.table(await bob.getTradingSchedule('USD', 'RUB', '1m'));
 
   // Order fullfiled(probably), now we can see transactions
   const transactions_alice = await alice.getTransactions(atid);
@@ -102,17 +113,17 @@ function mapOrderBook(orderBook: any) {
   const aa = await alice.getAccountById(atid);
   const ba = await bob.getAccountById(bfid);
 
-  console.log("\nTransactions after exchange:\n");
+  console.log('\nTransactions after exchange:\n');
   console.log(`\nAlice transactions (${aa?.balance} ${aa?.currencySymbol}):`);
   console.log(
     transactions_alice
       .map(
         (t) =>
-          `${t.amount} ${t.currencySymbol} ${atid === t.from ? "->" : "<-"} ${
+          `${t.amount} ${t.currencySymbol} ${atid === t.from ? '->' : '<-'} ${
             t.type
           }`
       )
-      .join("\n")
+      .join('\n')
   );
 
   console.log(`\nBob transactions (${ba?.balance} ${ba?.currencySymbol}):`);
@@ -121,10 +132,10 @@ function mapOrderBook(orderBook: any) {
     transactions_bob
       .map(
         (t) =>
-          `${t.amount} ${t.currencySymbol} ${bfid === t.from ? "->" : "<-"} ${
+          `${t.amount} ${t.currencySymbol} ${bfid === t.from ? '->' : '<-'} ${
             t.type
           }`
       )
-      .join("\n")
+      .join('\n')
   );
 })();

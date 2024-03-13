@@ -88,9 +88,13 @@ model Currency {
   OrdersFrom Order[] @relation("OrderFrom")
   OrdersTo   Order[] @relation("OrderTo")
 
-  CompleteOrderFrom CompleteOrder[] @relation("CompleteOrderFrom")
-  CompleteOrderTo   CompleteOrder[] @relation("CompleteOrderTo")
-  Transaction       Transaction[]
+  CompleteOrdersFrom CompleteOrder[] @relation("CompleteOrderFrom")
+  CompleteOrdersTo   CompleteOrder[] @relation("CompleteOrderTo")
+
+  GranularitiesFrom TradingSchedule[] @relation("TradeScheduleFrom")
+  GranularitiesTo   TradingSchedule[] @relation("TradeScheduleTo")
+
+  Transactions Transaction[]
 }
 
 model Order {
@@ -127,6 +131,26 @@ model CompleteOrder {
 
   fromCurrency Currency @relation(name: "CompleteOrderFrom", fields: [fromCurrencySymbol], references: [symbol])
   toCurrency   Currency @relation(name: "CompleteOrderTo", fields: [toCurrencySymbol], references: [symbol])
+}
+
+model TradingSchedule {
+  fromCurrencySymbol String
+  toCurrencySymbol   String
+  granularity        String
+
+  dateStart DateTime
+
+  open  Float
+  high  Float
+  low   Float
+  close Float
+
+  volume Float
+
+  fromCurrency Currency @relation(name: "TradeScheduleFrom", fields: [fromCurrencySymbol], references: [symbol])
+  toCurrency   Currency @relation(name: "TradeScheduleTo", fields: [toCurrencySymbol], references: [symbol])
+
+  @@unique([fromCurrencySymbol, toCurrencySymbol, granularity, dateStart])
 }
 
 model SmartContract {

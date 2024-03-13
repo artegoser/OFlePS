@@ -294,6 +294,18 @@ export default class Client {
     });
   }
 
+  public getTradingSchedule(
+    fromCurrencySymbol: string,
+    toCurrencySymbol: string,
+    granularity: string
+  ) {
+    return this._t.exchange.getTradingSchedule.query({
+      fromCurrencySymbol,
+      toCurrencySymbol,
+      granularity,
+    });
+  }
+
   // #endregion Public Methods (17)
 
   // #region Private Methods (1)

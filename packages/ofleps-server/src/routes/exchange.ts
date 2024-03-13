@@ -13,12 +13,27 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-import { router, publicProcedure } from "../config/trpc.js";
-import { z } from "zod";
-import core from "../core/main/main.js";
-import { HexString } from "ofleps-utils";
+import { router, publicProcedure } from '../config/trpc.js';
+import { z } from 'zod';
+import core from '../core/main/main.js';
+import { HexString } from 'ofleps-utils';
 
 const exchange = router({
+  getTradingSchedule: publicProcedure
+    .input(
+      z.object({
+        fromCurrencySymbol: z.string(),
+        toCurrencySymbol: z.string(),
+        granularity: z.string(),
+      })
+    )
+    .query(({ input }) => {
+      return core.exchange.getTradingSchedule(
+        input.fromCurrencySymbol,
+        input.toCurrencySymbol,
+        input.granularity
+      );
+    }),
   getOrderBook: publicProcedure
     .input(
       z.object({

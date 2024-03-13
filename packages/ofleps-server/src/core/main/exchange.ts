@@ -13,20 +13,25 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-import { HexString, ec } from "ofleps-utils";
-import { db, config } from "../../config/app.service.js";
-import { ForbiddenError } from "../../errors/main.js";
-import { txTransfer } from "../helpers/txTrans.js";
-import NP from "number-precision";
-import EventEmitter from "events";
-import { MatchResult, genComment, orderMatch } from "../helpers/orderMatch.js";
+import { HexString, ec } from 'ofleps-utils';
+import { db, config } from '../../config/app.service.js';
+import { ForbiddenError } from '../../errors/main.js';
+import { txTransfer } from '../helpers/txTrans.js';
+import NP from 'number-precision';
+import EventEmitter from 'events';
+import {
+  MatchResult,
+  genComment,
+  orderMatch,
+  updateTradingSchedule,
+} from '../helpers/orderMatch.js';
 
 const orderEmitter = new EventEmitter();
 
-orderEmitter.on("new_order", async (data) => {
+orderEmitter.on('new_order', async (data) => {
   let result: MatchResult | undefined;
 
-  while (result?.type !== "all_matched") {
+  while (result?.type !== 'all_matched') {
     await db.$transaction(async (tx) => {
       result = await orderMatch(
         tx,
@@ -34,8 +39,35 @@ orderEmitter.on("new_order", async (data) => {
         data.toCurrencySymbol
       );
     });
+
+    if (!result) continue;
+
+    if (result.type === 'match_success') {
+      if (!result.data) continue;
+
+      await updateTradingSchedule(
+        result.data.fromCurrencySymbol,
+        result.data.toCurrencySymbol,
+        result.data.price,
+        result.data.quantity
+      );
+    }
   }
 });
+
+export async function getTradingSchedule(
+  fromCurrencySymbol: string,
+  toCurrencySymbol: string,
+  granularity: string
+) {
+  return await db.tradingSchedule.findMany({
+    where: {
+      fromCurrencySymbol,
+      toCurrencySymbol,
+      granularity,
+    },
+  });
+}
 
 export async function getOrderBook(
   fromCurrencySymbol: string,
@@ -54,7 +86,7 @@ export async function getOrderBook(
         quantity: true,
         date: true,
       },
-      orderBy: [{ price: "desc" }, { date: "asc" }],
+      orderBy: [{ price: 'desc' }, { date: 'asc' }],
       skip: (page - 1) * 50,
       take: 50,
     }),
@@ -69,7 +101,7 @@ export async function getOrderBook(
         quantity: true,
         date: true,
       },
-      orderBy: [{ price: "asc" }, { date: "asc" }],
+      orderBy: [{ price: 'asc' }, { date: 'asc' }],
       skip: (page - 1) * 50,
       take: 50,
     }),
@@ -99,7 +131,7 @@ export async function cancelOrder(
         order.returnAccount.userPk as HexString
       )
     ) {
-      throw new ForbiddenError("Invalid signature");
+      throw new ForbiddenError('Invalid signature');
     }
 
     if (!order) {
@@ -115,9 +147,9 @@ export async function cancelOrder(
         ? NP.times(order.quantity, order.price)
         : order.quantity,
       comment: genComment({
-        type: "cancel",
+        type: 'cancel',
         orderId: order.id,
-        pair: order.fromCurrencySymbol + "/" + order.toCurrencySymbol,
+        pair: order.fromCurrencySymbol + '/' + order.toCurrencySymbol,
         price: order.price,
         quantity: order.quantity,
       }),
@@ -135,7 +167,7 @@ async function createOrder(
   type: boolean, // true - buy, false - sell
   signature: HexString
 ) {
-  if (quantity <= 0) throw new ForbiddenError("Set quantity <= 0");
+  if (quantity <= 0) throw new ForbiddenError('Set quantity <= 0');
 
   const account = await db.account.findUniqueOrThrow({
     where: {
@@ -146,7 +178,7 @@ async function createOrder(
   if (
     (type ? toCurrencySymbol : fromCurrencySymbol) !== account.currencySymbol
   ) {
-    throw new ForbiddenError("Buy/sell with wrong currency");
+    throw new ForbiddenError('Buy/sell with wrong currency');
   }
 
   if (
@@ -164,7 +196,7 @@ async function createOrder(
       account.userPk as HexString
     )
   ) {
-    throw new ForbiddenError("Invalid signature");
+    throw new ForbiddenError('Invalid signature');
   }
 
   const exchange_account_id_from =
@@ -194,7 +226,7 @@ async function createOrder(
       from: type ? toAccountId : fromAccountId,
       to: type ? exchange_account_id_to : exchange_account_id_from,
       comment: genComment({
-        type: type ? "buy" : "sell",
+        type: type ? 'buy' : 'sell',
         orderId: new_order.id,
         pair: `${fromCurrencySymbol}/${toCurrencySymbol}`,
         price,
@@ -202,7 +234,7 @@ async function createOrder(
       }),
     });
 
-    orderEmitter.emit("new_order", { fromCurrencySymbol, toCurrencySymbol });
+    orderEmitter.emit('new_order', { fromCurrencySymbol, toCurrencySymbol });
 
     return new_order;
   });
