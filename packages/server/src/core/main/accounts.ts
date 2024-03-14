@@ -75,3 +75,7 @@ export async function createAccount({
 export async function getAccountById(id: string) {
   return await db.account.findUnique({ where: { id } });
 }
+
+export async function getAccountsByUserPk(userPk: HexString) {
+  return await db.account.findMany({ where: { userPk } });
+}

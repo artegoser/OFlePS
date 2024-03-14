@@ -15,12 +15,15 @@
 
 import { router, publicProcedure } from '../config/trpc.js';
 import { z } from 'zod';
-import core from '../core/main/main.js';
+import core from '../core/main.js';
 import { HexString } from '@ofleps/utils';
 
 const accounts = router({
   getById: publicProcedure.input(z.string()).query(({ input }) => {
     return core.account.getAccountById(input);
+  }),
+  getByUserPk: publicProcedure.input(z.string()).query(({ input }) => {
+    return core.account.getAccountsByUserPk(input as HexString);
   }),
   create: publicProcedure
     .input(

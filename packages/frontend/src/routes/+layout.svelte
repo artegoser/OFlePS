@@ -1,6 +1,6 @@
 <script lang="ts">
   import '../app.postcss';
-  import { AppShell, AppBar, Toast } from '@skeletonlabs/skeleton';
+  import { AppShell, AppBar, Toast, Modal } from '@skeletonlabs/skeleton';
 
   // Floating UI for Popups
   import {
@@ -21,7 +21,7 @@
   import { Client } from '@ofleps/client';
   import { writable, type Writable } from 'svelte/store';
   import { onMount, setContext } from 'svelte';
-  import { goto } from '$app/navigation';
+  import { afterNavigate, goto } from '$app/navigation';
   import type { HexString } from '@ofleps/utils';
   import { browser } from '$app/environment';
   import { page } from '$app/stores';
@@ -32,20 +32,28 @@
   user.subscribe(async () => {
     if (browser) {
       if ($user.privateKey) return;
-
       const privk = window.localStorage.getItem('privk');
       if (!privk && $page.url.pathname !== '/auth') {
         goto('/auth');
       } else {
-        await $user.login(privk as HexString);
+        try {
+          await $user.login(privk as HexString);
+        } catch {
+          goto('/auth');
+        }
       }
     }
   });
 
   setContext('user', user);
+
+  afterNavigate(() => {
+    document.getElementById('page')?.scrollTo(0, 0);
+  });
 </script>
 
 <Toast />
+<Modal />
 
 <!-- App Shell -->
 <AppShell>
@@ -68,5 +76,5 @@
     </AppBar>
   </svelte:fragment>
   <!-- Page Route Content -->
-  <slot />
+  <span id="page"><slot /></span>
 </AppShell>

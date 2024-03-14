@@ -1,15 +1,14 @@
 <script lang="ts">
   import { browser } from '$app/environment';
   import { goto } from '$app/navigation';
-  import ErrorComponent from '$lib/Error.svelte';
   import Toggle from '$lib/components/Toggle.svelte';
-  import { computePosition } from '@floating-ui/dom';
   import type { Client } from '@ofleps/client';
   import type { HexString } from '@ofleps/utils';
   import type { ToastSettings } from '@skeletonlabs/skeleton';
   import { getContext } from 'svelte';
   import type { Writable } from 'svelte/store';
   import { getToastStore } from '@skeletonlabs/skeleton';
+  import Form from '$lib/components/Form.svelte';
 
   const toastStore = getToastStore();
 
@@ -49,14 +48,11 @@
   }
 </script>
 
-<div class="container h-full mx-auto flex flex-col justify-center items-center">
-  <div
-    class="variant-ghost-surface p-5 mx-5 rounded-2xl mt-2 grid grid-rows-3 gap-2 text center"
-  >
-    <div class="flex justify-between">
-      <div>{text}</div>
-      <Toggle bind:checked={type} />
-    </div>
+<div class="container h-full mx-auto flex justify-center items-center">
+  <Form title={text} buttonText={text} onSubmit={performAction}>
+    <svelte:fragment slot="title"
+      ><Toggle bind:checked={type} />
+    </svelte:fragment>
 
     {#if type}
       <input class="input" type="text" placeholder="Name" bind:value={name} />
@@ -74,12 +70,5 @@
         bind:value={privateKey}
       />
     {/if}
-
-    <button
-      type="button"
-      class="btn variant-filled-primary"
-      on:click={performAction}
-      >{text}
-    </button>
-  </div>
+  </Form>
 </div>

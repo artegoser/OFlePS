@@ -53,6 +53,9 @@ importers:
       '@trpc/client':
         specifier: ^10.45.1
         version: 10.45.2(@trpc/server@10.45.2)
+      '@trpc/server':
+        specifier: ^10.45.1
+        version: 10.45.2
 
   packages/docs:
     dependencies:

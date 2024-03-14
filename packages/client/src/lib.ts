@@ -17,3 +17,11 @@ import Client from './client.js';
 import Root from './root.js';
 
 export { Client, Root };
+
+import type { inferRouterInputs, inferRouterOutputs } from '@trpc/server';
+import type { AppRouter } from '@ofleps/server';
+
+export type RouterInput = inferRouterInputs<AppRouter>;
+export type RouterOutput = inferRouterOutputs<AppRouter>;
+
+export type Account = NonNullable<RouterOutput['accounts']['getById']>;

@@ -14,6 +14,7 @@
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 import { createTRPCProxyClient, httpBatchLink } from '@trpc/client';
+
 import type { AppRouter } from '@ofleps/server';
 
 import { ec, HexString, SmartRequest } from '@ofleps/utils';
@@ -60,7 +61,7 @@ export default class Client {
 
   // #endregion Public Getters And Setters (2)
 
-  // #region Public Methods (18)
+  // #region Public Methods (19)
 
   public buy(
     fromAccountId: string,
@@ -165,6 +166,10 @@ export default class Client {
 
   public getAccountById(id: string) {
     return this._t.accounts.getById.query(id);
+  }
+
+  public getAccounts() {
+    return this._t.accounts.getByUserPk.query(this._publicKey as HexString);
   }
 
   public getCurrencies(page: number = 1) {
@@ -306,7 +311,7 @@ export default class Client {
     });
   }
 
-  // #endregion Public Methods (18)
+  // #endregion Public Methods (19)
 
   // #region Private Methods (1)
 

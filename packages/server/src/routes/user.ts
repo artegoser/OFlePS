@@ -16,7 +16,7 @@
 import { router, publicProcedure } from '../config/trpc.js';
 import { z } from 'zod';
 import { HexString } from '@ofleps/utils';
-import core from '../core/main/main.js';
+import core from '../core/main.js';
 
 const user = router({
   register: publicProcedure
