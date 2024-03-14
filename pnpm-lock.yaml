@@ -138,6 +138,9 @@ importers:
       svelte-check:
         specifier: ^3.6.0
         version: 3.6.7(postcss@8.4.35)(svelte@4.2.12)
+      svelte-hero-icons:
+        specifier: ^5.1.0
+        version: 5.1.0(svelte@4.2.12)
       tailwindcss:
         specifier: 3.4.1
         version: 3.4.1
@@ -1868,6 +1871,10 @@ packages:
       tailwindcss: '>=3.0.0'
     dependencies:
       tailwindcss: 3.4.1
+    dev: true
+
+  /@steeze-ui/heroicons@2.3.0:
+    resolution: {integrity: sha512-tVOamjAd9ZzXgDwVKwbA3K+o86Z1ks/IMvqdgoCf9hKeGINVUIlAlGhM3wdpSmt7brIoBLgR70wlnsXGytZk9g==}
     dev: true
 
   /@sveltejs/adapter-auto@3.1.1(@sveltejs/kit@2.5.3):
@@ -8931,6 +8938,16 @@ packages:
       espree: 9.6.1
       postcss: 8.4.35
       postcss-scss: 4.0.9(postcss@8.4.35)
+      svelte: 4.2.12
+    dev: true
+
+  /svelte-hero-icons@5.1.0(svelte@4.2.12):
+    resolution: {integrity: sha512-8Z5+jpwFktz5aO325EAGo7nf4ailOKO8w+8Se1aHPVw/DiILuLMbxV6/xOfqpWPux2u7apMsBnMh4cWLbBN/xw==}
+    engines: {node: '>=18.0.0'}
+    peerDependencies:
+      svelte: ^3.0.0 || ^4.0.0 || ^5.0.0
+    dependencies:
+      '@steeze-ui/heroicons': 2.3.0
       svelte: 4.2.12
     dev: true
 

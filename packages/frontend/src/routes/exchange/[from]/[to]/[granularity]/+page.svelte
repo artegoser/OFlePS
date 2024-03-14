@@ -26,7 +26,7 @@
   import { writable, type Writable } from 'svelte/store';
   import { dateToUtc, type Order } from '$lib';
 
-  import OrderBook from '$lib/components/orderBook.svelte';
+  import OrderBook from '$lib/components/OrderBook.svelte';
   import BuySell from '$lib/components/BuySell.svelte';
 
   const user: Writable<Client> = getContext('user');

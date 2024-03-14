@@ -1,4 +1,6 @@
 <script lang="ts">
+  import type { Order } from '$lib';
+
   export let bids: Order[];
   export let asks: Order[];
 </script>
