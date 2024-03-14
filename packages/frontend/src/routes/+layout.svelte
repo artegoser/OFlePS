@@ -61,7 +61,9 @@
     <!-- App Bar -->
     <AppBar>
       <svelte:fragment slot="lead">
-        <strong class="text-xl uppercase">OFlePS</strong>
+        <strong class="text-xl uppercase mx-5">OFlePS</strong>
+
+        <a href="/my" class="btn btn-sm variant-ghost-surface"> My </a>
       </svelte:fragment>
       <svelte:fragment slot="trail">
         <a

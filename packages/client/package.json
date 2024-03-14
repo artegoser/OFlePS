@@ -9,7 +9,7 @@
   "scripts": {
     "btest": "npm run build && npm run test",
     "test": "node dist/tests/test.js",
-    "test:admin": "npm run build && node dist/tests/admin_init.js",
+    "test:admin": "npm run build && node dist/tests/admin-panel.js",
     "test:smart_contract": "npm run build && node dist/tests/smart_contract.js",
     "test:exchange": "npm run build && node dist/tests/exchange.js",
     "build": "npm run lint && tsc",

@@ -25,3 +25,4 @@ export type RouterInput = inferRouterInputs<AppRouter>;
 export type RouterOutput = inferRouterOutputs<AppRouter>;
 
 export type Account = NonNullable<RouterOutput['accounts']['getById']>;
+export type Transaction = RouterOutput['transactions']['get'][0];
