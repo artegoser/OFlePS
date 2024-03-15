@@ -68,10 +68,10 @@
     </div>
   </div>
 
-  <div class="flex flex-col items-center gap-2">
+  <div class="flex flex-col gap-2">
     {#each transactions as transaction}
       <div
-        class="p-2 rounded-2xl flex flex-wrap justify-center items-center gap-2 {transaction.to ===
+        class="p-2 rounded-2xl flex flex-wrap justify-between items-center gap-2 {transaction.to ===
         account?.id
           ? 'variant-ghost-success'
           : 'variant-ghost-error'}"
@@ -81,7 +81,7 @@
           {account?.currencySymbol}
         </div>
 
-        <div>
+        <div class="break-all">
           {transaction.comment}
         </div>
 

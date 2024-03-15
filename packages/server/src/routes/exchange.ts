@@ -17,8 +17,10 @@ import { router, publicProcedure } from '../config/trpc.js';
 import { z } from 'zod';
 import core from '../core/main.js';
 import { HexString } from '@ofleps/utils';
+import { config } from '../config/app.service.js';
 
 const exchange = router({
+  getGranularities: publicProcedure.query(() => config.granularities),
   getTradingSchedule: publicProcedure
     .input(
       z.object({

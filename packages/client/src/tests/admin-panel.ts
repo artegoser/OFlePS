@@ -16,7 +16,7 @@ const rl = readline.createInterface({ input, output });
 
   while (true) {
     eval(
-      '(async () => { console.log(await admin.' +
+      '(async () => { console.log("\n",await admin.' +
         (await rl.question('> ')) +
         ') })()'
     );

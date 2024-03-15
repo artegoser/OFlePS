@@ -100,6 +100,10 @@ export default class Client {
     });
   }
 
+  public getGranularities() {
+    return this._t.exchange.getGranularities.query();
+  }
+
   public createAccount(
     name: string,
     description: string,

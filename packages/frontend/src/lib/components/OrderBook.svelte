@@ -10,7 +10,9 @@
     <div class="font-bold text-right">Price</div>
     <div class="font-bold">Quantity</div>
   </div>
-  {#each bids as order}
+  {#each { length: bids.length } as _, index}
+    {@const reverseIndex = bids.length - 1 - index}
+    {@const order = bids[reverseIndex]}
     <div
       class="flex justify-between m-2 py-2 px-5 variant-ghost-success rounded-2xl"
     >
@@ -21,7 +23,7 @@
   <div
     class="flex justify-between m-2 py-2 px-5 variant-ghost-tertiary rounded-2xl"
   >
-    <div class="text-right">{(bids[0]?.price + asks[0]?.price) / 2}</div>
+    <div class="text-right">{(bids[0]?.price + asks[0]?.price) / 2 || 0}</div>
     <div>Price</div>
   </div>
   {#each asks as order}

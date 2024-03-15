@@ -8,3 +8,8 @@ export interface Order {
   quantity: number;
   date: string;
 }
+
+export interface Options {
+  title: string;
+  value: string;
+}
