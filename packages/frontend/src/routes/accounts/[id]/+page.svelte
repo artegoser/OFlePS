@@ -9,17 +9,19 @@
   import type { ModalSettings, ToastSettings } from '@skeletonlabs/skeleton';
   import { getModalStore, getToastStore } from '@skeletonlabs/skeleton';
 
+  import { slide } from 'svelte/transition';
+  import { to_pretty_html } from '$lib';
+
   const modalStore = getModalStore();
   const toastStore = getToastStore();
 
   const user: Writable<Client> = getContext('user');
 
-  let account: Account | null = null;
+  let account: Account | null = data.account;
   let transactions: Transaction[] = [];
   let page = 1;
 
   onMount(async () => {
-    account = await $user.getAccountById(data.id);
     transactions = await $user.getTransactions(data.id, page);
   });
 
@@ -46,21 +48,15 @@
 </script>
 
 <div class="container mx-auto p-5 flex flex-col">
-  <div
-    class="h1 p-5 rounded-2xl flex flex-wrap justify-center items-center gap-2"
-  >
+  <div class="h1 p-5 flex flex-wrap justify-center items-center gap-2">
     <div>
       {account?.name} ({account?.balance}
       {account?.currencySymbol})
     </div>
     <div>
       <button
-        class="btn variant-ghost-tertiary"
-        on:click={() =>
-          showModal(
-            `ID: ${account?.id}`,
-            `Description: ${account?.description}`
-          )}
+        class="btn variant-filled-surface"
+        on:click={() => showModal(`Account info`, to_pretty_html(account))}
       >
         More info
       </button>
@@ -70,13 +66,15 @@
 
   <div class="flex flex-col gap-2">
     {#each transactions as transaction}
+      {@const isIncome = transaction.to === account?.id}
       <div
-        class="p-2 rounded-2xl flex flex-wrap justify-between items-center gap-2 {transaction.to ===
-        account?.id
-          ? 'variant-ghost-success'
-          : 'variant-ghost-error'}"
+        transition:slide
+        class="p-2 px-5 rounded-2xl flex lg:flex-row flex-col justify-between lg:items-center items-start gap-2 {isIncome
+          ? 'variant-soft-success'
+          : 'variant-soft-error'}"
       >
         <div>
+          {isIncome ? '+' : '-'}
           {transaction.amount}
           {account?.currencySymbol}
         </div>
@@ -85,22 +83,28 @@
           {transaction.comment}
         </div>
 
-        <div>
-          {new Date(transaction.date).toLocaleString()}
+        <div class="flex flex-col gap-2">
+          <div>
+            {new Date(transaction.date).toLocaleString()}
+          </div>
+          <button
+            class="btn variant-soft-tertiary"
+            on:click={() => {
+              showModal(`Transaction info`, to_pretty_html(transaction));
+            }}
+          >
+            More info
+          </button>
         </div>
-
-        <button
-          class="btn variant-ghost-tertiary"
-          on:click={() => {
-            showModal(
-              `ID: ${transaction.id}`,
-              `From: ${transaction.from} To: ${transaction.to} Type: ${transaction.type}`
-            );
-          }}
-        >
-          More info
-        </button>
       </div>
     {/each}
+
+    {#if transactions.length > 0}
+      <div transition:slide>
+        <button class="btn variant-filled-primary" on:click={nextPage}>
+          Next page
+        </button>
+      </div>
+    {/if}
   </div>
 </div>

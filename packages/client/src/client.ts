@@ -238,6 +238,10 @@ export default class Client {
     return user;
   }
 
+  public loginWithoutChecking(privateKey: HexString) {
+    this.setPrivateKey(privateKey);
+  }
+
   public async registerUser(name: string, email: string) {
     if (!this._privateKey || !this._publicKey) {
       const { privateKey, publicKey } = ec.generateKeyPair();

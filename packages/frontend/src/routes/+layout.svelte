@@ -1,6 +1,7 @@
 <script lang="ts">
   import '../app.postcss';
   import { AppShell, AppBar, Toast, Modal } from '@skeletonlabs/skeleton';
+  import Cookies from 'js-cookie';
 
   // Floating UI for Popups
   import {
@@ -37,7 +38,13 @@
         goto('/auth');
       } else {
         try {
-          await $user.login(privk as HexString);
+          if (sessionStorage.getItem('loggedIn') !== 'true') {
+            const res = await $user.login(privk as HexString);
+            sessionStorage.setItem('loggedIn', 'true');
+            Cookies.set('userPk', res.pk);
+          } else {
+            await $user.loginWithoutChecking(privk as HexString);
+          }
         } catch {
           goto('/auth');
         }
