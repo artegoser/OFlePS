@@ -176,6 +176,10 @@ export default class Client {
     return this._t.accounts.getByUserPk.query(this._publicKey as HexString);
   }
 
+  public getAccountsByUserPk(userPk: string) {
+    return this._t.accounts.getByUserPk.query(userPk);
+  }
+
   public getCurrencies(page: number = 1) {
     return this._t.currencies.get.query({ page });
   }
@@ -236,6 +240,10 @@ export default class Client {
     }
 
     return user;
+  }
+
+  public loginWithoutChecking(privateKey: HexString) {
+    this.setPrivateKey(privateKey);
   }
 
   public async registerUser(name: string, email: string) {

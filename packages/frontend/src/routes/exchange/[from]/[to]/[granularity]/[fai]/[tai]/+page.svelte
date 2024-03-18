@@ -25,7 +25,7 @@
 
   import { getContext, onMount } from 'svelte';
   import { writable, type Writable } from 'svelte/store';
-  import { dateToUtc, type Order } from '$lib';
+  import { dateToUtc } from '$lib';
 
   import OrderBookComponent from '$lib/components/OrderBook.svelte';
   import BuySell from '$lib/components/BuySell.svelte';
@@ -42,16 +42,12 @@
   let histogramData: Writable<HistogramData<Time>[]> = writable();
   let baselineData: Writable<BaselineData<Time>[]> = writable();
 
-  let orderBook: OrderBook = {
-    bids: [],
-    asks: [],
-  };
-
-  let granularities: Granularity[] = [];
-
-  let price: string = '0';
+  let orderBook: OrderBook = data.orderBook;
+  let granularities: Granularity[] = data.granularities;
+  let price: string = data.price;
   let quantity: string = '0';
   let granularityValue: string = data.granularity;
+
   let type: 'line' | 'candle' = 'line';
 
   const options = {
@@ -75,7 +71,6 @@
     localization: {
       timeFormatter: (time: UTCTimestamp) => {
         const date = new Date(time * 1000).toLocaleString();
-        console.log(date);
         return date;
       },
     },

@@ -8,24 +8,16 @@
   import { getToastStore, type ToastSettings } from '@skeletonlabs/skeleton';
   import { goto } from '$app/navigation';
 
+  export let data;
+
   const toastStore = getToastStore();
 
-  const user: Writable<Client> = getContext('user');
-  let granularities: Granularity[] = [];
-  let accounts: Account[] = [];
+  let granularities: Granularity[] = data.granularities;
+  let accounts: Account[] = data.accounts;
 
-  let fromValue: string = '';
-  let toValue: string = '';
-  let granularityValue: string = '';
-
-  onMount(async () => {
-    accounts = await $user.getAccounts();
-    granularities = await $user.getGranularities();
-
-    granularityValue = granularities[0].granularity;
-    fromValue = accounts[0].id;
-    toValue = accounts[1].id;
-  });
+  let fromValue: string = accounts[0].id;
+  let toValue: string = accounts[1].id;
+  let granularityValue: string = granularities[0].granularity;
 
   function performAction() {
     const from = findAccountById(fromValue);

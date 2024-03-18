@@ -45,39 +45,45 @@ export async function getOrderBook(
   page: number
 ) {
   const [bids, asks] = await db.$transaction([
-    db.order.findMany({
+    db.order.groupBy({
       where: {
         fromCurrencySymbol,
         toCurrencySymbol,
         type: true,
       },
-      select: {
-        price: true,
+      _sum: {
         quantity: true,
-        date: true,
       },
-      orderBy: [{ price: 'desc' }, { date: 'asc' }],
+      by: ['price'],
+      orderBy: [{ price: 'desc' }],
       skip: (page - 1) * 50,
       take: 50,
     }),
-    db.order.findMany({
+    db.order.groupBy({
       where: {
         fromCurrencySymbol,
         toCurrencySymbol,
         type: false,
       },
-      select: {
-        price: true,
+      _sum: {
         quantity: true,
-        date: true,
       },
-      orderBy: [{ price: 'asc' }, { date: 'asc' }],
+      by: ['price'],
+      orderBy: [{ price: 'asc' }],
       skip: (page - 1) * 50,
       take: 50,
     }),
   ]);
 
-  return { bids, asks };
+  const map = (b: any): { price: number; quantity: number } => ({
+    price: b.price,
+    quantity: b?._sum?.quantity || 0,
+  });
+
+  return {
+    bids: bids.map(map),
+    asks: asks.map(map),
+  };
 }
 
 export async function cancelOrder(
