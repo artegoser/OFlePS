@@ -10,6 +10,9 @@
 - [x] View transactions
 - [x] View trading schedules
 - [ ] Cancel order
+- [ ] Run smart contract
+- [ ] Edit smart contract
+- [ ] Deploy smart contract
 
 ## Usage
 
