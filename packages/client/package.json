@@ -1,6 +1,6 @@
 {
   "name": "@ofleps/client",
-  "version": "1.0.3",
+  "version": "1.1.0",
   "description": "Ofleps client",
   "main": "dist/lib.js",
   "types": "dist/lib.d.ts",
