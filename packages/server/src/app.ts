@@ -44,6 +44,7 @@ const server = createHTTPServer({
 server.listen(config.port, config.host);
 console.log(`server is running at ${config.host}:${config.port}`);
 
-// Export type router type signature,
-// NOT the router itself.
 export type AppRouter = typeof appRouter;
+
+import { ExchangeCommentData } from './core/helpers/orderMatch.js';
+export { ExchangeCommentData };

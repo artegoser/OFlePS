@@ -27,15 +27,21 @@ export interface MatchResult {
   };
 }
 
-interface CommentData {
-  type: string;
+export interface ExchangeCommentData {
+  type:
+    | 'sell'
+    | 'buy'
+    | 'cancel'
+    | 'buy_success'
+    | 'sell_success'
+    | 'refund_unutilized_funds';
   orderId: string;
   pair: string;
   price: number;
   quantity: number;
 }
 
-export function genComment(obj: CommentData) {
+export function genComment(obj: ExchangeCommentData) {
   return `@exchange${JSON.stringify(obj)}`;
 }
 

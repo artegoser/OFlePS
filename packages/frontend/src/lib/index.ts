@@ -13,6 +13,5 @@ export interface Options {
 export function to_pretty_html(obj: any) {
   return YAML.stringify(obj, null, 2)
     .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/\n/g, '<br />');
+    .replace(/>/g, '&gt;');
 }

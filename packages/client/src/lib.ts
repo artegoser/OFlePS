@@ -29,3 +29,7 @@ export type Transaction = RouterOutput['transactions']['get'][0];
 export type Granularity = RouterOutput['exchange']['getGranularities'][0];
 export type OrderBook = RouterOutput['exchange']['getOrderBook'];
 export type Order = OrderBook['asks'][0];
+export type GroupedTransactions = Awaited<
+  ReturnType<Client['getTransactionsGrouped']>
+>;
+export type ExchangeTransactionData = GroupedTransactions['exchange'][0];

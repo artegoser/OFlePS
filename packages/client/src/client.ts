@@ -15,7 +15,7 @@
 
 import { createTRPCProxyClient, httpBatchLink } from '@trpc/client';
 
-import type { AppRouter } from '@ofleps/server';
+import type { AppRouter, ExchangeCommentData } from '@ofleps/server';
 
 import { ec, HexString, SmartRequest } from '@ofleps/utils';
 import { ITransferArgs } from './types/client.js';
@@ -224,6 +224,32 @@ export default class Client {
     const signature = ec.sign({ accountId, page }, this._privateKey);
 
     return this._t.transactions.get.query({ accountId, page, signature });
+  }
+
+  public async getTransactionsGrouped(accountId: string, page: number = 1) {
+    const non_grouped_transactions = await this.getTransactions(
+      accountId,
+      page
+    );
+
+    const transactions: typeof non_grouped_transactions = [];
+    const exchange: {
+      transaction: (typeof non_grouped_transactions)[0];
+      data: ExchangeCommentData;
+    }[] = [];
+
+    for (const transaction of non_grouped_transactions) {
+      if (transaction.comment.startsWith('@exchange')) {
+        exchange.push({
+          transaction,
+          data: JSON.parse(transaction.comment.slice(9)),
+        });
+      } else {
+        transactions.push(transaction);
+      }
+    }
+
+    return { transactions, exchange };
   }
 
   public getUserByPublicKey(publicKey: HexString) {
