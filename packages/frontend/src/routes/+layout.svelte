@@ -68,7 +68,11 @@
     <!-- App Bar -->
     <AppBar>
       <svelte:fragment slot="lead">
-        <strong class="text-xl uppercase mx-5">OFlePS</strong>
+        <img
+          class="h-10"
+          src="https://github.com/artegoser/OFlePS/raw/main/imgs/logo.png"
+          alt="Ofleps Logo"
+        />
 
         <a href="/my" class="btn btn-sm variant-ghost-surface mx-2">My</a>
       </svelte:fragment>
