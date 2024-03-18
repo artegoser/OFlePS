@@ -15,12 +15,12 @@
   <TextInput label="Quantity" bind:value={quantity} />
   <TextInput label="Price" bind:value={price} />
   <div class="grid grid-cols-2 gap-2 p-2">
-    <button type="button" class="btn variant-filled-success" on:click={onBuy}
-      >Buy</button
-    >
-    <button type="button" class="btn variant-filled-error" on:click={onSell}
-      >Sell</button
-    >
+    <button type="button" class="btn variant-ghost-success" on:click={onBuy}>
+      Buy
+    </button>
+    <button type="button" class="btn variant-ghost-error" on:click={onSell}>
+      Sell
+    </button>
   </div>
   <div class="text-center">
     Buy/Sell {quantity}

@@ -1,3 +1,5 @@
-<div class="container h-full mx-auto flex justify-center items-center">
-  <h1 class="h1">Open and flexible payment system</h1>
-</div>
+<script lang="ts">
+  import { goto } from '$app/navigation';
+
+  goto('/my');
+</script>

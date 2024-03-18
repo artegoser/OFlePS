@@ -2,6 +2,6 @@
   export let href: string;
 </script>
 
-<a {href} class="btn variant-filled-primary">
+<a {href} class="btn variant-ghost-primary">
   <slot />
 </a>

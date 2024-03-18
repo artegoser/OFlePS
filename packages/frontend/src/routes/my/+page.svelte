@@ -4,6 +4,9 @@
   import { getContext, onMount } from 'svelte';
   import { slide } from 'svelte/transition';
 
+  import { ArrowTrendingUp, PlusCircle, Icon, Plus } from 'svelte-hero-icons';
+  import { size } from '@floating-ui/dom';
+
   export let data;
 
   const user: Writable<Client> = getContext('user');
@@ -21,8 +24,14 @@
     <div>
       {name} accounts
     </div>
-    <a href="/exchange" class="btn btn-sm variant-filled-surface">Exchange</a>
-    <a href="/add/account" class="btn variant-filled-primary">Add</a>
+    <a href="/exchange" class="btn btn-sm variant-ghost-surface">
+      <div class="pr-2"><Icon src={ArrowTrendingUp} size="24" /></div>
+      Exchange
+    </a>
+    <a href="/add/account" class="btn variant-ghost-primary">
+      <div class="pr-2"><Icon src={PlusCircle} size="24" /></div>
+      Add
+    </a>
   </div>
 
   <div class="flex flex-col gap-2">
@@ -30,15 +39,15 @@
       <div
         transition:slide
         class="p-5 rounded-2xl flex flex-wrap justify-between items-center gap-2 {account.blocked
-          ? 'variant-filled-error'
-          : 'variant-filled-surface'}"
+          ? 'variant-soft-error'
+          : 'variant-soft-surface'}"
       >
         <div>
           {account.name}
           ({account.balance}
           {account.currencySymbol})
         </div>
-        <a href="/accounts/{account.id}" class="btn variant-filled-primary">
+        <a href="/accounts/{account.id}" class="btn variant-ghost-primary">
           View
         </a>
       </div>

@@ -45,7 +45,7 @@
     } catch (e: any) {
       const t: ToastSettings = {
         message: e.message,
-        background: 'variant-filled-error',
+        background: 'variant-ghost-error',
       };
       toastStore.trigger(t);
     }
@@ -69,7 +69,7 @@
     </div>
     <div>
       <button
-        class="btn variant-filled-surface"
+        class="btn variant-ghost-surface"
         on:click={() => showModal(`Account info`, to_pretty_html(account))}
       >
         More info
@@ -116,7 +116,7 @@
   <div class="flex flex-col py-5">
     {#if groupedTransactions.transactions.length > 0}
       <div transition:slide>
-        <button class="btn variant-filled-primary" on:click={nextPage}>
+        <button class="btn variant-ghost-primary" on:click={nextPage}>
           Next page
         </button>
       </div>
