@@ -28,11 +28,17 @@ interface PostSmartContractTask {
 
 export class SmartIsolate {
   private _smartContractId: string;
-  private _authorId: string;
+  private _authorAlias: string;
+  private _callerAlias: string;
   private _tasks: PostSmartContractTask[] = [];
-  constructor(smartContractId: string, authorId: string) {
+  constructor(
+    smartContractId: string,
+    authorAlias: string,
+    callerAlias: string
+  ) {
     this._smartContractId = smartContractId;
-    this._authorId = authorId;
+    this._authorAlias = authorAlias;
+    this._callerAlias = callerAlias;
   }
 
   private _gs_set(key: string, value: string | number | boolean) {
@@ -56,7 +62,8 @@ export class SmartIsolate {
     jail.setSync('__request', new ivm.ExternalCopy(request).copyInto());
     jail.setSync('__return', undefined);
     jail.setSync('gMem', new ivm.ExternalCopy(globalMemory).copyInto());
-    jail.setSync('__owner', this._authorId);
+    jail.setSync('__owner', this._authorAlias);
+    jail.setSync('__caller', this._callerAlias);
     jail.setSync(
       'gs_set',
       new ivm.Callback((key: string, value: ParamTypes) => {
@@ -65,7 +72,7 @@ export class SmartIsolate {
     );
 
     context.evalSync(code);
-    context.evalSync('const contract = new Contract(__owner)');
+    context.evalSync('const contract = new Contract(__owner, __caller)');
 
     const script = isolate.compileScriptSync(
       `__return = contract.${request.method}(...__request.params)`

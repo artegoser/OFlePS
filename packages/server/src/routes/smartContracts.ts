@@ -13,35 +13,32 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-import { router, publicProcedure } from '../config/trpc.js';
+import { router, publicProcedure, privateProcedure } from '../config/trpc.js';
 import { z } from 'zod';
 import core from '../core/main.js';
-import { HexString } from '@ofleps/utils';
 
 const smartContracts = router({
   getById: publicProcedure.input(z.string()).query(({ input }) => {
     return core.smartContracts.getSmartContractById(input);
   }),
-  create: publicProcedure
+  create: privateProcedure
     .input(
       z.object({
         name: z.string(),
         description: z.string(),
         code: z.string(),
-        authorPk: z.string(),
         signature: z.string(),
       })
     )
-    .mutation(({ input }) => {
+    .mutation(({ input, ctx }) => {
       return core.smartContracts.createSmartContract(
         input.name,
         input.description,
         input.code,
-        input.authorPk as HexString,
-        input.signature as HexString
+        ctx.user
       );
     }),
-  execute: publicProcedure
+  execute: privateProcedure
     .input(
       z.object({
         id: z.string(),
@@ -49,16 +46,13 @@ const smartContracts = router({
           method: z.string(),
           params: z.array(z.string().or(z.number()).or(z.boolean())),
         }),
-        callerPk: z.string(),
-        signature: z.string(),
       })
     )
-    .mutation(({ input }) => {
+    .mutation(({ input, ctx }) => {
       return core.smartContracts.executeSmartContract(
         input.id,
         input.request,
-        input.callerPk as HexString,
-        input.signature as HexString
+        ctx.user
       );
     }),
 });

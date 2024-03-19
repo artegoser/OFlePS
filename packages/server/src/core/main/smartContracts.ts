@@ -13,11 +13,11 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-import { HexString, ec } from '@ofleps/utils';
 import { db } from '../../config/app.service.js';
-import { ForbiddenError, NotFoundError } from '../../errors/main.js';
+import { NotFoundError } from '../../errors/main.js';
 import { SmartIsolate } from '../helpers/smartIsolate.js';
 import { SmartRequest } from '@ofleps/utils';
+import { User } from '../../types/auth.js';
 
 export function getSmartContractById(smartContractId: string) {
   return db.smartContract.findUnique({
@@ -28,19 +28,8 @@ export function getSmartContractById(smartContractId: string) {
 export async function executeSmartContract(
   smartContractId: string,
   reqData: SmartRequest,
-  callerPk: HexString,
-  signature: HexString
+  user: User
 ) {
-  if (
-    !ec.verify(
-      signature,
-      { smartContractId, reqData, callerPk },
-      callerPk as HexString
-    )
-  ) {
-    throw new ForbiddenError('Invalid signature');
-  }
-
   const smartContract = await db.smartContract.findUnique({
     where: { id: smartContractId },
   });
@@ -59,7 +48,11 @@ export async function executeSmartContract(
     );
   }
 
-  const isolate = new SmartIsolate(smartContract.id, smartContract.authorPk);
+  const isolate = new SmartIsolate(
+    smartContract.id,
+    smartContract.authorAlias,
+    user.alias
+  );
 
   return await isolate.execute(
     smartContract.code,
@@ -72,27 +65,15 @@ export async function createSmartContract(
   name: string,
   description: string,
   code: string,
-  authorPk: HexString,
-  signature: HexString
+  user: User
 ) {
-  if (
-    !ec.verify(
-      signature,
-      { name, description, code, authorPk },
-      authorPk as HexString
-    )
-  ) {
-    throw new ForbiddenError('Invalid signature');
-  }
-
   const smartContract = await db.$transaction(async (tx) => {
     const sc = await tx.smartContract.create({
       data: {
         name,
         description,
         code,
-        authorPk,
-        signature,
+        authorAlias: user.alias,
       },
     });
 

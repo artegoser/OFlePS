@@ -98,7 +98,7 @@ export async function orderMatch(
 
     //Perform transactions from exchange accounts
     // Seller gets the money
-    await txTransfer(tx, {
+    await txTransfer(tx, null, {
       amount: sellerAmount,
       from: config.exchange_account_prefix + toCurrencySymbol,
       to: lowestSellOrder.accountId,
@@ -112,7 +112,7 @@ export async function orderMatch(
     });
 
     // Buyer gets the money
-    await txTransfer(tx, {
+    await txTransfer(tx, null, {
       amount: quantityToTrade,
       from: config.exchange_account_prefix + fromCurrencySymbol,
       to: highestBuyOrder.accountId,
@@ -127,7 +127,7 @@ export async function orderMatch(
 
     // Refund unused funds to the buyer
     if (buyerAmount > sellerAmount) {
-      await txTransfer(tx, {
+      await txTransfer(tx, null, {
         amount: NP.minus(buyerAmount, sellerAmount),
         from: config.exchange_account_prefix + toCurrencySymbol,
         to: highestBuyOrder.returnAccountId,

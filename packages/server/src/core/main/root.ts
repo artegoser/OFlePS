@@ -20,17 +20,17 @@ import { ForbiddenError } from '../../errors/main.js';
 const invalidSign = new ForbiddenError('Invalid signature for root');
 
 export function setBlockUser(
-  userPk: HexString,
+  alias: string,
   block: boolean,
   signature: HexString
 ) {
-  if (!ec.verify(signature, { userPk, block }, config.root_public_key)) {
+  if (!ec.verify(signature, { alias, block }, config.root_public_key)) {
     throw invalidSign;
   }
 
   return db.user.update({
     where: {
-      pk: userPk,
+      alias,
     },
     data: {
       blocked: block,
@@ -38,17 +38,17 @@ export function setBlockUser(
   });
 }
 export function setApproveUser(
-  userPk: HexString,
+  alias: string,
   approve: boolean,
   signature: HexString
 ) {
-  if (!ec.verify(signature, { userPk, approve }, config.root_public_key)) {
+  if (!ec.verify(signature, { alias, approve }, config.root_public_key)) {
     throw invalidSign;
   }
 
   return db.user.update({
     where: {
-      pk: userPk,
+      alias,
     },
     data: {
       approved: approve,

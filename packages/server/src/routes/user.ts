@@ -15,29 +15,28 @@
 
 import { router, publicProcedure } from '../config/trpc.js';
 import { z } from 'zod';
-import { HexString } from '@ofleps/utils';
 import core from '../core/main.js';
 
 const user = router({
   register: publicProcedure
     .input(
       z.object({
+        alias: z.string(),
         name: z.string(),
         email: z.string(),
-        publicKey: z.string(),
-        signature: z.string(),
+        password: z.string(),
       })
     )
     .mutation(({ input }) => {
       return core.user.registerUser(
+        input.alias,
         input.name,
         input.email,
-        input.publicKey as HexString,
-        input.signature as HexString
+        input.password
       );
     }),
   getByPublicKey: publicProcedure.input(z.string()).query(({ input }) => {
-    return core.user.getUserByPublicKey(input as HexString);
+    return core.user.getUserByAlias(input);
   }),
 });
 

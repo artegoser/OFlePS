@@ -27,7 +27,7 @@ export class ConfigService {
   public readonly currencies: string[];
   public readonly exchange_account_prefix: string;
   public readonly granularities;
-
+  public readonly jwt_secret: string;
   constructor() {
     config();
 
@@ -57,6 +57,12 @@ export class ConfigService {
 
     this.exchange_account_prefix =
       process.env.EXCHANGE_ACCOUNT_PREFIX || 'exchange_';
+
+    if (!process.env.JWT_SECRET) {
+      throw new Error('JWT_SECRET is not defined, please set it');
+    }
+
+    this.jwt_secret = process.env.JWT_SECRET;
   }
 }
 

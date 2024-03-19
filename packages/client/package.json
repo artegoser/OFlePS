@@ -19,9 +19,15 @@
     "@ofleps/server": "workspace:*",
     "@ofleps/utils": "workspace:*",
     "@trpc/client": "^10.45.1",
-    "@trpc/server": "^10.45.1"
+    "@trpc/server": "^10.45.1",
+    "jsonwebtoken": "^9.0.2",
+    "notp": "^2.0.3"
   },
   "keywords": [],
   "author": "artegoser",
-  "license": "GPL-3.0-or-later"
+  "license": "GPL-3.0-or-later",
+  "devDependencies": {
+    "@types/jsonwebtoken": "^9.0.6",
+    "@types/notp": "^2.0.5"
+  }
 }

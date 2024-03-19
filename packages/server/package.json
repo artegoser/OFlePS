@@ -22,8 +22,11 @@
     "@ofleps/utils": "workspace:*",
     "@paralleldrive/cuid2": "^2.2.2",
     "@prisma/client": "^5.11.0",
+    "@types/bcrypt": "^5.0.2",
     "@types/cors": "^2.8.17",
     "@types/deasync": "^0.1.5",
+    "@types/jsonwebtoken": "^9.0.6",
+    "@types/notp": "^2.0.5",
     "cors": "^2.8.5",
     "dotenv": "^16.3.1",
     "isolated-vm": "^4.7.2",
@@ -33,6 +36,9 @@
     "zod": "^3.22.4"
   },
   "dependencies": {
-    "@trpc/server": "^10.45.1"
+    "@trpc/server": "^10.45.1",
+    "bcrypt": "^5.1.1",
+    "jsonwebtoken": "^9.0.2",
+    "notp": "^2.0.3"
   }
 }

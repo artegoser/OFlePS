@@ -27,10 +27,12 @@ datasource db {
 }
 
 model User {
-  pk String @id
+  alias String @id
 
-  email String @unique
   name  String
+  email String @unique
+
+  hashed_password String
 
   blocked  Boolean @default(false)
   approved Boolean
@@ -40,16 +42,18 @@ model User {
 }
 
 model Account {
-  id             String @id @default(cuid())
-  name           String
+  id String @id //{userAlias}/{accountAlias}
+
+  userAlias String
+
+  name String
+
   description    String @default("")
   currencySymbol String
   balance        Float  @default(0)
-  userPk         String
 
   blocked Boolean @default(false)
 
-  User     User     @relation(fields: [userPk], references: [pk])
   Currency Currency @relation(fields: [currencySymbol], references: [symbol])
 
   transactionsSender    Transaction[] @relation("TransactionSender")
@@ -57,6 +61,7 @@ model Account {
 
   Orders       Order[] @relation("OrderAccount")
   returnOrders Order[] @relation("OrderReturnAccount")
+  User         User    @relation(fields: [userAlias], references: [alias])
 }
 
 model Transaction {
@@ -159,11 +164,9 @@ model SmartContract {
   name        String
   description String
   code        String
-  authorPk    String
+  authorAlias String
 
-  signature String
-
-  author              User                       @relation(fields: [authorPk], references: [pk], onDelete: Cascade)
+  author              User                       @relation(fields: [authorAlias], references: [alias], onDelete: Cascade)
   SmartContractMemory SmartContractGlobalMemory?
 }
 

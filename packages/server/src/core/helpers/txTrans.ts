@@ -13,24 +13,24 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-import { HexString, ec } from '@ofleps/utils';
 import { ForbiddenError } from '../../errors/main.js';
 import type { txDb } from '../../config/app.service.js';
+import { User } from '../../types/auth.js';
 
 export interface TransactionReq {
   from: string;
   to: string;
   amount: number;
-  signature?: HexString;
+
   comment?: string;
 }
 
 export async function txTransfer(
   tx: txDb,
-  req: TransactionReq,
-  force: boolean = false
+  user: User | null,
+  req: TransactionReq
 ) {
-  const { from, to, amount, signature, comment } = req;
+  const { from, to, amount, comment } = req;
 
   const senderAccount = await tx.account.update({
     data: {
@@ -64,18 +64,8 @@ export async function txTransfer(
     throw new ForbiddenError("Sender account's user is blocked");
   }
 
-  if (
-    !force &&
-    signature &&
-    !ec.verify(
-      signature,
-      { from, to, amount, comment, type: 'transfer' },
-      senderAccount.userPk as HexString
-    )
-  ) {
-    throw new ForbiddenError(
-      "Invalid signature (Maybe you're sending not from your account) "
-    );
+  if (user && senderAccount.User.alias !== user.alias) {
+    throw new ForbiddenError("Sending from not your's account");
   }
 
   const recipientAccount = await tx.account.update({

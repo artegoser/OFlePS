@@ -13,7 +13,6 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-import { HexString, ec } from '@ofleps/utils';
 import { db, config } from '../../config/app.service.js';
 import { ForbiddenError } from '../../errors/main.js';
 import { txTransfer } from '../helpers/txTrans.js';
@@ -23,7 +22,8 @@ import {
   genComment,
   orderMatch,
   updateTradingSchedule,
-} from '../helpers/orderMatch.js';
+} from '../helpers/exchangeUtils.js';
+import { User } from '../../types/auth.js';
 
 export async function getTradingSchedule(
   fromCurrencySymbol: string,
@@ -86,10 +86,7 @@ export async function getOrderBook(
   };
 }
 
-export async function cancelOrder(
-  orderToCancelId: string,
-  signature: HexString
-) {
+export async function cancelOrder(orderToCancelId: string, user: User) {
   return await db.$transaction(async (tx) => {
     const order = await tx.order.delete({
       where: {
@@ -100,21 +97,15 @@ export async function cancelOrder(
       },
     });
 
-    if (
-      !ec.verify(
-        signature,
-        { orderToCancelId },
-        order.returnAccount.userPk as HexString
-      )
-    ) {
-      throw new ForbiddenError('Invalid signature');
-    }
-
     if (!order) {
       throw new ForbiddenError(`Order with id ${orderToCancelId} not found`);
     }
 
-    await txTransfer(tx, {
+    if (order.returnAccount.userAlias !== user.alias) {
+      throw new ForbiddenError(`Cancel orders that is not your's `);
+    }
+
+    await txTransfer(tx, user, {
       from:
         config.exchange_account_prefix +
         (order.type ? order.toCurrencySymbol : order.fromCurrencySymbol),
@@ -140,8 +131,8 @@ async function createOrder(
   toCurrencySymbol: string,
   quantity: number,
   price: number,
-  type: boolean, // true - buy, false - sell
-  signature: HexString
+  user: User,
+  type: boolean // true - buy, false - sell
 ) {
   if (quantity <= 0) throw new ForbiddenError('Set quantity <= 0');
 
@@ -151,28 +142,14 @@ async function createOrder(
     },
   });
 
+  if (account.userAlias !== user.alias) {
+    throw new ForbiddenError('Creating order from not your account');
+  }
+
   if (
     (type ? toCurrencySymbol : fromCurrencySymbol) !== account.currencySymbol
   ) {
     throw new ForbiddenError('Buy/sell with wrong currency');
-  }
-
-  if (
-    !ec.verify(
-      signature,
-      {
-        fromAccountId,
-        toAccountId,
-        fromCurrencySymbol,
-        toCurrencySymbol,
-        quantity,
-        price,
-        type,
-      },
-      account.userPk as HexString
-    )
-  ) {
-    throw new ForbiddenError('Invalid signature');
   }
 
   const exchange_account_id_from =
@@ -197,9 +174,9 @@ async function createOrder(
       },
     });
 
-    await txTransfer(tx, {
+    await txTransfer(tx, user, {
       amount: realAmount,
-      from: type ? toAccountId : fromAccountId,
+      from: account.id,
       to: type ? exchange_account_id_to : exchange_account_id_from,
       comment: genComment({
         type: type ? 'buy' : 'sell',
@@ -244,8 +221,9 @@ export function makeBuyOrder(
   fromCurrencySymbol: string,
   toCurrencySymbol: string,
   quantity: number,
+
   price: number,
-  signature: HexString
+  user: User
 ) {
   return createOrder(
     fromAccountId,
@@ -254,8 +232,8 @@ export function makeBuyOrder(
     toCurrencySymbol,
     quantity,
     price,
-    true,
-    signature
+    user,
+    true
   );
 }
 
@@ -266,7 +244,7 @@ export function makeSellOrder(
   toCurrencySymbol: string,
   quantity: number,
   price: number,
-  signature: HexString
+  user: User
 ) {
   return createOrder(
     fromAccountId,
@@ -275,7 +253,7 @@ export function makeSellOrder(
     toCurrencySymbol,
     quantity,
     price,
-    false,
-    signature
+    user,
+    false
   );
 }

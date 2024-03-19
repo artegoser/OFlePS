@@ -13,36 +13,28 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-import { router, publicProcedure } from '../config/trpc.js';
+import { router, privateProcedure } from '../config/trpc.js';
 import { z } from 'zod';
 import core from '../core/main.js';
-import { HexString } from '@ofleps/utils';
 
 const accounts = router({
-  getById: publicProcedure.input(z.string()).query(({ input }) => {
-    return core.account.getAccountById(input);
+  getById: privateProcedure.input(z.string()).query(({ input, ctx }) => {
+    return core.account.getAccountById(input, ctx.user);
   }),
-  getByUserPk: publicProcedure.input(z.string()).query(({ input }) => {
-    return core.account.getAccountsByUserPk(input as HexString);
+  get: privateProcedure.input({}).query(({ ctx }) => {
+    return core.account.getAccountsByUserAlias(ctx.user.alias);
   }),
-  create: publicProcedure
+  create: privateProcedure
     .input(
       z.object({
+        alias: z.string(),
         name: z.string(),
         description: z.string(),
         currencySymbol: z.string(),
-        userPk: z.string(),
-        signature: z.string(),
       })
     )
-    .mutation(({ input }) => {
-      return core.account.createAccount({
-        name: input.name,
-        description: input.description,
-        currencySymbol: input.currencySymbol,
-        userPk: input.userPk as HexString,
-        signature: input.signature as HexString,
-      });
+    .mutation(({ input, ctx }) => {
+      return core.account.createAccount({ ...input, userObj: ctx.user });
     }),
 });
 

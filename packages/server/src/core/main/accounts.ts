@@ -15,30 +15,28 @@
 
 import { db } from '../../config/app.service.js';
 import { ForbiddenError, NotFoundError } from '../../errors/main.js';
-import { ec } from '@ofleps/utils';
-import { getUserByPublicKey } from './user.js';
+import { getUserByAlias } from './user.js';
 import { getCurrencyBySymbol } from './currencies.js';
-
-import type { HexString } from '@ofleps/utils';
+import { User } from '../../types/auth.js';
 
 export async function createAccount({
+  userObj,
+  alias,
   name,
   description,
   currencySymbol,
-  userPk,
-  signature,
 }: {
+  userObj: User;
+  alias: string;
   name: string;
   description: string;
   currencySymbol: string;
-  userPk: HexString;
-  signature: HexString;
 }) {
-  const user = await getUserByPublicKey(userPk);
+  const user = await getUserByAlias(userObj.alias);
   const currency = await getCurrencyBySymbol(currencySymbol);
 
   if (!user) {
-    throw new NotFoundError(`User with public key "${userPk}"`);
+    throw new NotFoundError(`User with alias "${userObj.alias}"`);
   }
 
   if (!currency) {
@@ -47,35 +45,36 @@ export async function createAccount({
 
   if (user.blocked) {
     throw new ForbiddenError(
-      `User with id "${userPk}" is blocked and cannot create an account`
+      `User with alias "${userObj.alias}" is blocked and cannot create an account`
     );
-  }
-
-  if (
-    !ec.verify(
-      signature,
-      { name, description, currencySymbol, userPk },
-      user.pk as HexString
-    )
-  ) {
-    throw new ForbiddenError('Invalid signature');
   }
 
   return await db.account.create({
     data: {
+      id: `${user.alias}/${alias}`,
       name,
       description,
       currencySymbol,
       balance: 0,
-      userPk,
+      userAlias: user.alias,
     },
   });
 }
 
-export async function getAccountById(id: string) {
-  return await db.account.findUnique({ where: { id } });
+export async function getAccountById(id: string, user: User) {
+  const account = await db.account.findUnique({ where: { id } });
+
+  if (!account) {
+    throw new NotFoundError(`Account with id ${id}`);
+  }
+
+  if (account.userAlias !== user.alias) {
+    throw new ForbiddenError('Receiving an account data that is not yours');
+  }
+
+  return;
 }
 
-export async function getAccountsByUserPk(userPk: HexString) {
-  return await db.account.findMany({ where: { userPk } });
+export async function getAccountsByUserAlias(userAlias: string) {
+  return await db.account.findMany({ where: { userAlias } });
 }

@@ -13,7 +13,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-import { router } from './config/trpc.js';
+import { router, createContext } from './config/trpc.js';
 import { config } from './config/app.service.js';
 import { createHTTPServer } from '@trpc/server/adapters/standalone';
 import cors from 'cors';
@@ -37,6 +37,7 @@ const appRouter = router({
 });
 
 const server = createHTTPServer({
+  createContext,
   middleware: cors(),
   router: appRouter,
 });
@@ -46,5 +47,5 @@ console.log(`server is running at ${config.host}:${config.port}`);
 
 export type AppRouter = typeof appRouter;
 
-import { ExchangeCommentData } from './core/helpers/orderMatch.js';
+import { ExchangeCommentData } from './core/helpers/exchangeUtils.js';
 export { ExchangeCommentData };

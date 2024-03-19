@@ -14,29 +14,38 @@
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 import { db, config } from '../../config/app.service.js';
-import { ForbiddenError } from '../../errors/main.js';
-import { ec } from '@ofleps/utils';
 
-import type { HexString } from '@ofleps/utils';
+import { genSalt } from '@ofleps/utils';
+
+import * as bcrypt from 'bcrypt';
+import * as jwt from 'jsonwebtoken';
 
 export async function registerUser(
+  alias: string,
   name: string,
   email: string,
-  publicKey: HexString,
-  signature: HexString
+  password: string
 ) {
-  if (!ec.verify(signature, { name, email, publicKey }, publicKey)) {
-    throw new ForbiddenError('Invalid signature');
-  }
+  const hashed_password = await bcrypt.hash(password, 10);
+  const totp_key = genSalt();
+  const signedJwt = jwt.sign({ alias, totp_key }, config.jwt_secret);
 
-  return await db.user.create({
-    data: { name, email, pk: publicKey, approved: config.auto_approve },
+  await db.user.create({
+    data: {
+      alias,
+      name,
+      email,
+      hashed_password,
+      approved: config.auto_approve,
+    },
   });
+
+  return { totp_key, signedJwt };
 }
 
-export async function getUserByPublicKey(publicKey: HexString) {
+export async function getUserByAlias(alias: string) {
   return await db.user.findUnique({
-    where: { pk: publicKey },
-    select: { pk: true, name: true, blocked: true, approved: true },
+    where: { alias },
+    select: { alias: true, name: true, blocked: true, approved: true },
   });
 }

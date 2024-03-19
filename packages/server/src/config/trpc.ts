@@ -13,9 +13,68 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-import { initTRPC } from '@trpc/server';
+import { initTRPC, TRPCError } from '@trpc/server';
+import { config } from './app.service.js';
+import * as jwt from 'jsonwebtoken';
+import { totp } from 'notp';
 
-const t = initTRPC.create();
+import { CreateHTTPContextOptions } from '@trpc/server/adapters/standalone';
+import { JWTPayload } from '../types/auth.js';
+
+export const createContext = ({ req, res }: CreateHTTPContextOptions) => {
+  return { req, res };
+};
+
+const t = initTRPC
+  .context<Awaited<ReturnType<typeof createContext>>>()
+  .create();
 
 export const publicProcedure = t.procedure;
 export const router = t.router;
+
+export const privateProcedure = t.procedure.use(async ({ ctx, next }) => {
+  const token = ctx.req.headers.authorization?.split(' ')[1];
+  const totp_token = ctx.req.headers['X-TOTP'];
+
+  if (!token) {
+    throw new TRPCError({
+      code: 'UNAUTHORIZED',
+      cause: 'No jwt token provided in authorization header',
+    });
+  }
+
+  if (!totp_token) {
+    throw new TRPCError({
+      code: 'UNAUTHORIZED',
+      cause: 'No totp token provided in X-TOTP header',
+    });
+  }
+
+  if (typeof totp_token !== 'string') {
+    throw new TRPCError({
+      code: 'BAD_REQUEST',
+      cause: 'X-TOTP header invalid',
+    });
+  }
+
+  try {
+    const decoded = <JWTPayload>jwt.verify(token, config.jwt_secret);
+    const isTotpCorrect = totp.verify(totp_token, decoded.user.totp_key);
+
+    if (!isTotpCorrect) {
+      throw new TRPCError({
+        code: 'UNAUTHORIZED',
+        cause: 'invalid totp token',
+      });
+    }
+
+    return next({
+      ctx: { user: decoded.user },
+    });
+  } catch {
+    throw new TRPCError({
+      code: 'UNAUTHORIZED',
+      cause: 'Invalid jwt token',
+    });
+  }
+});

@@ -13,10 +13,9 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-import { router, publicProcedure } from '../config/trpc.js';
+import { router, publicProcedure, privateProcedure } from '../config/trpc.js';
 import { z } from 'zod';
 import core from '../core/main.js';
-import { HexString } from '@ofleps/utils';
 import { config } from '../config/app.service.js';
 
 const exchange = router({
@@ -51,21 +50,18 @@ const exchange = router({
         input.page
       );
     }),
-  cancel: publicProcedure
+  cancel: privateProcedure
     .input(
       z.object({
         orderToCancelId: z.string(),
         signature: z.string(),
       })
     )
-    .mutation(({ input }) => {
-      return core.exchange.cancelOrder(
-        input.orderToCancelId,
-        input.signature as HexString
-      );
+    .mutation(({ input, ctx }) => {
+      return core.exchange.cancelOrder(input.orderToCancelId, ctx.user);
     }),
 
-  sell: publicProcedure
+  sell: privateProcedure
     .input(
       z.object({
         fromAccountId: z.string(),
@@ -77,7 +73,7 @@ const exchange = router({
         signature: z.string(),
       })
     )
-    .mutation(({ input }) => {
+    .mutation(({ input, ctx }) => {
       return core.exchange.makeSellOrder(
         input.fromAccountId,
         input.toAccountId,
@@ -85,11 +81,11 @@ const exchange = router({
         input.toCurrencySymbol,
         input.quantity,
         input.price,
-        input.signature as HexString
+        ctx.user
       );
     }),
 
-  buy: publicProcedure
+  buy: privateProcedure
     .input(
       z.object({
         fromAccountId: z.string(),
@@ -101,7 +97,7 @@ const exchange = router({
         signature: z.string(),
       })
     )
-    .mutation(({ input }) => {
+    .mutation(({ input, ctx }) => {
       return core.exchange.makeBuyOrder(
         input.fromAccountId,
         input.toAccountId,
@@ -109,7 +105,7 @@ const exchange = router({
         input.toCurrencySymbol,
         input.quantity,
         input.price,
-        input.signature as HexString
+        ctx.user
       );
     }),
 });

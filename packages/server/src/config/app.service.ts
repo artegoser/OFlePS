@@ -23,15 +23,16 @@ let exchange;
 try {
   exchange = await db.user.create({
     data: {
-      pk: config.exchange_account_prefix + 'user',
+      alias: config.exchange_account_prefix + 'user',
       email: 'none',
       name: 'none',
+      hashed_password: 'none',
       approved: true,
     },
   });
 } catch {
   exchange = await db.user.findUnique({
-    where: { pk: config.exchange_account_prefix + 'user' },
+    where: { alias: config.exchange_account_prefix + 'user' },
   });
 }
 
@@ -52,7 +53,7 @@ for (const currency of config.currencies) {
         id: config.exchange_account_prefix + currency,
         name: currency,
         currencySymbol: currency,
-        userPk: exchange.pk,
+        userAlias: exchange.alias,
       },
     });
 

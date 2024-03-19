@@ -13,13 +13,12 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-import { router, publicProcedure } from '../config/trpc.js';
+import { router, privateProcedure } from '../config/trpc.js';
 import { z } from 'zod';
 import core from '../core/main.js';
-import { HexString } from '@ofleps/utils';
 
 const transactions = router({
-  get: publicProcedure
+  get: privateProcedure
     .input(
       z.object({
         page: z.number(),
@@ -27,30 +26,28 @@ const transactions = router({
         signature: z.string(),
       })
     )
-    .query(({ input }) => {
+    .query(({ input, ctx }) => {
       return core.transactions.getTransactions(
         input.page,
         input.accountId,
-        input.signature as HexString
+        ctx.user
       );
     }),
-  transfer: publicProcedure
+  transfer: privateProcedure
     .input(
       z.object({
         from: z.string(),
         to: z.string(),
         amount: z.number(),
-        signature: z.string(),
         comment: z.string().optional(),
       })
     )
-    .mutation(({ input }) => {
-      return core.transactions.transfer({
+    .mutation(({ input, ctx }) => {
+      return core.transactions.transfer(ctx.user, {
         from: input.from,
         to: input.to,
         amount: input.amount,
         comment: input.comment,
-        signature: input.signature as HexString,
       });
     }),
 });
