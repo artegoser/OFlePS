@@ -72,7 +72,7 @@ export async function getAccountById(id: string, user: User) {
     throw new ForbiddenError('Receiving an account data that is not yours');
   }
 
-  return;
+  return account;
 }
 
 export async function getAccountsByUserAlias(userAlias: string) {

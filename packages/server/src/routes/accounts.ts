@@ -21,7 +21,7 @@ const accounts = router({
   getById: privateProcedure.input(z.string()).query(({ input, ctx }) => {
     return core.account.getAccountById(input, ctx.user);
   }),
-  get: privateProcedure.input({}).query(({ ctx }) => {
+  get: privateProcedure.query(({ ctx }) => {
     return core.account.getAccountsByUserAlias(ctx.user.alias);
   }),
   create: privateProcedure

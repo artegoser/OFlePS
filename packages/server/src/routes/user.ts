@@ -35,6 +35,16 @@ const user = router({
         input.password
       );
     }),
+  signin: publicProcedure
+    .input(
+      z.object({
+        alias: z.string(),
+        password: z.string(),
+      })
+    )
+    .query(({ input }) => {
+      return core.user.signin(input.alias, input.password);
+    }),
   getByPublicKey: publicProcedure.input(z.string()).query(({ input }) => {
     return core.user.getUserByAlias(input);
   }),

@@ -46,24 +46,36 @@ function mapOrderBook(orderBook: any) {
   const alice = new Client('http://localhost:3000');
   const bob = new Client('http://localhost:3000');
 
-  await alice.registerUser('alice', 'alice@ofleps.io');
-  await bob.registerUser('bob', 'bob@ofleps.io');
+  await alice.registerUser('alice', 'alice_pass', 'alice', 'alice@ofleps.io');
+  await bob.registerUser('bob', 'bob_pass', 'bob', 'bob@ofleps.io');
 
   const { id: afid } = await alice.createAccount(
+    'usd',
     'alice usd',
     'alice account',
     'USD'
   );
 
   const { id: atid } = await alice.createAccount(
+    'rub',
     'alice rub',
     'alice account',
     'RUB'
   );
 
-  const { id: bfid } = await bob.createAccount('bob usd', 'bob account', 'USD');
+  const { id: bfid } = await bob.createAccount(
+    'usd',
+    'bob usd',
+    'bob account',
+    'USD'
+  );
 
-  const { id: btid } = await bob.createAccount('bob rub', 'bob account', 'RUB');
+  const { id: btid } = await bob.createAccount(
+    'rub',
+    'bob rub',
+    'bob account',
+    'RUB'
+  );
 
   //now admin issues money
   await admin.issue(afid, 5, 'issue usd to alice');

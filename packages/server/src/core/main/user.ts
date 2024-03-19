@@ -18,7 +18,8 @@ import { db, config } from '../../config/app.service.js';
 import { genSalt } from '@ofleps/utils';
 
 import * as bcrypt from 'bcrypt';
-import * as jwt from 'jsonwebtoken';
+import { BadRequestError, NotFoundError } from '../../errors/main.js';
+import { jwtSign } from '../../types/auth.js';
 
 export async function registerUser(
   alias: string,
@@ -28,7 +29,7 @@ export async function registerUser(
 ) {
   const hashed_password = await bcrypt.hash(password, 10);
   const totp_key = genSalt();
-  const signedJwt = jwt.sign({ alias, totp_key }, config.jwt_secret);
+  const signedJwt = jwtSign({ user: { alias }, totp_key });
 
   await db.user.create({
     data: {
@@ -40,7 +41,26 @@ export async function registerUser(
     },
   });
 
-  return { totp_key, signedJwt };
+  return { totp_key, jwt: signedJwt };
+}
+
+export async function signin(alias: string, password: string) {
+  const user = await db.user.findUnique({ where: { alias } });
+
+  if (!user) {
+    throw new NotFoundError(`User with alias: ${alias}`);
+  }
+
+  const hashed_password = await bcrypt.hash(password, 10);
+
+  if (user.hashed_password !== hashed_password) {
+    throw new BadRequestError('Invalid password');
+  }
+
+  const totp_key = genSalt();
+  const signedJwt = jwtSign({ user: { alias }, totp_key });
+
+  return { totp_key, jwt: signedJwt };
 }
 
 export async function getUserByAlias(alias: string) {

@@ -18,7 +18,12 @@ import { Client } from '../lib.js';
 (async () => {
   const user = new Client('http://localhost:3000');
 
-  await user.registerUser('sender', 'sender@ofleps.io');
+  await user.registerUser(
+    'sender',
+    'sender_password',
+    'sender',
+    'sender@ofleps.io'
+  );
 
   const smartContract = await user.createSmartContract(
     'Test sc',

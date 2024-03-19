@@ -54,7 +54,6 @@ const exchange = router({
     .input(
       z.object({
         orderToCancelId: z.string(),
-        signature: z.string(),
       })
     )
     .mutation(({ input, ctx }) => {
@@ -70,7 +69,6 @@ const exchange = router({
         toCurrencySymbol: z.string(),
         quantity: z.number(),
         price: z.number(),
-        signature: z.string(),
       })
     )
     .mutation(({ input, ctx }) => {
@@ -94,7 +92,6 @@ const exchange = router({
         toCurrencySymbol: z.string(),
         quantity: z.number(),
         price: z.number(),
-        signature: z.string(),
       })
     )
     .mutation(({ input, ctx }) => {

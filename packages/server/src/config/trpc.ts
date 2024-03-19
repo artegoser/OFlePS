@@ -15,7 +15,7 @@
 
 import { initTRPC, TRPCError } from '@trpc/server';
 import { config } from './app.service.js';
-import * as jwt from 'jsonwebtoken';
+import jwt from 'jsonwebtoken';
 import { totp } from 'notp';
 
 import { CreateHTTPContextOptions } from '@trpc/server/adapters/standalone';
@@ -34,7 +34,7 @@ export const router = t.router;
 
 export const privateProcedure = t.procedure.use(async ({ ctx, next }) => {
   const token = ctx.req.headers.authorization?.split(' ')[1];
-  const totp_token = ctx.req.headers['X-TOTP'];
+  const totp_token = ctx.req.headers['x-totp'];
 
   if (!token) {
     throw new TRPCError({
@@ -59,7 +59,7 @@ export const privateProcedure = t.procedure.use(async ({ ctx, next }) => {
 
   try {
     const decoded = <JWTPayload>jwt.verify(token, config.jwt_secret);
-    const isTotpCorrect = totp.verify(totp_token, decoded.user.totp_key);
+    const isTotpCorrect = totp.verify(totp_token, decoded.totp_key);
 
     if (!isTotpCorrect) {
       throw new TRPCError({
@@ -71,7 +71,7 @@ export const privateProcedure = t.procedure.use(async ({ ctx, next }) => {
     return next({
       ctx: { user: decoded.user },
     });
-  } catch {
+  } catch (e) {
     throw new TRPCError({
       code: 'UNAUTHORIZED',
       cause: 'Invalid jwt token',

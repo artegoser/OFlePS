@@ -27,7 +27,6 @@ const smartContracts = router({
         name: z.string(),
         description: z.string(),
         code: z.string(),
-        signature: z.string(),
       })
     )
     .mutation(({ input, ctx }) => {

@@ -13,53 +13,45 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-import { createTRPCProxyClient, httpBatchLink } from '@trpc/client';
+import { createTRPCProxyClient, httpLink } from '@trpc/client';
 
 import type { AppRouter, ExchangeCommentData } from '@ofleps/server';
 
-import { ec, HexString, SmartRequest } from '@ofleps/utils';
+import { HexString, SmartRequest } from '@ofleps/utils';
 import { ITransferArgs } from './types/client.js';
+import { totp } from 'notp';
 
 export default class Client {
   // #region Properties (5)
 
   private _noPrivateKey = new Error('No private key, generate or set first');
-  private _privateKey?: HexString;
-  private _publicKey?: HexString;
   private _t;
   private _userNotExist = new Error('User not exist, register first');
+
+  private _jwt?: string;
+  private _totp_key?: string;
 
   // #endregion Properties (5)
 
   // #region Constructors (1)
 
-  constructor(baseUrl: string, privateKey?: HexString) {
+  constructor(baseUrl: string) {
     this._t = createTRPCProxyClient<AppRouter>({
       links: [
-        httpBatchLink({
+        httpLink({
           url: baseUrl,
+          headers: (() => {
+            return {
+              Authorization: `Bearer ${this._jwt}`,
+              'x-totp': totp.gen(this._totp_key || ''),
+            };
+          }).bind(this),
         }),
       ],
     });
-
-    if (privateKey) {
-      this.setPrivateKey(privateKey);
-    }
   }
 
   // #endregion Constructors (1)
-
-  // #region Public Getters And Setters (2)
-
-  public get privateKey() {
-    return this._privateKey;
-  }
-
-  public get publicKey() {
-    return this._publicKey;
-  }
-
-  // #endregion Public Getters And Setters (2)
 
   // #region Public Methods (19)
 
@@ -83,20 +75,8 @@ export default class Client {
   }
 
   public cancelOrder(orderToCancelId: string) {
-    if (!this._privateKey || !this._publicKey) {
-      throw this._noPrivateKey;
-    }
-
-    const signature = ec.sign(
-      {
-        orderToCancelId,
-      },
-      this._privateKey
-    );
-
     return this._t.exchange.cancel.mutate({
       orderToCancelId,
-      signature,
     });
   }
 
@@ -105,25 +85,16 @@ export default class Client {
   }
 
   public createAccount(
+    alias: string,
     name: string,
     description: string,
     currencySymbol: string
   ) {
-    if (!this._privateKey || !this._publicKey) {
-      throw this._noPrivateKey;
-    }
-
-    const sign = ec.sign(
-      { name, description, currencySymbol, userPk: this._publicKey },
-      this._privateKey
-    );
-
     return this._t.accounts.create.mutate({
+      alias,
       name,
       description,
       currencySymbol,
-      userPk: this._publicKey,
-      signature: sign,
     });
   }
 
@@ -132,39 +103,17 @@ export default class Client {
     description: string,
     code: string
   ) {
-    if (!this._privateKey || !this._publicKey) {
-      throw this._noPrivateKey;
-    }
-
-    const sign = ec.sign(
-      { name, description, code, authorPk: this._publicKey },
-      this._privateKey
-    );
-
     return this._t.smartContracts.create.mutate({
       name,
       description,
       code,
-      authorPk: this._publicKey,
-      signature: sign,
     });
   }
 
   public async executeSmartContract(id: string, request: SmartRequest) {
-    if (!this._privateKey || !this._publicKey) {
-      throw this._noPrivateKey;
-    }
-
-    const signature = ec.sign(
-      { smartContractId: id, reqData: request, callerPk: this._publicKey },
-      this._privateKey
-    );
-
     return this._t.smartContracts.execute.mutate({
       id,
       request,
-      callerPk: this._publicKey,
-      signature,
     });
   }
 
@@ -173,11 +122,7 @@ export default class Client {
   }
 
   public getAccounts() {
-    return this._t.accounts.getByUserPk.query(this._publicKey as HexString);
-  }
-
-  public getAccountsByUserPk(userPk: string) {
-    return this._t.accounts.getByUserPk.query(userPk);
+    return this._t.accounts.get.query();
   }
 
   public getCurrencies(page: number = 1) {
@@ -217,13 +162,7 @@ export default class Client {
   }
 
   public getTransactions(accountId: string, page: number = 1) {
-    if (!this._privateKey || !this._publicKey) {
-      throw this._noPrivateKey;
-    }
-
-    const signature = ec.sign({ accountId, page }, this._privateKey);
-
-    return this._t.transactions.get.query({ accountId, page, signature });
+    return this._t.transactions.get.query({ accountId, page });
   }
 
   public async getTransactionsGrouped(accountId: string, page: number = 1) {
@@ -256,41 +195,37 @@ export default class Client {
     return this._t.user.getByPublicKey.query(publicKey);
   }
 
-  public async login(privateKey: HexString) {
-    this.setPrivateKey(privateKey);
+  public async signin(alias: string, password: string) {
+    const res = await this._t.user.signin.query({ alias, password });
 
-    const user = await this.getUserByPublicKey(this._publicKey as HexString);
+    this._jwt = res.jwt;
+    this._totp_key = res.totp_key;
 
-    if (!user) {
-      throw this._userNotExist;
-    }
-
-    return user;
+    return res;
   }
 
-  public loginWithoutChecking(privateKey: HexString) {
-    this.setPrivateKey(privateKey);
+  public async setCredentials(jwt: string, totp_key: string) {
+    this._jwt = jwt;
+    this._totp_key = totp_key;
   }
 
-  public async registerUser(name: string, email: string) {
-    if (!this._privateKey || !this._publicKey) {
-      const { privateKey, publicKey } = ec.generateKeyPair();
-
-      this._privateKey = privateKey;
-      this._publicKey = publicKey;
-    }
-
-    const signature = ec.sign(
-      { name, email, publicKey: this._publicKey },
-      this._privateKey
-    );
-
-    return await this._t.user.register.mutate({
+  public async registerUser(
+    alias: string,
+    password: string,
+    name: string,
+    email: string
+  ) {
+    const res = await this._t.user.register.mutate({
+      alias,
+      password,
       name,
       email,
-      publicKey: this._publicKey,
-      signature,
     });
+
+    this._jwt = res.jwt;
+    this._totp_key = res.totp_key;
+
+    return res;
   }
 
   public sell(
@@ -312,15 +247,6 @@ export default class Client {
     );
   }
 
-  public setPrivateKey(privateKey: HexString) {
-    const publicKey = ec.getPublicKey(privateKey);
-
-    this._privateKey = privateKey;
-    this._publicKey = publicKey;
-
-    return this._publicKey;
-  }
-
   /**
    * A function that transfers an amount from one account to another.
    *
@@ -331,21 +257,11 @@ export default class Client {
    * @return {ReturnType} the result of the transfer operation
    */
   public transfer({ from, to, amount, comment }: ITransferArgs) {
-    if (!this._privateKey || !this._publicKey) {
-      throw this._noPrivateKey;
-    }
-
-    const signature = ec.sign(
-      { from, to, amount, comment, type: 'transfer' },
-      this._privateKey
-    );
-
     return this._t.transactions.transfer.mutate({
       from,
       to,
       amount,
       comment,
-      signature,
     });
   }
 
@@ -362,23 +278,6 @@ export default class Client {
     price: number,
     type: boolean
   ) {
-    if (!this._privateKey || !this._publicKey) {
-      throw this._noPrivateKey;
-    }
-
-    const signature = ec.sign(
-      {
-        fromAccountId,
-        toAccountId,
-        fromCurrencySymbol,
-        toCurrencySymbol,
-        quantity,
-        price,
-        type,
-      },
-      this._privateKey
-    );
-
     if (type)
       return this._t.exchange.buy.mutate({
         fromAccountId,
@@ -387,7 +286,6 @@ export default class Client {
         toCurrencySymbol,
         quantity,
         price,
-        signature,
       });
 
     return this._t.exchange.sell.mutate({
@@ -397,7 +295,6 @@ export default class Client {
       toCurrencySymbol,
       quantity,
       price,
-      signature,
     });
   }
 

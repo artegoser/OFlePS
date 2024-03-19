@@ -23,7 +23,6 @@ const transactions = router({
       z.object({
         page: z.number(),
         accountId: z.string(),
-        signature: z.string(),
       })
     )
     .query(({ input, ctx }) => {

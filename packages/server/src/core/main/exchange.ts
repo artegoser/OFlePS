@@ -105,7 +105,7 @@ export async function cancelOrder(orderToCancelId: string, user: User) {
       throw new ForbiddenError(`Cancel orders that is not your's `);
     }
 
-    await txTransfer(tx, user, {
+    await txTransfer(tx, null, {
       from:
         config.exchange_account_prefix +
         (order.type ? order.toCurrencySymbol : order.fromCurrencySymbol),

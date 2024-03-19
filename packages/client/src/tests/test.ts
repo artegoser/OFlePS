@@ -25,10 +25,21 @@ import { Client, Root } from '../lib.js';
   const sender = new Client('http://localhost:3000');
   const recipient = new Client('http://localhost:3000');
 
-  await sender.registerUser('sender', 'sender@ofleps.io');
-  await recipient.registerUser('recipient', 'recipient@ofleps.io');
+  await sender.registerUser(
+    'sender',
+    'sender_pass',
+    'sender',
+    'sender@ofleps.io'
+  );
+  await recipient.registerUser(
+    'recipient',
+    'recipient_pass',
+    'recipient',
+    'recipient@ofleps.io'
+  );
 
   const { id: senderId } = await sender.createAccount(
+    'usd',
     'sender',
     'sender account',
     'USD'
@@ -38,6 +49,7 @@ import { Client, Root } from '../lib.js';
   await admin.issue(senderId, 100, 'issue money to sender');
 
   const { id: recipientId } = await recipient.createAccount(
+    'usd',
     'recipient',
     'recipient account',
     'USD'
