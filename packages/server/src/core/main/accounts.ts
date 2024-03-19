@@ -51,7 +51,7 @@ export async function createAccount({
 
   return await db.account.create({
     data: {
-      id: `${user.alias}/${alias}`,
+      id: `${user.alias}_${alias}`,
       name,
       description,
       currencySymbol,

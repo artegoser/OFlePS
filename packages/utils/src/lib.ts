@@ -120,3 +120,7 @@ export function parseGranularity(granularity: string) {
 
   return { value, unit, ms, cutoff, granularity };
 }
+
+import { totp } from 'botp';
+
+export { totp };

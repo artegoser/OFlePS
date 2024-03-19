@@ -10,14 +10,22 @@
 
   export let data;
 
+  const user: Writable<Client> = getContext('user');
+
   const toastStore = getToastStore();
 
   let granularities: Granularity[] = data.granularities;
-  let accounts: Account[] = data.accounts;
+  let accounts: Account[] = [];
 
-  let fromValue: string = accounts[0].id;
-  let toValue: string = accounts[1].id;
+  let fromValue: string = '';
+  let toValue: string = '';
   let granularityValue: string = granularities[0].granularity;
+
+  onMount(async () => {
+    accounts = await $user.getAccounts();
+    fromValue = accounts[0]?.id;
+    toValue = accounts[1]?.id;
+  });
 
   function performAction() {
     const from = findAccountById(fromValue);

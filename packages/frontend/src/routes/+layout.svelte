@@ -1,7 +1,6 @@
 <script lang="ts">
   import '../app.postcss';
   import { AppShell, AppBar, Toast, Modal } from '@skeletonlabs/skeleton';
-  import Cookies from 'js-cookie';
 
   // Floating UI for Popups
   import {
@@ -30,32 +29,31 @@
   const user: Writable<Client> = writable();
   user.set(new Client(env.PUBLIC_OFLEPS_URL || 'http://localhost:3000'));
 
-  user.subscribe(async () => {
+  async function authRedir() {
     if (browser) {
-      if ($user.privateKey) return;
-      const privk = window.localStorage.getItem('privk');
-      if (!privk && $page.url.pathname !== '/auth') {
-        goto('/auth');
+      if ($user.jwt) return;
+      const savedJWT = window.localStorage.getItem('jwt_t');
+      const savedTOTP = window.localStorage.getItem('totp_k');
+      if (!savedJWT || !savedTOTP) {
+        if ($page.url.pathname !== '/auth') goto('/auth');
       } else {
         try {
-          if (sessionStorage.getItem('loggedIn') !== 'true') {
-            const res = await $user.login(privk as HexString);
-            sessionStorage.setItem('loggedIn', 'true');
-            Cookies.set('userPk', res.pk);
-          } else {
-            await $user.loginWithoutChecking(privk as HexString);
-          }
+          await $user.setCredentials(savedJWT, savedTOTP);
         } catch {
           goto('/auth');
         }
       }
     }
-  });
+  }
+
+  user.subscribe(authRedir);
 
   setContext('user', user);
 
   afterNavigate(() => {
     document.getElementById('page')?.scrollTo(0, 0);
+
+    authRedir();
   });
 </script>
 
@@ -68,11 +66,7 @@
     <!-- App Bar -->
     <AppBar>
       <svelte:fragment slot="lead">
-        <img
-          class="h-10"
-          src="https://github.com/artegoser/OFlePS/raw/main/imgs/logo.png"
-          alt="Ofleps Logo"
-        />
+        <img class="h-10" src="/logo.png" alt="Ofleps Logo" />
 
         <a href="/my" class="btn btn-sm variant-ghost-surface mx-2">My</a>
       </svelte:fragment>

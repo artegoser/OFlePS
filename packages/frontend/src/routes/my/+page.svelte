@@ -4,8 +4,7 @@
   import { getContext, onMount } from 'svelte';
   import { slide } from 'svelte/transition';
 
-  import { ArrowTrendingUp, PlusCircle, Icon, Plus } from 'svelte-hero-icons';
-  import { size } from '@floating-ui/dom';
+  import { ArrowTrendingUp, PlusCircle, Icon } from 'svelte-hero-icons';
 
   export let data;
 

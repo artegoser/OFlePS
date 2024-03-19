@@ -13,7 +13,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-import { router, publicProcedure } from '../config/trpc.js';
+import { router, publicProcedure, privateProcedure } from '../config/trpc.js';
 import { z } from 'zod';
 import core from '../core/main.js';
 
@@ -45,8 +45,11 @@ const user = router({
     .query(({ input }) => {
       return core.user.signin(input.alias, input.password);
     }),
-  getByPublicKey: publicProcedure.input(z.string()).query(({ input }) => {
+  getByAlias: publicProcedure.input(z.string()).query(({ input }) => {
     return core.user.getUserByAlias(input);
+  }),
+  get: privateProcedure.query(({ ctx }) => {
+    return core.user.getUserByAlias(ctx.user.alias);
   }),
 });
 

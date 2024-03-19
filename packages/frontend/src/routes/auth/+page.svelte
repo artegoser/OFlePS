@@ -9,6 +9,8 @@
   import type { Writable } from 'svelte/store';
   import { getToastStore } from '@skeletonlabs/skeleton';
   import Form from '$lib/components/Form.svelte';
+  import TextInput from '$lib/components/TextInput.svelte';
+  import Cookies from 'js-cookie';
 
   const toastStore = getToastStore();
 
@@ -17,6 +19,8 @@
   let text = 'Register';
   $: text = type ? 'Register' : 'Login';
 
+  let alias: string = '';
+  let password: string = '';
   let name: string = '';
   let email: string = '';
   let privateKey: string = '';
@@ -26,16 +30,14 @@
   async function performAction() {
     try {
       if (type) {
-        await $user.registerUser(name, email);
+        await $user.registerUser(alias, password, name, email);
       } else {
-        await $user.login(privateKey as HexString);
+        await $user.signin(alias, password);
       }
 
-      if (browser) {
-        localStorage.setItem('privk', $user.privateKey as HexString);
-      } else {
-        throw new Error('No browser');
-      }
+      localStorage.setItem('jwt_t', $user.jwt!);
+      localStorage.setItem('totp_k', $user.totp_key!);
+      Cookies.set('user_alias', alias);
 
       goto('/my');
     } catch (e: any) {
@@ -50,25 +52,18 @@
 
 <div class="container h-full mx-auto flex justify-center items-center">
   <Form title={text} buttonText={text} onSubmit={performAction}>
-    <svelte:fragment slot="title"
-      ><Toggle bind:checked={type} />
+    <svelte:fragment slot="title">
+      <Toggle bind:checked={type} />
     </svelte:fragment>
 
     {#if type}
-      <input class="input" type="text" placeholder="Name" bind:value={name} />
-      <input
-        class="input"
-        type="email"
-        placeholder="Email"
-        bind:value={email}
-      />
+      <TextInput label="Alias" bind:value={alias} />
+      <TextInput label="Name" bind:value={name} />
+      <TextInput label="Email" bind:value={email} />
+      <TextInput label="Password" secure bind:value={password} />
     {:else}
-      <input
-        class="input"
-        type="text"
-        placeholder="Private key"
-        bind:value={privateKey}
-      />
+      <TextInput label="Alias" bind:value={alias} />
+      <TextInput label="Password" secure bind:value={password} />
     {/if}
   </Form>
 </div>

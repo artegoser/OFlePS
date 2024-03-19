@@ -42,7 +42,7 @@ model User {
 }
 
 model Account {
-  id String @id //{userAlias}/{accountAlias}
+  id String @id //{userAlias}_{accountAlias}
 
   userAlias String
 

@@ -11,6 +11,7 @@
   const toastStore = getToastStore();
   const user: Writable<Client> = getContext('user');
 
+  let alias: string = '';
   let name: string = '';
   let description: string = '';
   let currencySymbol: string = '';
@@ -18,6 +19,7 @@
   async function performAction() {
     try {
       const { id } = await $user.createAccount(
+        alias,
         name,
         description,
         currencySymbol
@@ -36,6 +38,7 @@
 
 <div class="container h-full mx-auto flex justify-center items-center">
   <Form title="Add account" onSubmit={performAction}>
+    <TextInput bind:value={alias} label="Alias" />
     <TextInput bind:value={name} label="Name" />
     <TextInput bind:value={description} label="Description" />
     <TextInput bind:value={currencySymbol} label="Currency symbol" />

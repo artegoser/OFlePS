@@ -16,7 +16,7 @@
 import { initTRPC, TRPCError } from '@trpc/server';
 import { config } from './app.service.js';
 import jwt from 'jsonwebtoken';
-import { totp } from 'notp';
+import { totp } from '@ofleps/utils';
 
 import { CreateHTTPContextOptions } from '@trpc/server/adapters/standalone';
 import { JWTPayload } from '../types/auth.js';

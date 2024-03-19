@@ -8,6 +8,7 @@
   export let onClick: () => void = () => {};
 
   const isIncome = transaction.to === account?.id;
+  console.log(account?.id);
 </script>
 
 <div

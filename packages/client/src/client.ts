@@ -17,18 +17,14 @@ import { createTRPCProxyClient, httpLink } from '@trpc/client';
 
 import type { AppRouter, ExchangeCommentData } from '@ofleps/server';
 
-import { HexString, SmartRequest } from '@ofleps/utils';
+import { SmartRequest, totp } from '@ofleps/utils';
 import { ITransferArgs } from './types/client.js';
-import { totp } from 'notp';
 
 export default class Client {
   // #region Properties (5)
 
-  private _noPrivateKey = new Error('No private key, generate or set first');
-  private _t;
-  private _userNotExist = new Error('User not exist, register first');
-
   private _jwt?: string;
+  private _t;
   private _totp_key?: string;
 
   // #endregion Properties (5)
@@ -53,7 +49,19 @@ export default class Client {
 
   // #endregion Constructors (1)
 
-  // #region Public Methods (19)
+  // #region Public Getters And Setters (2)
+
+  public get jwt() {
+    return this._jwt;
+  }
+
+  public get totp_key() {
+    return this._totp_key;
+  }
+
+  // #endregion Public Getters And Setters (2)
+
+  // #region Public Methods (21)
 
   public buy(
     fromAccountId: string,
@@ -78,10 +86,6 @@ export default class Client {
     return this._t.exchange.cancel.mutate({
       orderToCancelId,
     });
-  }
-
-  public getGranularities() {
-    return this._t.exchange.getGranularities.query();
   }
 
   public createAccount(
@@ -131,6 +135,10 @@ export default class Client {
 
   public getCurrencyBySymbol(symbol: string) {
     return this._t.currencies.getBySymbol.query(symbol);
+  }
+
+  public getGranularities() {
+    return this._t.exchange.getGranularities.query();
   }
 
   public getOrderBook(
@@ -191,22 +199,12 @@ export default class Client {
     return { transactions, exchange };
   }
 
-  public getUserByPublicKey(publicKey: HexString) {
-    return this._t.user.getByPublicKey.query(publicKey);
+  public getUserByAlias(alias: string) {
+    return this._t.user.getByAlias.query(alias);
   }
 
-  public async signin(alias: string, password: string) {
-    const res = await this._t.user.signin.query({ alias, password });
-
-    this._jwt = res.jwt;
-    this._totp_key = res.totp_key;
-
-    return res;
-  }
-
-  public async setCredentials(jwt: string, totp_key: string) {
-    this._jwt = jwt;
-    this._totp_key = totp_key;
+  public getUser() {
+    return this._t.user.get.query();
   }
 
   public async registerUser(
@@ -247,6 +245,20 @@ export default class Client {
     );
   }
 
+  public async setCredentials(jwt: string, totp_key: string) {
+    this._jwt = jwt;
+    this._totp_key = totp_key;
+  }
+
+  public async signin(alias: string, password: string) {
+    const res = await this._t.user.signin.query({ alias, password });
+
+    this._jwt = res.jwt;
+    this._totp_key = res.totp_key;
+
+    return res;
+  }
+
   /**
    * A function that transfers an amount from one account to another.
    *
@@ -265,7 +277,7 @@ export default class Client {
     });
   }
 
-  // #endregion Public Methods (19)
+  // #endregion Public Methods (21)
 
   // #region Private Methods (1)
 

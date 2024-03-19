@@ -12,6 +12,6 @@ export async function load({ params }) {
     granularity: params.granularity,
     granularities,
     orderBook,
-    price: `${(orderBook?.asks[0]?.price + orderBook?.bids[0]?.price) / 2}`,
+    price: `${(orderBook?.asks[0]?.price + orderBook?.bids[0]?.price) / 2 || 0}`,
   };
 }

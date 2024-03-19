@@ -24,7 +24,7 @@
 
   const user: Writable<Client> = getContext('user');
 
-  let account: Account | null = data.account;
+  let account: Account | null;
   let groupedTransactions: GroupedTransactions = {
     transactions: [],
     exchange: [],
@@ -34,7 +34,8 @@
   let tabSelected = 0;
 
   onMount(async () => {
-    groupedTransactions = await $user.getTransactionsGrouped(data.id, page); //await $user.getTransactions(data.id, page);
+    account = await $user.getAccountById(data.id);
+    groupedTransactions = await $user.getTransactionsGrouped(data.id, page);
   });
 
   async function nextPage() {
@@ -62,21 +63,26 @@
 </script>
 
 <div class="container mx-auto p-5 flex flex-col">
-  <div class="h1 p-5 flex flex-wrap justify-center items-center gap-2">
-    <div>
-      {account?.name} ({account?.balance}
-      {account?.currencySymbol})
+  {#if account}
+    <div
+      class="h1 p-5 flex flex-wrap justify-center items-center gap-2"
+      transition:slide
+    >
+      <div>
+        {account?.name} ({account?.balance}
+        {account?.currencySymbol})
+      </div>
+      <div>
+        <button
+          class="btn variant-ghost-surface"
+          on:click={() => showModal(`Account info`, to_pretty_html(account))}
+        >
+          More info
+        </button>
+        <ActionAnchor href="/transfer/{data.id}">Transfer</ActionAnchor>
+      </div>
     </div>
-    <div>
-      <button
-        class="btn variant-ghost-surface"
-        on:click={() => showModal(`Account info`, to_pretty_html(account))}
-      >
-        More info
-      </button>
-      <ActionAnchor href="/transfer/{data.id}">Transfer</ActionAnchor>
-    </div>
-  </div>
+  {/if}
 
   <TabGroup justify="justify-center">
     <Tab bind:group={tabSelected} name="Transactions" value={0}>

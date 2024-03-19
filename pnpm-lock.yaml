@@ -59,16 +59,10 @@ importers:
       jsonwebtoken:
         specifier: ^9.0.2
         version: 9.0.2
-      notp:
-        specifier: ^2.0.3
-        version: 2.0.3
     devDependencies:
       '@types/jsonwebtoken':
         specifier: ^9.0.6
         version: 9.0.6
-      '@types/notp':
-        specifier: ^2.0.5
-        version: 2.0.5
 
   packages/docs:
     dependencies:
@@ -193,9 +187,6 @@ importers:
       jsonwebtoken:
         specifier: ^9.0.2
         version: 9.0.2
-      notp:
-        specifier: ^2.0.3
-        version: 2.0.3
     devDependencies:
       '@ofleps/utils':
         specifier: workspace:*
@@ -218,9 +209,6 @@ importers:
       '@types/jsonwebtoken':
         specifier: ^9.0.6
         version: 9.0.6
-      '@types/notp':
-        specifier: ^2.0.5
-        version: 2.0.5
       cors:
         specifier: ^2.8.5
         version: 2.8.5
@@ -254,6 +242,13 @@ importers:
       '@paralleldrive/cuid2':
         specifier: ^2.2.2
         version: 2.2.2
+      botp:
+        specifier: ^2.3.2
+        version: 2.3.2
+    devDependencies:
+      '@types/notp':
+        specifier: ^2.0.5
+        version: 2.0.5
 
 packages:
 
@@ -2764,6 +2759,11 @@ packages:
   /balanced-match@1.0.2:
     resolution: {integrity: sha512-3oSeUO0TMV67hN1AmbXsK4yaqU7tjiHlbxRDZOpH0KW9+CeX4bRAaX0Anxt0tx2MrpRpWwQaPwIlISEJhYU5Pw==}
 
+  /base32.js@0.1.0:
+    resolution: {integrity: sha512-n3TkB02ixgBOhTvANakDb4xaMXnYUVkNoRFJjQflcqMQhyEKxEHdj3E6N8t8sUQ0mjH/3/JxzlXuz3ul/J90pQ==}
+    engines: {node: '>=0.12.0'}
+    dev: false
+
   /base64-js@1.5.1:
     resolution: {integrity: sha512-AKpaYlHn8t4SVbOHCy+b5+KKgvR4vrsD8vbvrbiQJps7fKDTkjkDry6ji0rUJjC0kzbNePLwzxq8iypo41qeWA==}
     dev: true
@@ -2796,6 +2796,14 @@ packages:
       inherits: 2.0.4
       readable-stream: 3.6.2
     dev: true
+
+  /botp@2.3.2:
+    resolution: {integrity: sha512-a/5Wh0km7kS0Hv2VJhyWgRCgPqTAzugyhbxjVVT1Ic/uQJDPyd+BwquL9xhubxUzyV+CS3sPculaThsYlmPOJQ==}
+    engines: {node: '> v0.6.0'}
+    dependencies:
+      base32.js: 0.1.0
+      crypto-js: 3.3.0
+    dev: false
 
   /brace-expansion@1.1.11:
     resolution: {integrity: sha512-iCuPHDFgrHX7H2vEI/5xpz07zSHB00TpugqhmYtVmMO6518mCuRMoOYFldEBl0g187ufozdaHgWKcYFb61qGiA==}
@@ -3394,6 +3402,10 @@ packages:
       shebang-command: 2.0.0
       which: 2.0.2
     dev: true
+
+  /crypto-js@3.3.0:
+    resolution: {integrity: sha512-DIT51nX0dCfKltpRiXV+/TVZq+Qq2NgF4644+K7Ttnla7zEzqc+kjJyiB96BHNyUTBxyjzRcZYpUdZa+QAqi6Q==}
+    dev: false
 
   /crypto-random-string@2.0.0:
     resolution: {integrity: sha512-v1plID3y9r/lPhviJ1wrXpLeyUIGAZ2SHNYTEapm7/8A9nLPoyvVp3RK/EPFqn5kEznyWgYZNsRtYYIWbuG8KA==}
@@ -7218,11 +7230,6 @@ packages:
     resolution: {integrity: sha512-bdok/XvKII3nUpklnV6P2hxtMNrCboOjAcyBuQnWEhO665FwrSNRxU+AqpsyvO6LgGYPspN+lu5CLtw4jPRKNA==}
     engines: {node: '>=0.10.0'}
     dev: true
-
-  /notp@2.0.3:
-    resolution: {integrity: sha512-oBig/2uqkjQ5AkBuw4QJYwkEWa/q+zHxI5/I5z6IeP2NT0alpJFsP/trrfCC+9xOAgQSZXssNi962kp5KBmypQ==}
-    engines: {node: '> v0.6.0'}
-    dev: false
 
   /npm-bundled@1.1.2:
     resolution: {integrity: sha512-x5DHup0SuyQcmL3s7Rx/YQ8sbw/Hzg0rj48eN0dV7hf5cmQq5PXIeioroH3raV1QC1yh3uTYuMThvEQF3iKgGQ==}
