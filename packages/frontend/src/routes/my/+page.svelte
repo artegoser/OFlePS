@@ -43,6 +43,9 @@
     <svelte:fragment slot="panel">
       {#if tabSelected === 0}
         <div class="flex flex-col gap-2">
+          {#if accounts.length === 0}
+            <div class="text-center">No accounts</div>
+          {/if}
           {#each accounts as account}
             <div
               transition:slide
@@ -66,6 +69,9 @@
         </div>
       {:else}
         <div class="flex flex-col gap-2">
+          {#if orders.length === 0}
+            <div class="text-center">No orders</div>
+          {/if}
           {#each orders as order}
             <div
               transition:slide

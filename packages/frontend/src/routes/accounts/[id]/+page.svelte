@@ -93,6 +93,9 @@
     <svelte:fragment slot="panel">
       <div class="flex flex-col gap-2">
         {#if tabSelected === 0}
+          {#if groupedTransactions.transactions.length === 0}
+            <div class="text-center">No transactions</div>
+          {/if}
           {#each groupedTransactions.transactions as transaction}
             <Transaction
               {transaction}
@@ -103,6 +106,9 @@
             />
           {/each}
         {:else if tabSelected === 1}
+          {#if groupedTransactions.exchange.length === 0}
+            <div class="text-center">No exchange transactions</div>
+          {/if}
           {#each groupedTransactions.exchange as exchange_transaction_data}
             <ExchangeTransaction
               {exchange_transaction_data}
