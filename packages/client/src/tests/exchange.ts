@@ -116,8 +116,8 @@ function mapOrderBook(orderBook: any) {
   console.table(await bob.getTradingSchedule('USD', 'RUB', '1m'));
 
   // Order fullfiled(probably), now we can see transactions
-  const transactions_alice = await alice.getTransactions(atid);
-  const transactions_bob = await bob.getTransactions(bfid);
+  const transactions_alice = await alice.getTransactionsByAccountId(atid);
+  const transactions_bob = await bob.getTransactionsByAccountId(bfid);
 
   const aa = await alice.getAccountById(atid);
   const ba = await bob.getAccountById(bfid);

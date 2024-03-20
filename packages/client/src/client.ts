@@ -173,12 +173,16 @@ export default class Client {
     });
   }
 
-  public getTransactions(accountId: string, page: number = 1) {
-    return this._t.transactions.get.query({ accountId, page });
+  public getTransactionsByAccountId(accountId: string, page: number = 1) {
+    return this._t.transactions.getByAccountId.query({ accountId, page });
+  }
+
+  public getTransactions(page: number = 1) {
+    return this._t.transactions.get.query(page);
   }
 
   public async getTransactionsGrouped(accountId: string, page: number = 1) {
-    const non_grouped_transactions = await this.getTransactions(
+    const non_grouped_transactions = await this.getTransactionsByAccountId(
       accountId,
       page
     );

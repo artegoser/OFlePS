@@ -34,9 +34,9 @@ export const account_id = z
 
 export const code = z.string().min(1).max(1024);
 
-export const description = z.string().min(1).max(256).trim();
+export const description = z.string().max(256).trim();
 
-export const comment = z.string().min(1).max(256).trim();
+export const comment = description;
 
 export const method = z
   .string()

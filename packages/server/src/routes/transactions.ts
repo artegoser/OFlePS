@@ -19,7 +19,7 @@ import core from '../core/main.js';
 import { account_id, amount, comment, page } from '../types/schema.js';
 
 const transactions = router({
-  get: privateProcedure
+  getByAccountId: privateProcedure
     .input(
       z.object({
         page,
@@ -27,12 +27,15 @@ const transactions = router({
       })
     )
     .query(({ input, ctx }) => {
-      return core.transactions.getTransactions(
+      return core.transactions.getTransactionsByAccountId(
         input.page,
         input.accountId,
         ctx.user
       );
     }),
+  get: privateProcedure.input(page).query(({ input, ctx }) => {
+    return core.transactions.getTransactions(input, ctx.user);
+  }),
   transfer: privateProcedure
     .input(
       z.object({

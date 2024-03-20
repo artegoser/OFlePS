@@ -22,7 +22,7 @@ import {
 import { User } from '../../types/auth.js';
 import { TransactionReq, txTransfer } from '../helpers/txTrans.js';
 
-export async function getTransactions(
+export async function getTransactionsByAccountId(
   page: number,
   accountId: string,
   user: User
@@ -51,6 +51,38 @@ export async function getTransactions(
         },
         {
           to: accountId,
+        },
+      ],
+    },
+    orderBy: {
+      date: 'desc',
+    },
+  });
+}
+
+export async function getTransactions(page: number, user: User) {
+  const accounts = (
+    await db.account.findMany({
+      where: {
+        userAlias: user.alias,
+      },
+    })
+  ).map((a) => a.id);
+
+  return await db.transaction.findMany({
+    skip: (page - 1) * 50,
+    take: 50,
+    where: {
+      OR: [
+        {
+          from: {
+            in: accounts,
+          },
+        },
+        {
+          to: {
+            in: accounts,
+          },
         },
       ],
     },

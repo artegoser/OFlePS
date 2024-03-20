@@ -40,9 +40,9 @@
 
   async function nextPage() {
     try {
-      groupedTransactions.transactions.push(
-        ...(await $user.getTransactions(data.id, ++page))
-      );
+      const groupedNew = await $user.getTransactionsGrouped(data.id, ++page);
+      groupedTransactions.transactions.push(...groupedNew.transactions);
+      groupedTransactions.exchange.push(...groupedNew.exchange);
     } catch (e: any) {
       const t: ToastSettings = {
         message: e.message,
@@ -97,13 +97,7 @@
             <div class="text-center">No transactions</div>
           {/if}
           {#each groupedTransactions.transactions as transaction}
-            <Transaction
-              {transaction}
-              {account}
-              onClick={() => {
-                showModal(`Transaction info`, to_pretty_html(transaction));
-              }}
-            />
+            <Transaction {transaction} {account} />
           {/each}
         {:else if tabSelected === 1}
           {#if groupedTransactions.exchange.length === 0}
