@@ -1,15 +1,15 @@
 import { z } from 'zod';
 
-function noSpaces(s: string) {
-  return !s.includes(' ');
-}
-
-function noUppercase(s: string) {
-  return !uppercase(s);
+function alphaNumeric(s: string) {
+  return /^[a-zA-Z0-9_]*$/.test(s);
 }
 
 function uppercase(s: string) {
-  return /[A-Z]/.test(s);
+  return s === s.toLocaleUpperCase();
+}
+
+function lowercase(s: string) {
+  return s === s.toLocaleLowerCase();
 }
 
 export const name = z.string().min(1).max(32).trim();
@@ -19,8 +19,8 @@ export const alias = z
   .min(3)
   .max(32)
   .refine(
-    (s) => noSpaces(s) && noUppercase(s),
-    'No spaces/uppercase in alias allowed'
+    (s) => alphaNumeric(s) && lowercase(s),
+    'Must be alphanumeric and lowercase'
   );
 
 export const account_id = z
@@ -28,8 +28,8 @@ export const account_id = z
   .min(34)
   .max(65)
   .refine(
-    (s) => noSpaces(s) && noUppercase(s),
-    'No spaces/uppercase in account_id allowed'
+    (s) => alphaNumeric(s) && lowercase(s),
+    'Must be alphanumeric and lowercase'
   );
 
 export const code = z.string().min(1).max(1024);
@@ -41,7 +41,7 @@ export const comment = z.string().min(1).max(256).trim();
 export const method = z
   .string()
   .trim()
-  .refine((s) => noSpaces(s), 'No spaces in method name allowed');
+  .refine((s) => alphaNumeric(s), 'Must be alphanumeric');
 
 export const params = z.array(z.string().or(z.number()).or(z.boolean()));
 
@@ -50,8 +50,8 @@ export const currencySymbol = z
   .min(3)
   .max(6)
   .refine(
-    (s) => noSpaces(s) && uppercase(s),
-    'No spaces/lowercase in symbol allowed'
+    (s) => alphaNumeric(s) && uppercase(s),
+    'Must be alphanumeric and uppercase'
   );
 
 export const email = z.string().email();
@@ -60,5 +60,5 @@ export const page = z.number().int().min(1);
 
 export const granularity = z.string().min(2).max(4);
 
-export const amount = z.number().refine((s) => s > 0);
+export const amount = z.number().refine((s) => s > 0, 'Amount must be > 0');
 export const password = z.string().min(8).max(32);
