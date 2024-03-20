@@ -21,13 +21,13 @@ import { SmartRequest, totp } from '@ofleps/utils';
 import { ITransferArgs } from './types/client.js';
 
 export default class Client {
-  // #region Properties (5)
+  // #region Properties (3)
 
   private _jwt?: string;
   private _t;
   private _totp_key?: string;
 
-  // #endregion Properties (5)
+  // #endregion Properties (3)
 
   // #region Constructors (1)
 
@@ -61,7 +61,7 @@ export default class Client {
 
   // #endregion Public Getters And Setters (2)
 
-  // #region Public Methods (21)
+  // #region Public Methods (23)
 
   public buy(
     fromAccountId: string,
@@ -153,6 +153,10 @@ export default class Client {
     });
   }
 
+  public getOrders() {
+    return this._t.exchange.getOrders.query();
+  }
+
   public getSmartContractById(id: string) {
     return this._t.smartContracts.getById.query(id);
   }
@@ -199,12 +203,12 @@ export default class Client {
     return { transactions, exchange };
   }
 
-  public getUserByAlias(alias: string) {
-    return this._t.user.getByAlias.query(alias);
-  }
-
   public getUser() {
     return this._t.user.get.query();
+  }
+
+  public getUserByAlias(alias: string) {
+    return this._t.user.getByAlias.query(alias);
   }
 
   public async registerUser(
@@ -277,7 +281,7 @@ export default class Client {
     });
   }
 
-  // #endregion Public Methods (21)
+  // #endregion Public Methods (23)
 
   // #region Private Methods (1)
 

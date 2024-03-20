@@ -8,7 +8,7 @@
 
 <div
   class="variant-ghost-surface p-5 mx-5 rounded-2xl mt-2 flex flex-col gap-2 text center"
-  transition:slide
+  in:slide
 >
   <div class="flex justify-between">
     <div>{title}</div>

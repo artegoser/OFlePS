@@ -40,16 +40,15 @@
         try {
           await $user.setCredentials(savedJWT, savedTOTP);
 
-          if (!window.sessionStorage.getItem('loggedIn')) {
-            const user_data = await $user.getUser();
-
-            if (!user_data) {
+          if (window.sessionStorage.getItem('loggedIn') !== 'true') {
+            try {
+              await $user.getUser();
+              window.sessionStorage.setItem('loggedIn', 'true');
+            } catch {
               window.localStorage.removeItem('jwt_t');
               window.localStorage.removeItem('totp_k');
-              return goto('/auth');
+              goto('/auth');
             }
-
-            window.sessionStorage.setItem('loggedIn', 'true');
           }
         } catch {
           goto('/auth');

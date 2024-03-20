@@ -155,7 +155,7 @@
   function triggerSuccess(message: string) {
     const t: ToastSettings = {
       message: message,
-      background: 'variant-filled-success',
+      background: 'variant-soft-success',
     };
     toastStore.trigger(t);
   }
@@ -250,6 +250,14 @@
         bind:quantity
       />
       <OrderBookComponent bids={orderBook.bids} asks={orderBook.asks} />
+
+      <div class="text-center text-xs text-gray-400">
+        TradingView Lightweight Charts™ <br />
+        Copyright (с) 2023 TradingView, Inc. <br />
+        <a href="https://www.tradingview.com" target="_blank">
+          https://www.tradingview.com/
+        </a>
+      </div>
     </div>
   </div>
 </div>

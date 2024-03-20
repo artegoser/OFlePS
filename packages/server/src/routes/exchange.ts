@@ -57,6 +57,9 @@ const exchange = router({
         input.page
       );
     }),
+  getOrders: privateProcedure.query(({ ctx }) => {
+    return core.exchange.getOrders(ctx.user);
+  }),
   cancel: privateProcedure
     .input(
       z.object({

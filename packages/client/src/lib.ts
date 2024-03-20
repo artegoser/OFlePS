@@ -33,3 +33,4 @@ export type GroupedTransactions = Awaited<
   ReturnType<Client['getTransactionsGrouped']>
 >;
 export type ExchangeTransactionData = GroupedTransactions['exchange'][0];
+export type PrivateOrder = RouterOutput['exchange']['getOrders'][0];

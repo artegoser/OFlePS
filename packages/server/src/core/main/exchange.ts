@@ -39,6 +39,12 @@ export async function getTradingSchedule(
   });
 }
 
+export async function getOrders(user: User) {
+  return await db.order.findMany({
+    where: { userAlias: user.alias },
+  });
+}
+
 export async function getOrderBook(
   fromCurrencySymbol: string,
   toCurrencySymbol: string,
@@ -163,6 +169,7 @@ async function createOrder(
   const order = await db.$transaction(async (tx) => {
     const new_order = await tx.order.create({
       data: {
+        userAlias: user.alias,
         accountId: !type ? toAccountId : fromAccountId,
         returnAccountId: type ? toAccountId : fromAccountId,
         quantity,

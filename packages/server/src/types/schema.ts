@@ -25,8 +25,8 @@ export const alias = z
 
 export const account_id = z
   .string()
-  .min(34)
-  .max(65)
+  .min(7) // 3(min user alias) + 1(_) + 3(min account alias)
+  .max(65) // 32(max user alias) + 1(_) + 32(max account alias)
   .refine(
     (s) => alphaNumeric(s) && lowercase(s),
     'Must be alphanumeric and lowercase'
