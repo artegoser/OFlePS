@@ -20,14 +20,31 @@ import { totp } from '@ofleps/utils';
 
 import { CreateHTTPContextOptions } from '@trpc/server/adapters/standalone';
 import { JWTPayload } from '../types/auth.js';
+import { ZodError } from 'zod';
 
 export const createContext = ({ req, res }: CreateHTTPContextOptions) => {
   return { req, res };
 };
 
-const t = initTRPC
-  .context<Awaited<ReturnType<typeof createContext>>>()
-  .create();
+const t = initTRPC.context<Awaited<ReturnType<typeof createContext>>>().create({
+  errorFormatter(opts) {
+    const { shape, error } = opts;
+    return {
+      ...shape,
+      message:
+        error.code === 'BAD_REQUEST' && error.cause instanceof ZodError
+          ? error.cause.issues.map((s) => `${s.path}: ${s.message}`).join('\n')
+          : shape.message,
+      data: {
+        ...shape.data,
+        zodError:
+          error.code === 'BAD_REQUEST' && error.cause instanceof ZodError
+            ? error.cause.flatten()
+            : null,
+      },
+    };
+  },
+});
 
 export const publicProcedure = t.procedure;
 export const router = t.router;

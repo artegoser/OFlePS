@@ -16,13 +16,14 @@
 import { router, privateProcedure } from '../config/trpc.js';
 import { z } from 'zod';
 import core from '../core/main.js';
+import { account_id, amount, comment, page } from '../types/schema.js';
 
 const transactions = router({
   get: privateProcedure
     .input(
       z.object({
-        page: z.number(),
-        accountId: z.string(),
+        page,
+        accountId: account_id,
       })
     )
     .query(({ input, ctx }) => {
@@ -35,10 +36,10 @@ const transactions = router({
   transfer: privateProcedure
     .input(
       z.object({
-        from: z.string(),
-        to: z.string(),
-        amount: z.number(),
-        comment: z.string().optional(),
+        from: account_id,
+        to: account_id,
+        amount,
+        comment: comment.optional(),
       })
     )
     .mutation(({ input, ctx }) => {

@@ -242,13 +242,9 @@ importers:
       '@paralleldrive/cuid2':
         specifier: ^2.2.2
         version: 2.2.2
-      botp:
-        specifier: ^2.3.2
-        version: 2.3.2
-    devDependencies:
-      '@types/notp':
-        specifier: ^2.0.5
-        version: 2.0.5
+      neotp:
+        specifier: ^2.3.3
+        version: 2.3.3
 
 packages:
 
@@ -2260,12 +2256,6 @@ packages:
     resolution: {integrity: sha512-37i+OaWTh9qeK4LSHPsyRC7NahnGotNuZvjLSgcPzblpHB3rrCJxAOgI5gCdKm7coonsaX1Of0ILiTcnZjbfxA==}
     dev: true
 
-  /@types/notp@2.0.5:
-    resolution: {integrity: sha512-ZsZS0PYUa6ZE4K3yOGerBvaxCp4ePf6ZmkFbPeilcqz2Ui/lmXox7KlRt7XZkXzqUgXhFLkc09ixyVmFLCU3gQ==}
-    dependencies:
-      '@types/node': 20.11.27
-    dev: true
-
   /@types/prop-types@15.7.11:
     resolution: {integrity: sha512-ga8y9v9uyeiLdpKddhxYQkxNDrfvuPrlFb0N1qnZZByvcElJaXthF1UhvCh9TLWJBEHeNtdnbysW7Y6Uq8CVng==}
     dev: false
@@ -2796,14 +2786,6 @@ packages:
       inherits: 2.0.4
       readable-stream: 3.6.2
     dev: true
-
-  /botp@2.3.2:
-    resolution: {integrity: sha512-a/5Wh0km7kS0Hv2VJhyWgRCgPqTAzugyhbxjVVT1Ic/uQJDPyd+BwquL9xhubxUzyV+CS3sPculaThsYlmPOJQ==}
-    engines: {node: '> v0.6.0'}
-    dependencies:
-      base32.js: 0.1.0
-      crypto-js: 3.3.0
-    dev: false
 
   /brace-expansion@1.1.11:
     resolution: {integrity: sha512-iCuPHDFgrHX7H2vEI/5xpz07zSHB00TpugqhmYtVmMO6518mCuRMoOYFldEBl0g187ufozdaHgWKcYFb61qGiA==}
@@ -3403,8 +3385,8 @@ packages:
       which: 2.0.2
     dev: true
 
-  /crypto-js@3.3.0:
-    resolution: {integrity: sha512-DIT51nX0dCfKltpRiXV+/TVZq+Qq2NgF4644+K7Ttnla7zEzqc+kjJyiB96BHNyUTBxyjzRcZYpUdZa+QAqi6Q==}
+  /crypto-js@4.2.0:
+    resolution: {integrity: sha512-KALDyEYgpY+Rlob/iriUtjV6d5Eq+Y191A5g4UqLAi8CyGP9N1+FdVbkc1SxKc2r4YAYqG8JzO2KGL+AizD70Q==}
     dev: false
 
   /crypto-random-string@2.0.0:
@@ -6931,6 +6913,14 @@ packages:
   /neo-async@2.6.2:
     resolution: {integrity: sha512-Yd3UES5mWCSqR+qNT93S3UoYUkqAZ9lLg8a7g9rimsWmYGK8cVToA4/sF3RrshdyV3sAGMXVUmpMYOw+dLpOuw==}
     dev: true
+
+  /neotp@2.3.3:
+    resolution: {integrity: sha512-BReTMyA/4pCRv0uL/4kcCWWH1RxTUh7VLe1EQ2nzeUas0EyaboYZjcPaF7mMGTwm31a4RIGkcNz3XgHt3khuLQ==}
+    engines: {node: '>=18'}
+    dependencies:
+      base32.js: 0.1.0
+      crypto-js: 4.2.0
+    dev: false
 
   /new-github-issue-url@0.2.1:
     resolution: {integrity: sha512-md4cGoxuT4T4d/HDOXbrUHkTKrp/vp+m3aOA7XXVYwNsUNMK49g3SQicTSeV5GIz/5QVGAeYRAOlyp9OvlgsYA==}

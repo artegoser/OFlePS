@@ -16,15 +16,16 @@
 import { router, publicProcedure, privateProcedure } from '../config/trpc.js';
 import { z } from 'zod';
 import core from '../core/main.js';
+import { alias, email, name, password } from '../types/schema.js';
 
 const user = router({
   register: publicProcedure
     .input(
       z.object({
-        alias: z.string(),
-        name: z.string(),
-        email: z.string(),
-        password: z.string(),
+        alias,
+        name,
+        email,
+        password,
       })
     )
     .mutation(({ input }) => {
@@ -38,14 +39,14 @@ const user = router({
   signin: publicProcedure
     .input(
       z.object({
-        alias: z.string(),
-        password: z.string(),
+        alias,
+        password,
       })
     )
     .query(({ input }) => {
       return core.user.signin(input.alias, input.password);
     }),
-  getByAlias: publicProcedure.input(z.string()).query(({ input }) => {
+  getByAlias: publicProcedure.input(alias).query(({ input }) => {
     return core.user.getUserByAlias(input);
   }),
   get: privateProcedure.query(({ ctx }) => {

@@ -16,16 +16,15 @@
 import { router, publicProcedure } from '../config/trpc.js';
 import { z } from 'zod';
 import core from '../core/main.js';
+import { currencySymbol, page } from '../types/schema.js';
 
 const currencies = router({
-  getBySymbol: publicProcedure.input(z.string()).query(({ input }) => {
+  getBySymbol: publicProcedure.input(currencySymbol).query(({ input }) => {
     return core.currencies.getCurrencyBySymbol(input);
   }),
-  get: publicProcedure
-    .input(z.object({ page: z.number() }))
-    .query(({ input }) => {
-      return core.currencies.getCurrencies(input.page);
-    }),
+  get: publicProcedure.input(z.object({ page })).query(({ input }) => {
+    return core.currencies.getCurrencies(input.page);
+  }),
 });
 
 export default currencies;

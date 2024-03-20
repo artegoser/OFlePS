@@ -7,6 +7,7 @@
 
   import { getToastStore, type ToastSettings } from '@skeletonlabs/skeleton';
   import TextInput from '$lib/components/TextInput.svelte';
+  import { trigger_error } from '$lib';
 
   const toastStore = getToastStore();
   const user: Writable<Client> = getContext('user');
@@ -27,11 +28,7 @@
 
       goto(`/accounts/${id}`);
     } catch (e: any) {
-      const t: ToastSettings = {
-        message: e.message,
-        background: 'variant-filled-error',
-      };
-      toastStore.trigger(t);
+      trigger_error(toastStore, e);
     }
   }
 </script>

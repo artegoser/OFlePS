@@ -121,18 +121,22 @@ export async function issue({
   amount,
   comment,
   signature,
-  salt,
+  timestamp,
 }: {
   to: string;
   amount: number;
   comment?: string;
   signature: HexString;
-  salt: string;
+  timestamp: number;
 }) {
+  if (timestamp < Date.now() - 2 * 1000) {
+    throw new Error('Invalid timestamp');
+  }
+
   if (
     !ec.verify(
       signature,
-      { from: 'root', to, amount, comment, salt, type: 'issue' },
+      { from: 'root', to, amount, comment, timestamp, type: 'issue' },
       config.root_public_key
     )
   ) {

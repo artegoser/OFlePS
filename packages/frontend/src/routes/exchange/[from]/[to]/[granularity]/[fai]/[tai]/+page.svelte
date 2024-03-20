@@ -25,7 +25,7 @@
 
   import { getContext, onMount } from 'svelte';
   import { writable, type Writable } from 'svelte/store';
-  import { dateToUtc } from '$lib';
+  import { dateToUtc, trigger_error } from '$lib';
 
   import OrderBookComponent from '$lib/components/OrderBook.svelte';
   import BuySell from '$lib/components/BuySell.svelte';
@@ -131,7 +131,7 @@
       triggerSuccess(`Order ${order.id} created`);
       await updateInfo();
     } catch (e: any) {
-      triggerErr(e.message);
+      trigger_error(toastStore, e);
     }
   }
   async function onSell() {
@@ -148,16 +148,8 @@
       triggerSuccess(`Order ${order.id} created`);
       await updateInfo();
     } catch (e: any) {
-      triggerErr(e.message);
+      trigger_error(toastStore, e);
     }
-  }
-
-  function triggerErr(message: string) {
-    const t: ToastSettings = {
-      message: message,
-      background: 'variant-filled-error',
-    };
-    toastStore.trigger(t);
   }
 
   function triggerSuccess(message: string) {

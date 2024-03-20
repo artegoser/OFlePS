@@ -121,6 +121,6 @@ export function parseGranularity(granularity: string) {
   return { value, unit, ms, cutoff, granularity };
 }
 
-import { totp } from 'botp';
+import { totp } from 'neotp';
 
 export { totp };

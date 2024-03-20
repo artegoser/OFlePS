@@ -17,15 +17,22 @@ import { router, publicProcedure, privateProcedure } from '../config/trpc.js';
 import { z } from 'zod';
 import core from '../core/main.js';
 import { config } from '../config/app.service.js';
+import {
+  account_id,
+  amount,
+  currencySymbol,
+  granularity,
+  page,
+} from '../types/schema.js';
 
 const exchange = router({
   getGranularities: publicProcedure.query(() => config.granularities),
   getTradingSchedule: publicProcedure
     .input(
       z.object({
-        fromCurrencySymbol: z.string(),
-        toCurrencySymbol: z.string(),
-        granularity: z.string(),
+        fromCurrencySymbol: currencySymbol,
+        toCurrencySymbol: currencySymbol,
+        granularity: granularity,
       })
     )
     .query(({ input }) => {
@@ -38,9 +45,9 @@ const exchange = router({
   getOrderBook: publicProcedure
     .input(
       z.object({
-        fromCurrencySymbol: z.string(),
-        toCurrencySymbol: z.string(),
-        page: z.number(),
+        fromCurrencySymbol: currencySymbol,
+        toCurrencySymbol: currencySymbol,
+        page,
       })
     )
     .query(({ input }) => {
@@ -63,12 +70,12 @@ const exchange = router({
   sell: privateProcedure
     .input(
       z.object({
-        fromAccountId: z.string(),
-        toAccountId: z.string(),
-        fromCurrencySymbol: z.string(),
-        toCurrencySymbol: z.string(),
-        quantity: z.number(),
-        price: z.number(),
+        fromAccountId: account_id,
+        toAccountId: account_id,
+        fromCurrencySymbol: currencySymbol,
+        toCurrencySymbol: currencySymbol,
+        quantity: amount,
+        price: amount,
       })
     )
     .mutation(({ input, ctx }) => {
@@ -86,12 +93,12 @@ const exchange = router({
   buy: privateProcedure
     .input(
       z.object({
-        fromAccountId: z.string(),
-        toAccountId: z.string(),
-        fromCurrencySymbol: z.string(),
-        toCurrencySymbol: z.string(),
-        quantity: z.number(),
-        price: z.number(),
+        fromAccountId: account_id,
+        toAccountId: account_id,
+        fromCurrencySymbol: currencySymbol,
+        toCurrencySymbol: currencySymbol,
+        quantity: amount,
+        price: amount,
       })
     )
     .mutation(({ input, ctx }) => {

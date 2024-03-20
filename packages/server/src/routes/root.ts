@@ -22,19 +22,27 @@ import {
   setBlockAccount,
   setBlockUser,
 } from '../core/main/root.js';
+import {
+  account_id,
+  alias,
+  comment,
+  currencySymbol,
+  description,
+  name,
+} from '../types/schema.js';
 
 export const root = router({
   setBlockUser: publicProcedure
     .input(
       z.object({
-        userPk: z.string(),
+        alias,
         block: z.boolean(),
         signature: z.string(),
       })
     )
     .mutation(({ input }) => {
       return setBlockUser(
-        input.userPk as HexString,
+        input.alias,
         input.block,
         input.signature as HexString
       );
@@ -42,14 +50,14 @@ export const root = router({
   setApproveUser: publicProcedure
     .input(
       z.object({
-        userPk: z.string(),
+        alias,
         approve: z.boolean(),
         signature: z.string(),
       })
     )
     .mutation(({ input }) => {
       return setApproveUser(
-        input.userPk as HexString,
+        input.alias,
         input.approve,
         input.signature as HexString
       );
@@ -57,7 +65,7 @@ export const root = router({
   setBlockAccount: publicProcedure
     .input(
       z.object({
-        accountId: z.string(),
+        accountId: account_id,
         block: z.boolean(),
         signature: z.string(),
       })
@@ -72,9 +80,9 @@ export const root = router({
   addCurrency: publicProcedure
     .input(
       z.object({
-        symbol: z.string(),
-        name: z.string(),
-        description: z.string(),
+        symbol: currencySymbol,
+        name,
+        description,
         type: z.string().optional(),
         signature: z.string(),
       })
@@ -91,11 +99,11 @@ export const root = router({
   issue: publicProcedure
     .input(
       z.object({
-        to: z.string(),
+        to: account_id,
         amount: z.number(),
-        comment: z.string().optional(),
+        comment,
         signature: z.string(),
-        salt: z.string(),
+        timestamp: z.number(),
       })
     )
     .mutation(({ input }) => {
@@ -103,7 +111,7 @@ export const root = router({
         to: input.to,
         amount: input.amount,
         comment: input.comment,
-        salt: input.salt,
+        timestamp: input.timestamp,
         signature: input.signature as HexString,
       });
     }),

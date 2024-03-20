@@ -1,9 +1,7 @@
 <script lang="ts">
-  import { browser } from '$app/environment';
   import { goto } from '$app/navigation';
   import Toggle from '$lib/components/Toggle.svelte';
   import type { Client } from '@ofleps/client';
-  import type { HexString } from '@ofleps/utils';
   import type { ToastSettings } from '@skeletonlabs/skeleton';
   import { getContext } from 'svelte';
   import type { Writable } from 'svelte/store';
@@ -11,6 +9,7 @@
   import Form from '$lib/components/Form.svelte';
   import TextInput from '$lib/components/TextInput.svelte';
   import Cookies from 'js-cookie';
+  import { trigger_error } from '$lib';
 
   const toastStore = getToastStore();
 
@@ -23,7 +22,6 @@
   let password: string = '';
   let name: string = '';
   let email: string = '';
-  let privateKey: string = '';
 
   const user: Writable<Client> = getContext('user');
 
@@ -41,11 +39,7 @@
 
       goto('/my');
     } catch (e: any) {
-      const t: ToastSettings = {
-        message: e.message,
-        background: 'variant-filled-error',
-      };
-      toastStore.trigger(t);
+      trigger_error(toastStore, e);
     }
   }
 </script>

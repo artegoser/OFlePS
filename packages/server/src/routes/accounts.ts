@@ -16,9 +16,10 @@
 import { router, privateProcedure } from '../config/trpc.js';
 import { z } from 'zod';
 import core from '../core/main.js';
+import { alias, currencySymbol, description, name } from '../types/schema.js';
 
 const accounts = router({
-  getById: privateProcedure.input(z.string()).query(({ input, ctx }) => {
+  getById: privateProcedure.input(alias).query(({ input, ctx }) => {
     return core.account.getAccountById(input, ctx.user);
   }),
   get: privateProcedure.query(({ ctx }) => {
@@ -27,10 +28,10 @@ const accounts = router({
   create: privateProcedure
     .input(
       z.object({
-        alias: z.string(),
-        name: z.string(),
-        description: z.string(),
-        currencySymbol: z.string(),
+        alias,
+        name,
+        description,
+        currencySymbol,
       })
     )
     .mutation(({ input, ctx }) => {

@@ -16,7 +16,7 @@
 import type { AppRouter } from '@ofleps/server';
 import { createTRPCProxyClient, httpBatchLink } from '@trpc/client';
 
-import { ec, genSalt, HexString } from '@ofleps/utils';
+import { ec, HexString } from '@ofleps/utils';
 
 export default class Root {
   private _t;
@@ -43,11 +43,11 @@ export default class Root {
     return this._publicKey;
   }
 
-  setBlockUser(userPk: HexString, block: boolean) {
-    const signature = ec.sign({ userPk, block }, this._privateKey);
+  setBlockUser(alias: string, block: boolean) {
+    const signature = ec.sign({ alias, block }, this._privateKey);
 
     return this._t.root.setBlockUser.mutate({
-      userPk,
+      alias,
       block,
       signature,
     });
@@ -63,11 +63,11 @@ export default class Root {
     });
   }
 
-  setApproveUser(userPk: HexString, approve: boolean) {
-    const signature = ec.sign({ userPk, approve }, this._privateKey);
+  setApproveUser(alias: string, approve: boolean) {
+    const signature = ec.sign({ alias, approve }, this._privateKey);
 
     return this._t.root.setApproveUser.mutate({
-      userPk,
+      alias,
       approve,
       signature,
     });
@@ -111,8 +111,8 @@ export default class Root {
    * @return {ReturnType} the result of the issue operation
    */
   issue(to: string, amount: number, comment?: string) {
-    const salt = genSalt();
     const commentTx = `Issued by root${comment ? `: ${comment}` : ''}`;
+    const timestamp = Date.now();
 
     const signature = ec.sign(
       {
@@ -120,7 +120,7 @@ export default class Root {
         to,
         amount,
         comment: commentTx,
-        salt,
+        timestamp,
         type: 'issue',
       },
       this._privateKey
@@ -131,7 +131,7 @@ export default class Root {
       amount,
       comment: commentTx,
       signature,
-      salt,
+      timestamp,
     });
   }
 }

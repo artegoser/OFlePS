@@ -16,6 +16,7 @@
 import { router, publicProcedure, privateProcedure } from '../config/trpc.js';
 import { z } from 'zod';
 import core from '../core/main.js';
+import { code, description, method, name, params } from '../types/schema.js';
 
 const smartContracts = router({
   getById: publicProcedure.input(z.string()).query(({ input }) => {
@@ -24,9 +25,9 @@ const smartContracts = router({
   create: privateProcedure
     .input(
       z.object({
-        name: z.string(),
-        description: z.string(),
-        code: z.string(),
+        name,
+        description,
+        code,
       })
     )
     .mutation(({ input, ctx }) => {
@@ -42,8 +43,8 @@ const smartContracts = router({
       z.object({
         id: z.string(),
         request: z.object({
-          method: z.string(),
-          params: z.array(z.string().or(z.number()).or(z.boolean())),
+          method,
+          params,
         }),
       })
     )
