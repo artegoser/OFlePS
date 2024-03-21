@@ -91,7 +91,7 @@
     <Tab bind:group={tabSelected} name="Exchange" value={1}>Exchange</Tab>
 
     <svelte:fragment slot="panel">
-      <div class="flex flex-col gap-2">
+      <div class="flex flex-col gap-2 items-center">
         {#if tabSelected === 0}
           {#if groupedTransactions.transactions.length === 0}
             <div class="text-center">No transactions</div>
@@ -107,17 +107,26 @@
             <ExchangeTransaction {exchange_transaction_data} />
           {/each}
         {/if}
+
+        <hr
+          class="{tabSelected === 0
+            ? 'lg:w-96 w-full'
+            : 'w-full'} rounded-full my-2"
+        />
+        <div
+          class="flex flex-col {tabSelected === 0
+            ? 'lg:w-96 w-full'
+            : 'w-full'}"
+        >
+          {#if groupedTransactions.transactions.length > 0}
+            <div transition:slide>
+              <button class="btn variant-ghost-primary" on:click={nextPage}>
+                Next page
+              </button>
+            </div>
+          {/if}
+        </div>
       </div>
     </svelte:fragment>
   </TabGroup>
-
-  <div class="flex flex-col py-5">
-    {#if groupedTransactions.transactions.length > 0}
-      <div transition:slide>
-        <button class="btn variant-ghost-primary" on:click={nextPage}>
-          Next page
-        </button>
-      </div>
-    {/if}
-  </div>
 </div>

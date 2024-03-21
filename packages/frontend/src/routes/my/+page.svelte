@@ -38,6 +38,16 @@
       Add
     </a>
   </div>
+  {#if data.user?.approved !== true}
+    <div class="text-center text-warning-500">
+      Your account is not approved, please contact support for more information.
+    </div>
+  {/if}
+  {#if data.user?.blocked === true}
+    <div class="text-center text-error-500">
+      Your account is blocked, please contact support for more information.
+    </div>
+  {/if}
   <TabGroup justify="justify-center">
     <Tab bind:group={tabSelected} name="Accounts" value={0}>Accounts</Tab>
     <Tab bind:group={tabSelected} name="Orders" value={1}>Orders</Tab>
@@ -50,11 +60,12 @@
           {#each accounts as account}
             <div
               transition:slide
-              class="lg:w-96 w-full p-5 rounded-2xl flex flex-wrap justify-between items-center gap-2 {account.blocked
-                ? 'variant-soft-error'
+              class="lg:w-96 w-full p-5 rounded-2xl grid grid-cols-3 justify-between items-center gap-2 {account.blocked
+                ? 'variant-ringed-warning'
                 : 'variant-soft-surface'}"
             >
-              <div>
+              <div class="break-words col-span-2">
+                {account.blocked ? 'Blocked ' : ''}
                 {account.name}
                 ({account.balance}
                 {account.currencySymbol})

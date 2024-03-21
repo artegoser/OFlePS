@@ -19,7 +19,7 @@
 >
   <div
     transition:slide
-    class="text-start variant-ghost-surface p-2 px-5 rounded-2xl flex flex-row justify-between lg:items-center items-start gap-2"
+    class="lg:w-96 w-full text-start variant-ghost-surface p-2 px-5 rounded-2xl flex justify-between lg:items-center items-start gap-2"
   >
     <div class="flex flex-col gap-2">
       <div class="font-bold {isIncome ? 'text-success-500' : 'text-error-500'}">
@@ -30,10 +30,6 @@
       <div class="text-center text-sm text-tertiary-500">
         {isIncome ? transaction.from : transaction.to}
       </div>
-    </div>
-
-    <div class="break-all hidden lg:block">
-      {transaction.comment}
     </div>
 
     <div class="flex flex-col gap-2">
@@ -54,15 +50,15 @@
       <pre>{to_pretty_html(transaction)}</pre>
     </div>
   {/if}
-</button>
 
-{#if transaction.comment && !isActive}
-  <div class="flex flex-col ml-10 mr-5 items-end justify-self-end">
-    <div
-      class="break-all p-5 lg:hidden variant-soft-primary rounded-2xl rounded-tr-none"
-      transition:slide
-    >
-      {transaction.comment}
+  {#if transaction.comment && !isActive}
+    <div class="flex flex-col ml-10 mr-5 items-end justify-self-end">
+      <div
+        class="break-all p-5 variant-soft-primary rounded-2xl rounded-tr-none"
+        transition:slide
+      >
+        {transaction.comment}
+      </div>
     </div>
-  </div>
-{/if}
+  {/if}
+</button>

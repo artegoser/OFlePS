@@ -33,7 +33,7 @@
 </script>
 
 <button
-  class="flex flex-col gap-2"
+  class="flex flex-col gap-2 w-full"
   on:click={() => {
     isActive = !isActive;
   }}
