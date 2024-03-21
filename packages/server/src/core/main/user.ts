@@ -19,7 +19,7 @@ import { genSalt } from '@ofleps/utils';
 
 import * as bcrypt from 'bcrypt';
 import { BadRequestError, NotFoundError } from '../../errors/main.js';
-import { jwtSign } from '../../types/auth.js';
+import { jwtSign, JWTPermissions } from '../../types/auth.js';
 import { getPermissions } from '../helpers/getPermissions.js';
 
 export async function registerUser(
@@ -59,7 +59,7 @@ export async function registerUser(
 
 export async function signin(alias: string, password: string) {
   const user = await db.user.findUnique({ where: { alias } });
-  const permissions = await getPermissions(alias);
+  const permissions: JWTPermissions = await getPermissions(alias);
 
   if (!user) {
     throw new NotFoundError(`User with alias: ${alias}`);

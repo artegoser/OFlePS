@@ -17,7 +17,7 @@ import { db } from '../../config/app.service.js';
 import { NotFoundError } from '../../errors/main.js';
 import { SmartIsolate } from '../helpers/smartIsolate.js';
 import { SmartRequest } from '@ofleps/utils';
-import { User } from '../../types/auth.js';
+import { JWTUser } from '../../types/auth.js';
 
 export function getSmartContractById(smartContractId: string) {
   return db.smartContract.findUnique({
@@ -28,7 +28,7 @@ export function getSmartContractById(smartContractId: string) {
 export async function executeSmartContract(
   smartContractId: string,
   reqData: SmartRequest,
-  user: User
+  user: JWTUser
 ) {
   const smartContract = await db.smartContract.findUnique({
     where: { id: smartContractId },
@@ -65,7 +65,7 @@ export async function createSmartContract(
   name: string,
   description: string,
   code: string,
-  user: User
+  user: JWTUser
 ) {
   const smartContract = await db.$transaction(async (tx) => {
     const sc = await tx.smartContract.create({

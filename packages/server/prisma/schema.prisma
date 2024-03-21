@@ -46,22 +46,9 @@ model User {
 model UserPermission {
   userAlias String @id
 
-  // Read
-  getAccounts     Boolean @default(false)
-  getTransactions Boolean @default(false)
-  getOrders       Boolean @default(false)
-
-  // Write
-  createAccounts        Boolean @default(false)
-  blockAccounts         Boolean @default(false)
-  createTransactions    Boolean @default(false)
-  createOrders          Boolean @default(false)
-  cancelOrders          Boolean @default(false)
-  createSmartContracts  Boolean @default(false)
-  executeSmartContracts Boolean @default(false)
-
   // Special
-  issueCurrency String?
+  issueCurrency      Boolean @default(false)
+  issueCurrencyValue String?
 
   // Roles
   root Boolean @default(false)

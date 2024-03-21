@@ -13,13 +13,14 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-import { router, privateProcedure } from '../config/trpc.js';
+import { router, privateProcedure, perms } from '../config/trpc.js';
 import { z } from 'zod';
 import core from '../core/main.js';
 import { account_id, amount, comment, page } from '../types/schema.js';
 
 const transactions = router({
   getByAccountId: privateProcedure
+    .use(perms('getTransactions'))
     .input(
       z.object({
         page,
@@ -33,10 +34,14 @@ const transactions = router({
         ctx
       );
     }),
-  get: privateProcedure.input(page).query(({ input, ctx }) => {
-    return core.transactions.getTransactions(input, ctx);
-  }),
+  get: privateProcedure
+    .use(perms('getTransactions'))
+    .input(page)
+    .query(({ input, ctx }) => {
+      return core.transactions.getTransactions(input, ctx);
+    }),
   transfer: privateProcedure
+    .use(perms('createTransactions'))
     .input(
       z.object({
         from: account_id,

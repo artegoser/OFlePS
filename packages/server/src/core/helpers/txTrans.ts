@@ -15,7 +15,7 @@
 
 import { ForbiddenError } from '../../errors/main.js';
 import type { txDb } from '../../config/app.service.js';
-import { User } from '../../types/auth.js';
+import { JWTUser } from '../../types/auth.js';
 
 export interface TransactionReq {
   from: string;
@@ -27,7 +27,7 @@ export interface TransactionReq {
 
 export async function txTransfer(
   tx: txDb,
-  user: User | null,
+  user: JWTUser | null,
   req: TransactionReq
 ) {
   const { from, to, amount, comment } = req;

@@ -13,7 +13,12 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-import { router, publicProcedure, privateProcedure } from '../config/trpc.js';
+import {
+  router,
+  publicProcedure,
+  privateProcedure,
+  perms,
+} from '../config/trpc.js';
 import { z } from 'zod';
 import core from '../core/main.js';
 import { code, description, method, name, params } from '../types/schema.js';
@@ -23,6 +28,7 @@ const smartContracts = router({
     return core.smartContracts.getSmartContractById(input);
   }),
   create: privateProcedure
+    .use(perms('createSmartContracts'))
     .input(
       z.object({
         name,
@@ -39,6 +45,7 @@ const smartContracts = router({
       );
     }),
   execute: privateProcedure
+    .use(perms('executeSmartContracts'))
     .input(
       z.object({
         id: z.string(),

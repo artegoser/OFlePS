@@ -19,8 +19,9 @@ import jwt from 'jsonwebtoken';
 import { totp } from '@ofleps/utils';
 
 import { CreateHTTPContextOptions } from '@trpc/server/adapters/standalone';
-import { User } from '../types/auth.js';
+import { ContextPermissions, ContextUser, JWTUser } from '../types/auth.js';
 import { ZodError } from 'zod';
+import { mapPermissions } from '../core/helpers/getPermissions.js';
 
 export const createContext = ({ req, res }: CreateHTTPContextOptions) => {
   return { req, res };
@@ -75,7 +76,7 @@ export const privateProcedure = t.procedure.use(async ({ ctx, next }) => {
   }
 
   try {
-    const decoded = <User>jwt.verify(token, config.jwt_secret);
+    const decoded = <JWTUser>jwt.verify(token, config.jwt_secret);
     const isTotpCorrect = totp.verify(totp_token, decoded.totp_key);
 
     if (!isTotpCorrect) {
@@ -85,9 +86,13 @@ export const privateProcedure = t.procedure.use(async ({ ctx, next }) => {
       });
     }
 
-    return next({
-      ctx: decoded,
-    });
+    const context: ContextUser = {
+      alias: decoded.alias,
+      permissions: mapPermissions(decoded.permissions),
+      totp_key: decoded.totp_key,
+    };
+
+    return next({ ctx: context });
   } catch (e) {
     throw new TRPCError({
       code: 'UNAUTHORIZED',
@@ -95,3 +100,40 @@ export const privateProcedure = t.procedure.use(async ({ ctx, next }) => {
     });
   }
 });
+
+export const rootProcedure = privateProcedure.use(async ({ ctx, next }) => {
+  if (!ctx.permissions.root) {
+    throw new TRPCError({
+      code: 'UNAUTHORIZED',
+      cause: 'Permission denied',
+    });
+  }
+
+  return next({ ctx });
+});
+
+export function perms(
+  perms: keyof ContextPermissions | (keyof ContextPermissions)[]
+) {
+  return ({ ctx, next }: any) => {
+    if (typeof perms === 'string') {
+      if (!ctx.permissions[perms]) {
+        throw new TRPCError({
+          code: 'UNAUTHORIZED',
+          cause: 'Permission denied',
+        });
+      }
+    } else {
+      for (const perm of perms) {
+        if (!ctx.permissions[perm]) {
+          throw new TRPCError({
+            code: 'UNAUTHORIZED',
+            cause: 'Permission denied',
+          });
+        }
+      }
+    }
+
+    return next({ ctx });
+  };
+}

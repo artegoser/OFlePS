@@ -13,19 +13,23 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-import { router, privateProcedure } from '../config/trpc.js';
+import { router, privateProcedure, perms } from '../config/trpc.js';
 import { z } from 'zod';
 import core from '../core/main.js';
 import { alias, currencySymbol, description, name } from '../types/schema.js';
 
 const accounts = router({
-  getById: privateProcedure.input(alias).query(({ input, ctx }) => {
-    return core.account.getAccountById(input, ctx);
-  }),
-  get: privateProcedure.query(({ ctx }) => {
+  getById: privateProcedure
+    .use(perms('getAccounts'))
+    .input(alias)
+    .query(({ input, ctx }) => {
+      return core.account.getAccountById(input, ctx);
+    }),
+  get: privateProcedure.use(perms('getAccounts')).query(({ ctx }) => {
     return core.account.getAccountsByUserAlias(ctx.alias);
   }),
   create: privateProcedure
+    .use(perms('createAccounts'))
     .input(
       z.object({
         alias,

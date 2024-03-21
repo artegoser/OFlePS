@@ -17,7 +17,7 @@ import { db } from '../../config/app.service.js';
 import { ForbiddenError, NotFoundError } from '../../errors/main.js';
 import { getUserByAlias } from './user.js';
 import { getCurrencyBySymbol } from './currencies.js';
-import { User } from '../../types/auth.js';
+import { JWTUser } from '../../types/auth.js';
 
 export async function createAccount({
   userObj,
@@ -26,7 +26,7 @@ export async function createAccount({
   description,
   currencySymbol,
 }: {
-  userObj: User;
+  userObj: JWTUser;
   alias: string;
   name: string;
   description: string;
@@ -61,7 +61,7 @@ export async function createAccount({
   });
 }
 
-export async function getAccountById(id: string, user: User) {
+export async function getAccountById(id: string, user: JWTUser) {
   const account = await db.account.findUnique({ where: { id } });
 
   if (!account) {

@@ -19,13 +19,13 @@ import {
   ForbiddenError,
   NotFoundError,
 } from '../../errors/main.js';
-import { User } from '../../types/auth.js';
+import { JWTUser } from '../../types/auth.js';
 import { TransactionReq, txTransfer } from '../helpers/txTrans.js';
 
 export async function getTransactionsByAccountId(
   page: number,
   accountId: string,
-  user: User
+  user: JWTUser
 ) {
   const account = await db.account.findUnique({
     where: {
@@ -60,7 +60,7 @@ export async function getTransactionsByAccountId(
   });
 }
 
-export async function getTransactions(page: number, user: User) {
+export async function getTransactions(page: number, user: JWTUser) {
   const accounts = (
     await db.account.findMany({
       where: {
@@ -93,7 +93,7 @@ export async function getTransactions(page: number, user: User) {
 }
 
 export async function transfer(
-  user: User,
+  user: JWTUser,
   { from, to, amount, comment }: TransactionReq
 ) {
   if (from === to) {

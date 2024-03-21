@@ -16,7 +16,17 @@
 import jwt from 'jsonwebtoken';
 import { config } from '../config/app.service.js';
 
-export interface Permissions {
+export interface JWTPermissions {
+  // Special
+  issueCurrency?: boolean;
+  issueCurrencyValue?: string | null;
+
+  // Roles
+  root?: boolean;
+  user?: boolean;
+}
+
+export interface ContextPermissions extends JWTPermissions {
   // Read
   getAccounts?: boolean;
   getTransactions?: boolean;
@@ -30,21 +40,20 @@ export interface Permissions {
   cancelOrders?: boolean;
   createSmartContracts?: boolean;
   executeSmartContracts?: boolean;
-
-  // Special
-  issueCurrency?: string | null;
-
-  // Roles
-  root?: boolean;
-  user?: boolean;
 }
 
-export interface User {
+export interface JWTUser {
   alias: string;
   totp_key: string;
-  permissions: Permissions;
+  permissions: JWTPermissions;
 }
 
-export function jwtSign(payload: User) {
+export interface ContextUser {
+  alias: string;
+  totp_key: string;
+  permissions: ContextPermissions;
+}
+
+export function jwtSign(payload: JWTUser) {
   return jwt.sign(payload, config.jwt_secret);
 }

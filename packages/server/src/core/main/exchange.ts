@@ -23,7 +23,7 @@ import {
   orderMatch,
   updateTradingSchedule,
 } from '../helpers/exchangeUtils.js';
-import { User } from '../../types/auth.js';
+import { JWTUser } from '../../types/auth.js';
 
 export async function getTradingSchedule(
   fromCurrencySymbol: string,
@@ -39,7 +39,7 @@ export async function getTradingSchedule(
   });
 }
 
-export async function getOrders(user: User) {
+export async function getOrders(user: JWTUser) {
   return await db.order.findMany({
     where: { userAlias: user.alias },
   });
@@ -92,7 +92,7 @@ export async function getOrderBook(
   };
 }
 
-export async function cancelOrder(orderToCancelId: string, user: User) {
+export async function cancelOrder(orderToCancelId: string, user: JWTUser) {
   return await db.$transaction(async (tx) => {
     const order = await tx.order.delete({
       where: {
@@ -137,7 +137,7 @@ async function createOrder(
   toCurrencySymbol: string,
   quantity: number,
   price: number,
-  user: User,
+  user: JWTUser,
   type: boolean // true - buy, false - sell
 ) {
   if (quantity <= 0) throw new ForbiddenError('Set quantity <= 0');
@@ -230,7 +230,7 @@ export function makeBuyOrder(
   quantity: number,
 
   price: number,
-  user: User
+  user: JWTUser
 ) {
   return createOrder(
     fromAccountId,
@@ -251,7 +251,7 @@ export function makeSellOrder(
   toCurrencySymbol: string,
   quantity: number,
   price: number,
-  user: User
+  user: JWTUser
 ) {
   return createOrder(
     fromAccountId,

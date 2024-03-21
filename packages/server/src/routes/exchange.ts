@@ -13,7 +13,12 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-import { router, publicProcedure, privateProcedure } from '../config/trpc.js';
+import {
+  router,
+  publicProcedure,
+  privateProcedure,
+  perms,
+} from '../config/trpc.js';
 import { z } from 'zod';
 import core from '../core/main.js';
 import { config } from '../config/app.service.js';
@@ -57,10 +62,11 @@ const exchange = router({
         input.page
       );
     }),
-  getOrders: privateProcedure.query(({ ctx }) => {
+  getOrders: privateProcedure.use(perms('getOrders')).query(({ ctx }) => {
     return core.exchange.getOrders(ctx);
   }),
   cancel: privateProcedure
+    .use(perms('cancelOrders'))
     .input(
       z.object({
         orderToCancelId: z.string(),
@@ -71,6 +77,7 @@ const exchange = router({
     }),
 
   sell: privateProcedure
+    .use(perms('createOrders'))
     .input(
       z.object({
         fromAccountId: account_id,
@@ -94,6 +101,7 @@ const exchange = router({
     }),
 
   buy: privateProcedure
+    .use(perms('createOrders'))
     .input(
       z.object({
         fromAccountId: account_id,
