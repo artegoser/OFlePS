@@ -51,10 +51,8 @@ export async function signin(alias: string, password: string) {
     throw new NotFoundError(`User with alias: ${alias}`);
   }
 
-  const hashed_password = await bcrypt.hash(password, 10);
-
-  if (user.hashed_password !== hashed_password) {
-    throw new BadRequestError('Invalid password');
+  if (!(await bcrypt.compare(password, user.hashed_password))) {
+    throw new BadRequestError(`Invalid password`);
   }
 
   const totp_key = genSalt();
