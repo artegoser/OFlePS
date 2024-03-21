@@ -19,7 +19,7 @@ import jwt from 'jsonwebtoken';
 import { totp } from '@ofleps/utils';
 
 import { CreateHTTPContextOptions } from '@trpc/server/adapters/standalone';
-import { JWTPayload } from '../types/auth.js';
+import { User } from '../types/auth.js';
 import { ZodError } from 'zod';
 
 export const createContext = ({ req, res }: CreateHTTPContextOptions) => {
@@ -75,7 +75,7 @@ export const privateProcedure = t.procedure.use(async ({ ctx, next }) => {
   }
 
   try {
-    const decoded = <JWTPayload>jwt.verify(token, config.jwt_secret);
+    const decoded = <User>jwt.verify(token, config.jwt_secret);
     const isTotpCorrect = totp.verify(totp_token, decoded.totp_key);
 
     if (!isTotpCorrect) {
@@ -86,7 +86,7 @@ export const privateProcedure = t.procedure.use(async ({ ctx, next }) => {
     }
 
     return next({
-      ctx: { user: decoded.user },
+      ctx: decoded,
     });
   } catch (e) {
     throw new TRPCError({

@@ -20,6 +20,7 @@ import { genSalt } from '@ofleps/utils';
 import * as bcrypt from 'bcrypt';
 import { BadRequestError, NotFoundError } from '../../errors/main.js';
 import { jwtSign } from '../../types/auth.js';
+import { getPermissions } from '../helpers/getPermissions.js';
 
 export async function registerUser(
   alias: string,
@@ -29,23 +30,36 @@ export async function registerUser(
 ) {
   const hashed_password = await bcrypt.hash(password, 10);
   const totp_key = genSalt();
-  const signedJwt = jwtSign({ user: { alias }, totp_key });
-
-  await db.user.create({
-    data: {
-      alias,
-      name,
-      email,
-      hashed_password,
-      approved: config.auto_approve,
-    },
+  const signedJwt = jwtSign({
+    alias,
+    totp_key,
+    permissions: { user: true },
   });
+
+  await db.$transaction([
+    db.user.create({
+      data: {
+        alias,
+        name,
+        email,
+        hashed_password,
+        approved: config.auto_approve,
+      },
+    }),
+    db.userPermission.create({
+      data: {
+        userAlias: alias,
+        user: true,
+      },
+    }),
+  ]);
 
   return { totp_key, jwt: signedJwt };
 }
 
 export async function signin(alias: string, password: string) {
   const user = await db.user.findUnique({ where: { alias } });
+  const permissions = await getPermissions(alias);
 
   if (!user) {
     throw new NotFoundError(`User with alias: ${alias}`);
@@ -56,7 +70,11 @@ export async function signin(alias: string, password: string) {
   }
 
   const totp_key = genSalt();
-  const signedJwt = jwtSign({ user: { alias }, totp_key });
+  const signedJwt = jwtSign({
+    alias,
+    totp_key,
+    permissions,
+  });
 
   return { totp_key, jwt: signedJwt };
 }

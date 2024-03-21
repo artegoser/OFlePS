@@ -40,6 +40,34 @@ model User {
   accounts       Account[]
   SmartContracts SmartContract[]
   Order          Order[]
+  UserPermission UserPermission?
+}
+
+model UserPermission {
+  userAlias String @id
+
+  // Read
+  getAccounts     Boolean @default(false)
+  getTransactions Boolean @default(false)
+  getOrders       Boolean @default(false)
+
+  // Write
+  createAccounts        Boolean @default(false)
+  blockAccounts         Boolean @default(false)
+  createTransactions    Boolean @default(false)
+  createOrders          Boolean @default(false)
+  cancelOrders          Boolean @default(false)
+  createSmartContracts  Boolean @default(false)
+  executeSmartContracts Boolean @default(false)
+
+  // Special
+  issueCurrency String?
+
+  // Roles
+  root Boolean @default(false)
+  user Boolean @default(true)
+
+  userRef User @relation(fields: [userAlias], references: [alias])
 }
 
 model Account {

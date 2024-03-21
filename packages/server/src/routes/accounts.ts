@@ -20,10 +20,10 @@ import { alias, currencySymbol, description, name } from '../types/schema.js';
 
 const accounts = router({
   getById: privateProcedure.input(alias).query(({ input, ctx }) => {
-    return core.account.getAccountById(input, ctx.user);
+    return core.account.getAccountById(input, ctx);
   }),
   get: privateProcedure.query(({ ctx }) => {
-    return core.account.getAccountsByUserAlias(ctx.user.alias);
+    return core.account.getAccountsByUserAlias(ctx.alias);
   }),
   create: privateProcedure
     .input(
@@ -35,7 +35,7 @@ const accounts = router({
       })
     )
     .mutation(({ input, ctx }) => {
-      return core.account.createAccount({ ...input, userObj: ctx.user });
+      return core.account.createAccount({ ...input, userObj: ctx });
     }),
 });
 

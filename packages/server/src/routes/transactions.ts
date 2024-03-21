@@ -30,11 +30,11 @@ const transactions = router({
       return core.transactions.getTransactionsByAccountId(
         input.page,
         input.accountId,
-        ctx.user
+        ctx
       );
     }),
   get: privateProcedure.input(page).query(({ input, ctx }) => {
-    return core.transactions.getTransactions(input, ctx.user);
+    return core.transactions.getTransactions(input, ctx);
   }),
   transfer: privateProcedure
     .input(
@@ -46,7 +46,7 @@ const transactions = router({
       })
     )
     .mutation(({ input, ctx }) => {
-      return core.transactions.transfer(ctx.user, {
+      return core.transactions.transfer(ctx, {
         from: input.from,
         to: input.to,
         amount: input.amount,

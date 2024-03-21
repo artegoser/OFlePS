@@ -50,7 +50,7 @@ const user = router({
     return core.user.getUserByAlias(input);
   }),
   get: privateProcedure.query(({ ctx }) => {
-    return core.user.getUserByAlias(ctx.user.alias);
+    return core.user.getUserByAlias(ctx.alias);
   }),
 });
 

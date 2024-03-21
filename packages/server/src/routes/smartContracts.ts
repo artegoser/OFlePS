@@ -35,7 +35,7 @@ const smartContracts = router({
         input.name,
         input.description,
         input.code,
-        ctx.user
+        ctx
       );
     }),
   execute: privateProcedure
@@ -52,7 +52,7 @@ const smartContracts = router({
       return core.smartContracts.executeSmartContract(
         input.id,
         input.request,
-        ctx.user
+        ctx
       );
     }),
 });

@@ -58,7 +58,7 @@ const exchange = router({
       );
     }),
   getOrders: privateProcedure.query(({ ctx }) => {
-    return core.exchange.getOrders(ctx.user);
+    return core.exchange.getOrders(ctx);
   }),
   cancel: privateProcedure
     .input(
@@ -67,7 +67,7 @@ const exchange = router({
       })
     )
     .mutation(({ input, ctx }) => {
-      return core.exchange.cancelOrder(input.orderToCancelId, ctx.user);
+      return core.exchange.cancelOrder(input.orderToCancelId, ctx);
     }),
 
   sell: privateProcedure
@@ -89,7 +89,7 @@ const exchange = router({
         input.toCurrencySymbol,
         input.quantity,
         input.price,
-        ctx.user
+        ctx
       );
     }),
 
@@ -112,7 +112,7 @@ const exchange = router({
         input.toCurrencySymbol,
         input.quantity,
         input.price,
-        ctx.user
+        ctx
       );
     }),
 });

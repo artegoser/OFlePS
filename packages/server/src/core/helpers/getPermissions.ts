@@ -13,38 +13,30 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-import jwt from 'jsonwebtoken';
-import { config } from '../config/app.service.js';
+import { db } from '../../config/app.service.js';
 
-export interface Permissions {
-  // Read
-  getAccounts?: boolean;
-  getTransactions?: boolean;
-  getOrders?: boolean;
+export async function getPermissions(userAlias: string) {
+  const rawPermissions = await db.userPermission.findUnique({
+    where: { userAlias },
+  });
 
-  // Write
-  createAccounts?: boolean;
-  blockAccounts?: boolean;
-  createTransactions?: boolean;
-  createOrders?: boolean;
-  cancelOrders?: boolean;
-  createSmartContracts?: boolean;
-  executeSmartContracts?: boolean;
+  if (!rawPermissions) {
+    throw new Error('Permissions not found');
+  }
 
-  // Special
-  issueCurrency?: string | null;
-
-  // Roles
-  root?: boolean;
-  user?: boolean;
+  return removeFalseValues(rawPermissions);
 }
 
-export interface User {
-  alias: string;
-  totp_key: string;
-  permissions: Permissions;
-}
+function removeFalseValues<T extends object>(obj: T) {
+  const result: any = {};
 
-export function jwtSign(payload: User) {
-  return jwt.sign(payload, config.jwt_secret);
+  for (const key in obj) {
+    if (obj[key] !== false || obj[key] !== null) {
+      result[key] = obj[key];
+    }
+  }
+
+  delete result.userAlias;
+
+  return result;
 }
