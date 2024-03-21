@@ -23,8 +23,7 @@
   >
     <div class="flex flex-col gap-2">
       <div class="font-bold {isIncome ? 'text-success-500' : 'text-error-500'}">
-        {isIncome ? '+' : '-'}
-        {transaction.amount}
+        {isIncome ? '+' : '-'}{transaction.amount}
         {transaction.currencySymbol}
       </div>
 

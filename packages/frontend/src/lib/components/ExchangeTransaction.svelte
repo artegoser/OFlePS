@@ -43,8 +43,7 @@
     class="text-start variant-ghost-surface p-2 px-5 rounded-2xl flex flex-row justify-between lg:items-center items-start gap-2"
   >
     <div class="font-bold {color}">
-      {isIncome ? '+' : '-'}
-      {transaction.amount}
+      {isIncome ? '+' : '-'}{transaction.amount}
       {transaction.currencySymbol}
     </div>
 

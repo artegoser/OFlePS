@@ -6,6 +6,7 @@
 
   import { ArrowTrendingUp, PlusCircle, Icon } from 'svelte-hero-icons';
   import { Tab, TabGroup } from '@skeletonlabs/skeleton';
+  import Order from '$lib/components/Order.svelte';
 
   export let data;
 
@@ -42,14 +43,14 @@
     <Tab bind:group={tabSelected} name="Orders" value={1}>Orders</Tab>
     <svelte:fragment slot="panel">
       {#if tabSelected === 0}
-        <div class="flex flex-col gap-2">
+        <div class="flex flex-col gap-2 items-center">
           {#if accounts.length === 0}
             <div class="text-center">No accounts</div>
           {/if}
           {#each accounts as account}
             <div
               transition:slide
-              class="p-5 rounded-2xl flex flex-wrap justify-between items-center gap-2 {account.blocked
+              class="lg:w-96 w-full p-5 rounded-2xl flex flex-wrap justify-between items-center gap-2 {account.blocked
                 ? 'variant-soft-error'
                 : 'variant-soft-surface'}"
             >
@@ -68,43 +69,19 @@
           {/each}
         </div>
       {:else}
-        <div class="flex flex-col gap-2">
+        <div class="flex flex-col gap-2 items-center">
           {#if orders.length === 0}
             <div class="text-center">No orders</div>
           {/if}
           {#each orders as order}
-            <div
-              transition:slide
-              class="p-5 rounded-2xl flex flex-wrap justify-between items-center gap-2 {order.type
-                ? 'variant-soft-success'
-                : 'variant-soft-error'}"
-            >
-              <div>
-                {order.fromCurrencySymbol}/{order.toCurrencySymbol}
-              </div>
-
-              <div>
-                {order.type ? 'Buy' : 'Sell'}
-                {order.quantity}
-                {order.fromCurrencySymbol}
-              </div>
-
-              <div>Price: {order.price} {order.toCurrencySymbol}</div>
-
-              <div>{new Date(order.date).toLocaleString()}</div>
-
-              <button
-                type="button"
-                class="btn variant-soft-error"
-                on:click={async () => {
-                  await $user.cancelOrder(order.id);
-                  orders = await $user.getOrders();
-                  accounts = await $user.getAccounts();
-                }}
-              >
-                Cancel
-              </button>
-            </div>
+            <Order
+              {order}
+              onClick={async () => {
+                await $user.cancelOrder(order.id);
+                orders = await $user.getOrders();
+                accounts = await $user.getAccounts();
+              }}
+            />
           {/each}
         </div>
       {/if}
