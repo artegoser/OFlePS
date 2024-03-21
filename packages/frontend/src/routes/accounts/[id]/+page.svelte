@@ -104,15 +104,7 @@
             <div class="text-center">No exchange transactions</div>
           {/if}
           {#each groupedTransactions.exchange as exchange_transaction_data}
-            <ExchangeTransaction
-              {exchange_transaction_data}
-              onClick={() => {
-                showModal(
-                  `Exchange transaction info`,
-                  to_pretty_html(exchange_transaction_data)
-                );
-              }}
-            />
+            <ExchangeTransaction {exchange_transaction_data} />
           {/each}
         {/if}
       </div>

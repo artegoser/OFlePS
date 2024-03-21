@@ -194,10 +194,14 @@ export default class Client {
     }[] = [];
 
     for (const transaction of non_grouped_transactions) {
-      if (transaction.comment.startsWith('@exchange')) {
+      if (transaction?.comment?.startsWith('@exchange')) {
+        const data = JSON.parse(transaction.comment.slice(9));
+
+        transaction.comment = null;
+
         exchange.push({
           transaction,
-          data: JSON.parse(transaction.comment.slice(9)),
+          data,
         });
       } else {
         transactions.push(transaction);
