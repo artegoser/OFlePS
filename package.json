@@ -10,14 +10,14 @@
   },
   "devDependencies": {
     "@types/eslint": "8.56.0",
-    "@types/node": "^20.11.27",
+    "@types/node": "^20.11.30",
     "@typescript-eslint/eslint-plugin": "^6.21.0",
     "@typescript-eslint/parser": "^6.21.0",
     "eslint": "^8.57.0",
     "lerna": "^8.1.2",
     "prettier": "^3.2.5",
     "tsc-watch": "^6.0.4",
-    "typescript": "^5.4.2"
+    "typescript": "^5.4.3"
   },
   "resolutions": {
     "@noble/ed25519": "^2.0.0",

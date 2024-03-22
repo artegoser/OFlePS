@@ -34,7 +34,6 @@
       }
 
       localStorage.setItem('jwt_t', $user.jwt!);
-      localStorage.setItem('totp_k', $user.totp_key!);
       Cookies.set('user_alias', alias);
 
       goto('/my');

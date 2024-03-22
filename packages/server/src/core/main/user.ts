@@ -15,8 +15,6 @@
 
 import { db, config } from '../../config/app.service.js';
 
-import { genSalt } from '@ofleps/utils';
-
 import * as bcrypt from 'bcrypt';
 import { BadRequestError, NotFoundError } from '../../errors/main.js';
 import { jwtSign, JWTPermissions } from '../../types/auth.js';
@@ -32,10 +30,9 @@ export async function registerUser(
     password,
     alias === 'root' ? 14 : 10
   );
-  const totp_key = genSalt();
+
   const signedJwt = jwtSign({
     alias,
-    totp_key,
     permissions: { user: true, ...(alias === 'root' ? { root: true } : {}) },
   });
 
@@ -49,7 +46,7 @@ export async function registerUser(
     },
   });
 
-  return { totp_key, jwt: signedJwt };
+  return { jwt: signedJwt };
 }
 
 export async function signin(alias: string, password: string) {
@@ -64,14 +61,12 @@ export async function signin(alias: string, password: string) {
     throw new BadRequestError(`Invalid password`);
   }
 
-  const totp_key = genSalt();
   const signedJwt = jwtSign({
     alias,
-    totp_key,
     permissions: { ...permissions, user: true },
   });
 
-  return { totp_key, jwt: signedJwt };
+  return { jwt: signedJwt };
 }
 
 export async function getUserByAlias(alias: string) {

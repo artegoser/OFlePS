@@ -42,10 +42,9 @@ export interface JWTPermissions {
 
 export interface JWTUser {
   alias: string;
-  totp_key: string;
   permissions: JWTPermissions;
 }
 
 export function jwtSign(payload: JWTUser) {
-  return jwt.sign(payload, config.jwt_secret);
+  return jwt.sign(payload, config.jwt_secret, { expiresIn: '1d' });
 }

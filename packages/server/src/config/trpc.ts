@@ -16,7 +16,6 @@
 import { initTRPC, TRPCError } from '@trpc/server';
 import { config } from './app.service.js';
 import jwt from 'jsonwebtoken';
-import { totp } from '@ofleps/utils';
 
 import { CreateHTTPContextOptions } from '@trpc/server/adapters/standalone';
 import { JWTPermissions, JWTUser } from '../types/auth.js';
@@ -51,45 +50,21 @@ export const publicProcedure = t.procedure;
 export const router = t.router;
 
 export const privateProcedure = t.procedure.use(async ({ ctx, next }) => {
-  const token = ctx.req.headers.authorization?.split(' ')[1];
-  const totp_token = ctx.req.headers['x-totp'];
+  const jwt_token = ctx.req.headers.authorization?.split(' ')[1];
 
-  if (!token) {
+  if (!jwt_token) {
     throw new TRPCError({
       code: 'UNAUTHORIZED',
       cause: 'No jwt token provided in authorization header',
     });
   }
 
-  if (!totp_token) {
-    throw new TRPCError({
-      code: 'UNAUTHORIZED',
-      cause: 'No totp token provided in X-TOTP header',
-    });
-  }
-
-  if (typeof totp_token !== 'string') {
-    throw new TRPCError({
-      code: 'BAD_REQUEST',
-      cause: 'X-TOTP header invalid',
-    });
-  }
-
   try {
-    const decoded = <JWTUser>jwt.verify(token, config.jwt_secret);
-    const isTotpCorrect = totp.verify(totp_token, decoded.totp_key);
-
-    if (!isTotpCorrect) {
-      throw new TRPCError({
-        code: 'UNAUTHORIZED',
-        cause: 'invalid totp token',
-      });
-    }
+    const decoded = <JWTUser>jwt.verify(jwt_token, config.jwt_secret);
 
     const context: JWTUser = {
       alias: decoded.alias,
       permissions: mapPermissions(decoded.permissions),
-      totp_key: decoded.totp_key,
     };
 
     return next({ ctx: context });

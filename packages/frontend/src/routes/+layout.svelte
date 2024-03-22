@@ -20,9 +20,8 @@
   import { env } from '$env/dynamic/public';
   import { Client } from '@ofleps/client';
   import { writable, type Writable } from 'svelte/store';
-  import { onMount, setContext } from 'svelte';
+  import { setContext } from 'svelte';
   import { afterNavigate, goto } from '$app/navigation';
-  import type { HexString } from '@ofleps/utils';
   import { browser } from '$app/environment';
   import { page } from '$app/stores';
 
@@ -33,12 +32,11 @@
     if (browser) {
       if ($user.jwt) return;
       const savedJWT = window.localStorage.getItem('jwt_t');
-      const savedTOTP = window.localStorage.getItem('totp_k');
-      if (!savedJWT || !savedTOTP) {
+      if (!savedJWT) {
         if ($page.url.pathname !== '/auth') goto('/auth');
       } else {
         try {
-          await $user.setCredentials(savedJWT, savedTOTP);
+          await $user.setCredentials(savedJWT);
 
           if (window.sessionStorage.getItem('loggedIn') !== 'true') {
             try {
@@ -46,7 +44,6 @@
               window.sessionStorage.setItem('loggedIn', 'true');
             } catch {
               window.localStorage.removeItem('jwt_t');
-              window.localStorage.removeItem('totp_k');
               goto('/auth');
             }
           }

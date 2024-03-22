@@ -17,7 +17,7 @@ import { createTRPCProxyClient, httpLink } from '@trpc/client';
 
 import type { AppRouter, ExchangeCommentData } from '@ofleps/server';
 
-import { SmartRequest, totp } from '@ofleps/utils';
+import { SmartRequest } from '@ofleps/utils';
 import { ITransferArgs } from './types/client.js';
 
 export default class Client {
@@ -25,7 +25,6 @@ export default class Client {
 
   private _jwt?: string;
   private _t;
-  private _totp_key?: string;
 
   // #endregion Properties (3)
 
@@ -39,7 +38,6 @@ export default class Client {
           headers: (() => {
             return {
               Authorization: `Bearer ${this._jwt}`,
-              'x-totp': totp.gen(this._totp_key || ''),
             };
           }).bind(this),
         }),
@@ -53,10 +51,6 @@ export default class Client {
 
   public get jwt() {
     return this._jwt;
-  }
-
-  public get totp_key() {
-    return this._totp_key;
   }
 
   // #endregion Public Getters And Setters (2)
@@ -233,7 +227,6 @@ export default class Client {
     });
 
     this._jwt = res.jwt;
-    this._totp_key = res.totp_key;
 
     return res;
   }
@@ -304,16 +297,14 @@ export default class Client {
     );
   }
 
-  public async setCredentials(jwt: string, totp_key: string) {
+  public async setCredentials(jwt: string) {
     this._jwt = jwt;
-    this._totp_key = totp_key;
   }
 
   public async signin(alias: string, password: string) {
     const res = await this._t.user.signin.query({ alias, password });
 
     this._jwt = res.jwt;
-    this._totp_key = res.totp_key;
 
     return res;
   }

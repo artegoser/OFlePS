@@ -18,8 +18,8 @@
   "dependencies": {
     "@ofleps/server": "workspace:*",
     "@ofleps/utils": "workspace:*",
-    "@trpc/client": "^10.45.1",
-    "@trpc/server": "^10.45.1",
+    "@trpc/client": "^10.45.2",
+    "@trpc/server": "^10.45.2",
     "jsonwebtoken": "^9.0.2"
   },
   "keywords": [],
