@@ -13,17 +13,14 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-import { HexString } from '@ofleps/utils';
-import { Client, Root } from '../lib.js';
+import { Client } from '../lib.js';
 
 (async () => {
-  const admin = new Root(
-    'http://localhost:3000',
-    'ac601a987ab9a5fcfa076190f4a0643be1ac53842f05f65047240dc8b679f452' as HexString
-  );
+  const admin = new Client('http://localhost:8080');
+  await admin.signin('root', 'root_pass');
 
-  const sender = new Client('http://localhost:3000');
-  const recipient = new Client('http://localhost:3000');
+  const sender = new Client('http://localhost:8080');
+  const recipient = new Client('http://localhost:8080');
 
   await sender.registerUser(
     'sender',
@@ -46,7 +43,7 @@ import { Client, Root } from '../lib.js';
   );
 
   //now admin issues money to sender
-  await admin.issue(senderId, 100, 'issue money to sender');
+  await admin.rootIssueToAccountId(senderId, 100, 'issue money to sender');
 
   const { id: recipientId } = await recipient.createAccount(
     'usd',

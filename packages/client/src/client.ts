@@ -61,7 +61,7 @@ export default class Client {
 
   // #endregion Public Getters And Setters (2)
 
-  // #region Public Methods (23)
+  // #region Public Methods (29)
 
   public buy(
     fromAccountId: string,
@@ -173,12 +173,12 @@ export default class Client {
     });
   }
 
-  public getTransactionsByAccountId(accountId: string, page: number = 1) {
-    return this._t.transactions.getByAccountId.query({ accountId, page });
-  }
-
   public getTransactions(page: number = 1) {
     return this._t.transactions.get.query(page);
+  }
+
+  public getTransactionsByAccountId(accountId: string, page: number = 1) {
+    return this._t.transactions.getByAccountId.query({ accountId, page });
   }
 
   public async getTransactionsGrouped(accountId: string, page: number = 1) {
@@ -238,6 +238,53 @@ export default class Client {
     return res;
   }
 
+  public rootAddCurrency(
+    symbol: string,
+    name: string,
+    description: string,
+    type?: string
+  ) {
+    return this._t.root.addCurrency.mutate({
+      symbol,
+      name,
+      description,
+      type,
+    });
+  }
+
+  public rootApproveUser(userAlias: string, approve: boolean = true) {
+    return this._t.root.setApproveUser.mutate({
+      alias: userAlias,
+      approve,
+    });
+  }
+
+  public rootBlockAccount(accountId: string, block: boolean = true) {
+    return this._t.root.setBlockAccount.mutate({
+      accountId,
+      block,
+    });
+  }
+
+  public rootBlockUser(userAlias: string, block: boolean = true) {
+    return this._t.root.setBlockUser.mutate({
+      alias: userAlias,
+      block,
+    });
+  }
+
+  public rootIssueToAccountId(
+    accountId: string,
+    amount: number,
+    comment?: string
+  ) {
+    return this._t.root.issue.mutate({
+      to: accountId,
+      amount,
+      comment: comment || '',
+    });
+  }
+
   public sell(
     fromAccountId: string,
     toAccountId: string,
@@ -289,7 +336,7 @@ export default class Client {
     });
   }
 
-  // #endregion Public Methods (23)
+  // #endregion Public Methods (29)
 
   // #region Private Methods (1)
 

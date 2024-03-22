@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable no-constant-condition */
 import { HexString } from '@ofleps/utils';
-import { Root } from '../lib.js';
+import { Client } from '../lib.js';
 
 import * as readline from 'node:readline/promises';
 import { stdin as input, stdout as output } from 'node:process';
@@ -9,14 +9,13 @@ import { stdin as input, stdout as output } from 'node:process';
 const rl = readline.createInterface({ input, output });
 
 (async () => {
-  const admin = new Root(
-    'http://localhost:3000',
-    'ac601a987ab9a5fcfa076190f4a0643be1ac53842f05f65047240dc8b679f452' as HexString
-  );
+  const admin = new Client('http://localhost:8080');
+
+  await admin.signin('artegoser', 'fynjy2020');
 
   while (true) {
     eval(
-      `(async () => { console.log(await admin.${await rl.question('> ')}) })()`
+      `(async () => { console.log(await admin.root${await rl.question('> ')}) })()`
     );
   }
 })();

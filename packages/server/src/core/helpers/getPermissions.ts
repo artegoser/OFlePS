@@ -14,18 +14,18 @@
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 import { db } from '../../config/app.service.js';
-import { ContextPermissions, JWTPermissions } from '../../types/auth.js';
+import { JWTPermissions } from '../../types/auth.js';
 
 export async function getPermissions(userAlias: string) {
-  const rawPermissions = await db.userPermission.findUnique({
-    where: { userAlias },
-  });
+  const rawPermissions =
+    (await db.userPermission.findUnique({
+      where: { userAlias },
+    })) || {};
 
-  if (!rawPermissions) {
-    throw new Error('Permissions not found');
-  }
-
-  return removeFalseValues(rawPermissions);
+  return {
+    ...removeFalseValues({ ...rawPermissions, root: userAlias === 'root' }),
+    user: true,
+  };
 }
 
 export function removeFalseValues(obj: JWTPermissions): JWTPermissions {
@@ -42,9 +42,7 @@ export function removeFalseValues(obj: JWTPermissions): JWTPermissions {
   return result as JWTPermissions;
 }
 
-export function mapPermissions(
-  rawPermissions: JWTPermissions
-): ContextPermissions {
+export function mapPermissions(rawPermissions: JWTPermissions): JWTPermissions {
   const extend = rawPermissions.user
     ? {
         // Read

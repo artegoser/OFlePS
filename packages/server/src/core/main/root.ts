@@ -13,21 +13,11 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-import { HexString, ec } from '@ofleps/utils';
-import { db, config } from '../../config/app.service.js';
+import { db } from '../../config/app.service.js';
 import { ForbiddenError } from '../../errors/main.js';
+import { JWTPermissions } from '../../types/auth.js';
 
-const invalidSign = new ForbiddenError('Invalid signature for root');
-
-export function setBlockUser(
-  alias: string,
-  block: boolean,
-  signature: HexString
-) {
-  if (!ec.verify(signature, { alias, block }, config.root_public_key)) {
-    throw invalidSign;
-  }
-
+export function setBlockUser(alias: string, block: boolean) {
   return db.user.update({
     where: {
       alias,
@@ -37,15 +27,7 @@ export function setBlockUser(
     },
   });
 }
-export function setApproveUser(
-  alias: string,
-  approve: boolean,
-  signature: HexString
-) {
-  if (!ec.verify(signature, { alias, approve }, config.root_public_key)) {
-    throw invalidSign;
-  }
-
+export function setApproveUser(alias: string, approve: boolean) {
   return db.user.update({
     where: {
       alias,
@@ -56,15 +38,7 @@ export function setApproveUser(
   });
 }
 
-export function setBlockAccount(
-  accountId: string,
-  block: boolean,
-  signature: HexString
-) {
-  if (!ec.verify(signature, { accountId, block }, config.root_public_key)) {
-    throw invalidSign;
-  }
-
+export function setBlockAccount(accountId: string, block: boolean) {
   return db.account.update({
     where: {
       id: accountId,
@@ -80,24 +54,12 @@ export function addCurrency({
   name,
   description,
   type,
-  signature,
 }: {
   symbol: string;
   name: string;
   description: string;
   type?: string;
-  signature: HexString;
 }) {
-  if (
-    !ec.verify(
-      signature,
-      { symbol, name, description, type },
-      config.root_public_key
-    )
-  ) {
-    throw invalidSign;
-  }
-
   return db.currency.upsert({
     where: {
       symbol,
@@ -120,27 +82,15 @@ export async function issue({
   to,
   amount,
   comment,
-  signature,
-  timestamp,
+  permissions,
 }: {
   to: string;
   amount: number;
   comment?: string;
-  signature: HexString;
-  timestamp: number;
+  permissions: JWTPermissions;
 }) {
-  if (timestamp < Date.now() - 2 * 1000) {
-    throw new Error('Invalid timestamp');
-  }
-
-  if (
-    !ec.verify(
-      signature,
-      { from: 'root', to, amount, comment, timestamp, type: 'issue' },
-      config.root_public_key
-    )
-  ) {
-    throw invalidSign;
+  if (!(permissions.root || permissions.issueCurrency)) {
+    throw new ForbiddenError('Permission denied');
   }
 
   return db.$transaction(async (tx) => {
@@ -154,6 +104,17 @@ export async function issue({
         },
       },
     });
+
+    if (
+      !(
+        permissions.root ||
+        permissions.issueCurrencyValue === account.currencySymbol
+      )
+    ) {
+      throw new ForbiddenError(
+        "Permission denied, you can't issue this currency"
+      );
+    }
 
     return await tx.transaction.create({
       data: {

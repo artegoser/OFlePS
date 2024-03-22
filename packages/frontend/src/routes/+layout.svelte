@@ -27,7 +27,7 @@
   import { page } from '$app/stores';
 
   const user: Writable<Client> = writable();
-  user.set(new Client(env.PUBLIC_OFLEPS_URL || 'http://localhost:3000'));
+  user.set(new Client(env.PUBLIC_OFLEPS_URL || 'http://localhost:8080'));
 
   async function authRedir() {
     if (browser) {

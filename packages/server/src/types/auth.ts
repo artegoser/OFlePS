@@ -21,12 +21,6 @@ export interface JWTPermissions {
   issueCurrency?: boolean;
   issueCurrencyValue?: string | null;
 
-  // Roles
-  root?: boolean;
-  user?: boolean;
-}
-
-export interface ContextPermissions extends JWTPermissions {
   // Read
   getAccounts?: boolean;
   getTransactions?: boolean;
@@ -40,18 +34,16 @@ export interface ContextPermissions extends JWTPermissions {
   cancelOrders?: boolean;
   createSmartContracts?: boolean;
   executeSmartContracts?: boolean;
+
+  // Roles
+  user?: boolean;
+  root?: boolean;
 }
 
 export interface JWTUser {
   alias: string;
   totp_key: string;
   permissions: JWTPermissions;
-}
-
-export interface ContextUser {
-  alias: string;
-  totp_key: string;
-  permissions: ContextPermissions;
 }
 
 export function jwtSign(payload: JWTUser) {

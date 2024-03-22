@@ -67,10 +67,10 @@
   </div>
 
   {#if isActive}
-    <div class="flex flex-col items-end text-start break-all" transition:slide>
-      <pre class="overflow-auto">{to_pretty_html(
-          exchange_transaction_data
-        )}</pre>
-    </div>
+    <pre
+      transition:slide
+      class="text-start break-words whitespace-pre-wrap p-5 variant-soft-tertiary rounded-2xl rounded-tr-none">{to_pretty_html(
+        exchange_transaction_data
+      )}</pre>
   {/if}
 </button>

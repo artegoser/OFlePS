@@ -50,10 +50,6 @@ model UserPermission {
   issueCurrency      Boolean @default(false)
   issueCurrencyValue String?
 
-  // Roles
-  root Boolean @default(false)
-  user Boolean @default(true)
-
   userRef User @relation(fields: [userAlias], references: [alias])
 }
 

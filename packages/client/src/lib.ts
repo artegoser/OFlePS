@@ -14,9 +14,8 @@
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 import Client from './client.js';
-import Root from './root.js';
 
-export { Client, Root };
+export { Client };
 
 import type { inferRouterInputs, inferRouterOutputs } from '@trpc/server';
 import type { AppRouter } from '@ofleps/server';

@@ -13,7 +13,7 @@
 
   const toastStore = getToastStore();
 
-  let type: boolean = true; // false = login, true = register
+  let type: boolean = false; // false = login, true = register
 
   let text = 'Register';
   $: text = type ? 'Register' : 'Login';

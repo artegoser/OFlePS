@@ -19,7 +19,7 @@ import jwt from 'jsonwebtoken';
 import { totp } from '@ofleps/utils';
 
 import { CreateHTTPContextOptions } from '@trpc/server/adapters/standalone';
-import { ContextPermissions, ContextUser, JWTUser } from '../types/auth.js';
+import { JWTPermissions, JWTUser } from '../types/auth.js';
 import { ZodError } from 'zod';
 import { mapPermissions } from '../core/helpers/getPermissions.js';
 
@@ -86,7 +86,7 @@ export const privateProcedure = t.procedure.use(async ({ ctx, next }) => {
       });
     }
 
-    const context: ContextUser = {
+    const context: JWTUser = {
       alias: decoded.alias,
       permissions: mapPermissions(decoded.permissions),
       totp_key: decoded.totp_key,
@@ -101,36 +101,14 @@ export const privateProcedure = t.procedure.use(async ({ ctx, next }) => {
   }
 });
 
-export const rootProcedure = privateProcedure.use(async ({ ctx, next }) => {
-  if (!ctx.permissions.root) {
-    throw new TRPCError({
-      code: 'UNAUTHORIZED',
-      cause: 'Permission denied',
-    });
-  }
-
-  return next({ ctx });
-});
-
-export function perms(
-  perms: keyof ContextPermissions | (keyof ContextPermissions)[]
-) {
+export function perms(...perms: (keyof JWTPermissions)[]) {
   return ({ ctx, next }: any) => {
-    if (typeof perms === 'string') {
-      if (!ctx.permissions[perms]) {
+    for (const perm of perms) {
+      if (!ctx.permissions[perm]) {
         throw new TRPCError({
           code: 'UNAUTHORIZED',
           cause: 'Permission denied',
         });
-      }
-    } else {
-      for (const perm of perms) {
-        if (!ctx.permissions[perm]) {
-          throw new TRPCError({
-            code: 'UNAUTHORIZED',
-            cause: 'Permission denied',
-          });
-        }
       }
     }
 

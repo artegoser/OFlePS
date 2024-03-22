@@ -13,8 +13,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-import { HexString } from '@ofleps/utils';
-import { Client, Root } from '../lib.js';
+import { Client } from '../lib.js';
 
 function wait(ms: number) {
   return new Promise((resolve) => {
@@ -38,13 +37,11 @@ function mapOrderBook(orderBook: any) {
 }
 
 (async () => {
-  const admin = new Root(
-    'http://localhost:3000',
-    'ac601a987ab9a5fcfa076190f4a0643be1ac53842f05f65047240dc8b679f452' as HexString
-  );
+  const admin = new Client('http://localhost:8080');
+  await admin.signin('root', 'root_pass');
 
-  const alice = new Client('http://localhost:3000');
-  const bob = new Client('http://localhost:3000');
+  const alice = new Client('http://localhost:8080');
+  const bob = new Client('http://localhost:8080');
 
   await alice.registerUser('alice', 'alice_pass', 'alice', 'alice@ofleps.io');
   await bob.registerUser('bob', 'bob_pass', 'bob', 'bob@ofleps.io');
@@ -78,8 +75,8 @@ function mapOrderBook(orderBook: any) {
   );
 
   //now admin issues money
-  await admin.issue(afid, 5, 'issue usd to alice');
-  await admin.issue(btid, 500, 'issue rub to bob');
+  await admin.rootIssueToAccountId(afid, 5, 'issue usd to alice');
+  await admin.rootIssueToAccountId(btid, 500, 'issue rub to bob');
 
   // Place multiple limit orders
   await alice.sell(afid, atid, 'USD', 'RUB', 1, 90);

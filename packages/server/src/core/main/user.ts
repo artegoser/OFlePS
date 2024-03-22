@@ -28,31 +28,26 @@ export async function registerUser(
   email: string,
   password: string
 ) {
-  const hashed_password = await bcrypt.hash(password, 10);
+  const hashed_password = await bcrypt.hash(
+    password,
+    alias === 'root' ? 14 : 10
+  );
   const totp_key = genSalt();
   const signedJwt = jwtSign({
     alias,
     totp_key,
-    permissions: { user: true },
+    permissions: { user: true, ...(alias === 'root' ? { root: true } : {}) },
   });
 
-  await db.$transaction([
-    db.user.create({
-      data: {
-        alias,
-        name,
-        email,
-        hashed_password,
-        approved: config.auto_approve,
-      },
-    }),
-    db.userPermission.create({
-      data: {
-        userAlias: alias,
-        user: true,
-      },
-    }),
-  ]);
+  await db.user.create({
+    data: {
+      alias,
+      name,
+      email,
+      hashed_password,
+      approved: config.auto_approve,
+    },
+  });
 
   return { totp_key, jwt: signedJwt };
 }
@@ -73,7 +68,7 @@ export async function signin(alias: string, password: string) {
   const signedJwt = jwtSign({
     alias,
     totp_key,
-    permissions,
+    permissions: { ...permissions, user: true },
   });
 
   return { totp_key, jwt: signedJwt };

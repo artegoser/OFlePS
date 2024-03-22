@@ -13,10 +13,9 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-import { router, publicProcedure } from '../config/trpc.js';
+import { router, privateProcedure } from '../config/trpc.js';
 import { z } from 'zod';
 import core from '../core/main.js';
-import { HexString } from '@ofleps/utils';
 import {
   setApproveUser,
   setBlockAccount,
@@ -31,60 +30,50 @@ import {
   name,
 } from '../types/schema.js';
 
+import { perms } from '../config/trpc.js';
+
 export const root = router({
-  setBlockUser: publicProcedure
+  setBlockUser: privateProcedure
+    .use(perms('root'))
     .input(
       z.object({
         alias,
         block: z.boolean(),
-        signature: z.string(),
       })
     )
     .mutation(({ input }) => {
-      return setBlockUser(
-        input.alias,
-        input.block,
-        input.signature as HexString
-      );
+      return setBlockUser(input.alias, input.block);
     }),
-  setApproveUser: publicProcedure
+  setApproveUser: privateProcedure
+    .use(perms('root'))
     .input(
       z.object({
         alias,
         approve: z.boolean(),
-        signature: z.string(),
       })
     )
     .mutation(({ input }) => {
-      return setApproveUser(
-        input.alias,
-        input.approve,
-        input.signature as HexString
-      );
+      return setApproveUser(input.alias, input.approve);
     }),
-  setBlockAccount: publicProcedure
+  setBlockAccount: privateProcedure
+    .use(perms('root'))
     .input(
       z.object({
         accountId: account_id,
         block: z.boolean(),
-        signature: z.string(),
       })
     )
     .mutation(({ input }) => {
-      return setBlockAccount(
-        input.accountId,
-        input.block,
-        input.signature as HexString
-      );
+      return setBlockAccount(input.accountId, input.block);
     }),
-  addCurrency: publicProcedure
+  addCurrency: privateProcedure
+    .use(perms('root'))
     .input(
       z.object({
         symbol: currencySymbol,
         name,
         description,
         type: z.string().optional(),
-        signature: z.string(),
       })
     )
     .mutation(({ input }) => {
@@ -93,26 +82,22 @@ export const root = router({
         name: input.name,
         description: input.description,
         type: input.type,
-        signature: input.signature as HexString,
       });
     }),
-  issue: publicProcedure
+  issue: privateProcedure
     .input(
       z.object({
         to: account_id,
         amount: z.number(),
         comment,
-        signature: z.string(),
-        timestamp: z.number(),
       })
     )
-    .mutation(({ input }) => {
+    .mutation(({ input, ctx }) => {
       return core.root.issue({
         to: input.to,
         amount: input.amount,
         comment: input.comment,
-        timestamp: input.timestamp,
-        signature: input.signature as HexString,
+        permissions: ctx.permissions,
       });
     }),
 });

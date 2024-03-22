@@ -16,7 +16,7 @@
 import { Client } from '../lib.js';
 
 (async () => {
-  const user = new Client('http://localhost:3000');
+  const user = new Client('http://localhost:8080');
 
   await user.registerUser(
     'sender',

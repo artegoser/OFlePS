@@ -46,19 +46,19 @@
   </div>
 
   {#if isActive}
-    <div class="flex flex-col items-end text-start" transition:slide>
-      <pre>{to_pretty_html(transaction)}</pre>
-    </div>
+    <pre
+      transition:slide
+      class="text-start whitespace-pre-wrap lg:w-96 w-full break-words p-5 variant-soft-tertiary rounded-2xl rounded-tr-none">{to_pretty_html(
+        transaction
+      )}</pre>
   {/if}
 
   {#if transaction.comment && !isActive}
-    <div class="flex flex-col ml-10 mr-5 items-end justify-self-end">
-      <div
-        class="break-all p-5 variant-soft-primary rounded-2xl rounded-tr-none"
-        transition:slide
-      >
-        {transaction.comment}
-      </div>
+    <div
+      class="text-start lg:w-96 w-full break-words p-5 variant-soft-primary rounded-2xl rounded-tr-none"
+      transition:slide
+    >
+      {transaction.comment}
     </div>
   {/if}
 </button>
