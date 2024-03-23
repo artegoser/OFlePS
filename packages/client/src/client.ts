@@ -13,7 +13,13 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-import { createTRPCProxyClient, httpLink } from '@trpc/client';
+import {
+  createTRPCProxyClient,
+  httpLink,
+  createWSClient,
+  wsLink,
+  splitLink,
+} from '@trpc/client';
 
 import type { AppRouter, ExchangeCommentData } from '@ofleps/server';
 
@@ -25,21 +31,30 @@ export default class Client {
 
   private _jwt?: string;
   private _t;
+  private _wst;
 
   // #endregion Properties (3)
 
   // #region Constructors (1)
 
   constructor(baseUrl: string) {
+    const url = new URL(baseUrl);
+    this._wst = createWSClient({
+      url: `ws://${url.host}`,
+    });
+
     this._t = createTRPCProxyClient<AppRouter>({
       links: [
-        httpLink({
-          url: baseUrl,
-          headers: (() => {
-            return {
-              Authorization: `Bearer ${this._jwt}`,
-            };
-          }).bind(this),
+        splitLink({
+          condition(op) {
+            return op.type === 'subscription';
+          },
+          true: wsLink({
+            client: this._wst,
+          }),
+          false: httpLink({
+            url: baseUrl,
+          }),
         }),
       ],
     });
@@ -51,6 +66,10 @@ export default class Client {
 
   public get jwt() {
     return this._jwt;
+  }
+
+  public get orderBookSubscribe(): typeof this._t.exchange.orderBookSubscription.subscribe {
+    return this._t.exchange.orderBookSubscription.subscribe;
   }
 
   // #endregion Public Getters And Setters (2)

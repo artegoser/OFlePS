@@ -13,11 +13,13 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-import { ConfigService } from './config.service.js';
+import { ConfigService } from './config.js';
 import { PrismaClient } from '@prisma/client';
+import { emitter as _emitter } from './emitter.js';
 
 export const db = new PrismaClient();
 export const config = new ConfigService();
+export const emitter = _emitter;
 
 let exchange;
 try {

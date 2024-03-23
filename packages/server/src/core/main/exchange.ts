@@ -24,6 +24,7 @@ import {
   updateTradingSchedule,
 } from '../helpers/exchangeUtils.js';
 import { JWTUser } from '../../types/auth.js';
+import { emitter } from '../../config/emitter.js';
 
 export async function getTradingSchedule(
   fromCurrencySymbol: string,
@@ -218,6 +219,15 @@ async function createOrder(
       );
     }
   }
+
+  emitter.emit(
+    'new_order',
+    fromCurrencySymbol,
+    toCurrencySymbol,
+    price,
+    quantity,
+    type
+  );
 
   return order;
 }

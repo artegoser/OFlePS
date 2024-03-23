@@ -21,12 +21,17 @@ import { CreateHTTPContextOptions } from '@trpc/server/adapters/standalone';
 import { JWTPermissions, JWTUser } from '../types/auth.js';
 import { ZodError } from 'zod';
 import { mapPermissions } from '../core/helpers/getPermissions.js';
+import { CreateWSSContextFnOptions } from '@trpc/server/adapters/ws';
 
-export const createContext = ({ req, res }: CreateHTTPContextOptions) => {
+export const createContext = ({
+  req,
+  res,
+}: CreateHTTPContextOptions | CreateWSSContextFnOptions) => {
   return { req, res };
 };
+export type Context = Awaited<ReturnType<typeof createContext>>;
 
-const t = initTRPC.context<Awaited<ReturnType<typeof createContext>>>().create({
+const t = initTRPC.context<Context>().create({
   errorFormatter(opts) {
     const { shape, error } = opts;
     return {

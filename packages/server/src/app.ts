@@ -16,6 +16,9 @@
 import { router, createContext } from './config/trpc.js';
 import { config } from './config/app.service.js';
 import { createHTTPServer } from '@trpc/server/adapters/standalone';
+import { WebSocketServer } from 'ws';
+import { ExchangeCommentData } from './core/helpers/exchangeUtils.js';
+import { applyWSSHandler } from '@trpc/server/adapters/ws';
 import cors from 'cors';
 
 import root from './routes/root.js';
@@ -36,16 +39,22 @@ const appRouter = router({
   exchange,
 });
 
+export type AppRouter = typeof appRouter;
+
 const server = createHTTPServer({
   createContext,
   middleware: cors(),
   router: appRouter,
 });
 
+const wss = new WebSocketServer({ port: config.port });
+applyWSSHandler<AppRouter>({
+  wss,
+  router: appRouter,
+  createContext,
+});
+
 server.listen(config.port, config.host);
 console.log(`server is running at ${config.host}:${config.port}`);
 
-export type AppRouter = typeof appRouter;
-
-import { ExchangeCommentData } from './core/helpers/exchangeUtils.js';
 export { ExchangeCommentData };

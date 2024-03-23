@@ -26,6 +26,7 @@
     "@types/cors": "^2.8.17",
     "@types/deasync": "^0.1.5",
     "@types/jsonwebtoken": "^9.0.6",
+    "@types/ws": "^8.5.10",
     "bcrypt": "^5.1.1",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
@@ -34,6 +35,8 @@
     "number-precision": "^1.6.0",
     "prisma": "^5.11.0",
     "prisma-dbml-generator": "^0.12.0",
+    "typed-emitter": "^2.1.0",
+    "ws": "^8.16.0",
     "zod": "^3.22.4"
   },
   "dependencies": {
