@@ -93,7 +93,7 @@ export async function issue({
     throw new ForbiddenError('Permission denied');
   }
 
-  return db.$transaction(async (tx) => {
+  return await db.$transaction(async (tx) => {
     const account = await tx.account.update({
       where: {
         id: to,

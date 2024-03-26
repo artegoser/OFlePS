@@ -104,7 +104,7 @@ export async function transfer(
     throw new BadRequestError('Amount must be > 0');
   }
 
-  return db.$transaction(async (tx) => {
+  return await db.$transaction(async (tx) => {
     return await txTransfer(tx, user, {
       from,
       to,

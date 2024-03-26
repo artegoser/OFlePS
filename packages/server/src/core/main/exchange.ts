@@ -94,7 +94,7 @@ export async function getOrderBook(
 }
 
 export async function cancelOrder(orderToCancelId: string, user: JWTUser) {
-  return await db.$transaction(async (tx) => {
+  const order = await db.$transaction(async (tx) => {
     const order = await tx.order.delete({
       where: {
         id: orderToCancelId,
@@ -103,10 +103,6 @@ export async function cancelOrder(orderToCancelId: string, user: JWTUser) {
         returnAccount: true,
       },
     });
-
-    if (!order) {
-      throw new ForbiddenError(`Order with id ${orderToCancelId} not found`);
-    }
 
     if (order.returnAccount.userAlias !== user.alias) {
       throw new ForbiddenError(`Cancel orders that is not your's `);
@@ -128,7 +124,17 @@ export async function cancelOrder(orderToCancelId: string, user: JWTUser) {
         quantity: order.quantity,
       }),
     });
+
+    return order;
   });
+
+  emitter.emit(`book ${order.fromCurrencySymbol}/${order.toCurrencySymbol}`, {
+    price: order.price,
+    quantity: order.quantity,
+    type: 'cancel',
+  });
+
+  return order;
 }
 
 async function createOrder(
@@ -198,6 +204,12 @@ async function createOrder(
     return new_order;
   });
 
+  emitter.emit(`book ${fromCurrencySymbol}/${toCurrencySymbol}`, {
+    price,
+    quantity,
+    type: type ? 'buy' : 'sell',
+  });
+
   // Start matching
   let result: MatchResult | undefined;
 
@@ -219,15 +231,6 @@ async function createOrder(
       );
     }
   }
-
-  emitter.emit(
-    'new_order',
-    fromCurrencySymbol,
-    toCurrencySymbol,
-    price,
-    quantity,
-    type
-  );
 
   return order;
 }

@@ -29,8 +29,7 @@ import {
   granularity,
   page,
 } from '../types/schema.js';
-import { observable } from '@trpc/server/observable';
-import { emitter } from '../config/app.service.js';
+import { onEmitter } from '../config/emitter.js';
 
 const exchange = router({
   getGranularities: publicProcedure.query(() => config.granularities),
@@ -72,25 +71,7 @@ const exchange = router({
       })
     )
     .subscription(({ input }) =>
-      observable((emit) => {
-        emitter.on(
-          'new_order',
-          (fromCurrencySymbol, toCurrencySymbol, price, quantity, type) => {
-            if (
-              fromCurrencySymbol === input.fromCurrencySymbol &&
-              toCurrencySymbol === input.toCurrencySymbol
-            ) {
-              emit.next({
-                fromCurrencySymbol,
-                toCurrencySymbol,
-                price,
-                quantity,
-                type,
-              });
-            }
-          }
-        );
-      })
+      onEmitter(`book ${input.fromCurrencySymbol}/${input.toCurrencySymbol}`)
     ),
   getOrders: privateProcedure.use(perms('getOrders')).query(({ ctx }) => {
     return core.exchange.getOrders(ctx);
