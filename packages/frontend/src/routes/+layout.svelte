@@ -28,6 +28,9 @@
   const user: Writable<Client> = writable();
   user.set(new Client(env.PUBLIC_OFLEPS_URL || 'http://localhost:8080'));
 
+  user.subscribe(authRedir);
+  setContext('user', user);
+
   async function authRedir() {
     if (browser) {
       if ($user.jwt) return;
@@ -53,10 +56,6 @@
       }
     }
   }
-
-  user.subscribe(authRedir);
-
-  setContext('user', user);
 
   afterNavigate(() => {
     document.getElementById('page')?.scrollTo(0, 0);

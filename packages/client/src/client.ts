@@ -15,16 +15,18 @@
 
 import {
   createTRPCProxyClient,
-  httpLink,
   createWSClient,
   wsLink,
   splitLink,
+  httpBatchLink,
 } from '@trpc/client';
 
 import type { AppRouter, ExchangeCommentData } from '@ofleps/server';
 
 import { SmartRequest } from '@ofleps/utils';
 import { ITransferArgs } from './types/client.js';
+
+import { WebSocket } from 'ws';
 
 export default class Client {
   // #region Properties (3)
@@ -37,27 +39,46 @@ export default class Client {
 
   // #region Constructors (1)
 
-  constructor(baseUrl: string) {
-    const url = new URL(baseUrl);
-    this._wst = createWSClient({
-      url: `ws://${url.host}`,
-    });
+  constructor(baseUrl: string, wss: boolean = false) {
+    const headers = (() => {
+      return {
+        Authorization: `Bearer ${this._jwt}`,
+      };
+    }).bind(this);
 
-    this._t = createTRPCProxyClient<AppRouter>({
-      links: [
-        splitLink({
-          condition(op) {
-            return op.type === 'subscription';
-          },
-          true: wsLink({
-            client: this._wst,
+    if (wss) {
+      globalThis.WebSocket = WebSocket as any;
+      const url = new URL(baseUrl);
+      this._wst = createWSClient({
+        url: `ws://${url.host}`,
+      });
+
+      this._t = createTRPCProxyClient<AppRouter>({
+        links: [
+          splitLink({
+            condition(op) {
+              return op.type === 'subscription';
+            },
+            true: wsLink({
+              client: this._wst,
+            }),
+            false: httpBatchLink({
+              headers,
+              url: baseUrl,
+            }),
           }),
-          false: httpLink({
+        ],
+      });
+    } else {
+      this._t = createTRPCProxyClient<AppRouter>({
+        links: [
+          httpBatchLink({
+            headers,
             url: baseUrl,
           }),
-        }),
-      ],
-    });
+        ],
+      });
+    }
   }
 
   // #endregion Constructors (1)
