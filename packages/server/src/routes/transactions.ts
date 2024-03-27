@@ -34,6 +34,12 @@ const transactions = router({
         ctx
       );
     }),
+  subscription: privateProcedure
+    .use(perms('getTransactions'))
+    .input(account_id)
+    .subscription(async ({ input, ctx }) => {
+      return await core.account.subscribe(input, ctx);
+    }),
   get: privateProcedure
     .use(perms('getTransactions'))
     .input(page)

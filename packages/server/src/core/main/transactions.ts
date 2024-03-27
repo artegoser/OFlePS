@@ -14,6 +14,7 @@
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 import { db } from '../../config/app.service.js';
+import { emitter } from '../../config/emitter.js';
 import {
   BadRequestError,
   ForbiddenError,
@@ -104,7 +105,7 @@ export async function transfer(
     throw new BadRequestError('Amount must be > 0');
   }
 
-  return await db.$transaction(async (tx) => {
+  const transaction = await db.$transaction(async (tx) => {
     return await txTransfer(tx, user, {
       from,
       to,
@@ -112,4 +113,9 @@ export async function transfer(
       comment,
     });
   });
+
+  emitter.emit(`transaction ${transaction.from}`, transaction);
+  emitter.emit(`transaction ${transaction.to}`, transaction);
+
+  return transaction;
 }

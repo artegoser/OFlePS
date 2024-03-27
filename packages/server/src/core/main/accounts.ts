@@ -18,6 +18,7 @@ import { ForbiddenError, NotFoundError } from '../../errors/main.js';
 import { getUserByAlias } from './user.js';
 import { getCurrencyBySymbol } from './currencies.js';
 import { JWTUser } from '../../types/auth.js';
+import { onEmitter } from '../../config/emitter.js';
 
 export async function createAccount({
   userObj,
@@ -77,4 +78,18 @@ export async function getAccountById(id: string, user: JWTUser) {
 
 export async function getAccountsByUserAlias(userAlias: string) {
   return await db.account.findMany({ where: { userAlias } });
+}
+
+export async function subscribe(accountId: string, user: JWTUser) {
+  const account = await db.account.findUnique({ where: { id: accountId } });
+
+  if (!account) {
+    throw new NotFoundError(`Account with id ${accountId}`);
+  }
+
+  if (account.userAlias !== user.alias) {
+    throw new ForbiddenError('Receiving an account data that is not yours');
+  }
+
+  return onEmitter(`transaction ${accountId}`);
 }

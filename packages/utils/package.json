@@ -15,7 +15,7 @@
   "author": "artegoser",
   "license": "GPL-3.0-or-later",
   "dependencies": {
-    "@noble/ed25519": "^2.0.0",
+    "@noble/ed25519": "^2.1.0",
     "@noble/hashes": "^1.4.0",
     "@paralleldrive/cuid2": "^2.2.2",
     "neotp": "^2.3.3"

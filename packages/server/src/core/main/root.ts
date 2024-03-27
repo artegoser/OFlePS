@@ -14,6 +14,7 @@
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 import { db } from '../../config/app.service.js';
+import { emitter } from '../../config/emitter.js';
 import { ForbiddenError } from '../../errors/main.js';
 import { JWTPermissions } from '../../types/auth.js';
 
@@ -93,7 +94,7 @@ export async function issue({
     throw new ForbiddenError('Permission denied');
   }
 
-  return await db.$transaction(async (tx) => {
+  const transaction = await db.$transaction(async (tx) => {
     const account = await tx.account.update({
       where: {
         id: to,
@@ -127,4 +128,8 @@ export async function issue({
       },
     });
   });
+
+  emitter.emit(`transaction ${transaction.to}`, transaction);
+
+  return transaction;
 }

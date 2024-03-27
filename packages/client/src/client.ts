@@ -62,7 +62,7 @@ export default class Client {
 
   // #endregion Constructors (1)
 
-  // #region Public Getters And Setters (2)
+  // #region Public Getters And Setters (3)
 
   public get jwt() {
     return this._jwt;
@@ -72,7 +72,11 @@ export default class Client {
     return this._t.exchange.orderBookSubscription.subscribe;
   }
 
-  // #endregion Public Getters And Setters (2)
+  public get transactionsSubscribe(): typeof this._t.transactions.subscription.subscribe {
+    return this._t.transactions.subscription.subscribe;
+  }
+
+  // #endregion Public Getters And Setters (3)
 
   // #region Public Methods (29)
 
