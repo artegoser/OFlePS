@@ -22,7 +22,7 @@ Open and flexible payment system (OFlePS) is a federated payment system based on
 - [x] trpc api: OFlePS uses [trpc](https://trpc.io/) to interaction between client and server
 - [x] JavaScript smart contracts: OFlePS uses [isolated-vm](https://github.com/laverdet/isolated-vm) to run JavaScript smart contracts
 - [x] OFlePS uses ed25519 cryptography for inter-server data exchange and JWT for authentication
-- [ ] Support for currency types: (fiat, crypto, stock, )
+- [ ] Support for currency types: (fiat, crypto, stock, bonds)
 - [x] Stock exchange (sell, buy limit orders) (It is not yet possible to cancel orders)
 - [ ] Federated inter-server transactions
 
